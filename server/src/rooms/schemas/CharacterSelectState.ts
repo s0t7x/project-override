@@ -1,0 +1,1 @@
+// Schema defining the state for CharacterSelectRoom (e.g., MapSchema<CharacterSummarySchema> mapping character ID to basic info like name and level).

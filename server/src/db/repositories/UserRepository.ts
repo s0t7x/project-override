@@ -1,0 +1,1 @@
+// Methods for User model CRUD and specific queries (e.g., findByUsername, findByIdWithCharacters).

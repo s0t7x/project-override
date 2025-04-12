@@ -1,0 +1,1 @@
+// Defines shared enums like EntityType, ItemSlot, QuestStatus, FriendStatus, InputActions used by both client and server logic.

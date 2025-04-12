@@ -1,0 +1,1 @@
+// Schema defining the state for WorldLobbyRoom (e.g., MapSchema<RoomListingSchema> mapping room instance ID to details like name, owner, player count).

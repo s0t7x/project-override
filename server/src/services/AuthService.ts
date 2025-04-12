@@ -1,0 +1,1 @@
+// Handles password hashing/comparison (bcrypt), JWT generation/signing, and JWT verification/decoding. Provides methods used by AuthRoom and `onAuth` handlers.

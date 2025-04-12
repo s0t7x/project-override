@@ -1,0 +1,1 @@
+// Attached to NPC entities, defines which quests (Quest IDs) they offer and handles quest start/completion dialogue triggers and reward distribution logic.

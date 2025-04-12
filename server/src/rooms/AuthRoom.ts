@@ -1,0 +1,1 @@
+// Handles user login ('login' message) and registration ('register' message) requests. Uses AuthService for validation/creation, issues JWTs on success, updates AuthRoomState.

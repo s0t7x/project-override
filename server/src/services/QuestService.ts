@@ -1,0 +1,1 @@
+// Handles checking quest prerequisites, updating CharacterQuest progress based on game events (kills, edits, interactions), granting quest rewards (XP, Bytes, items via EconomyService/Inventory).

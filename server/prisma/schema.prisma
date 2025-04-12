@@ -1,0 +1,1 @@
+// Defines the ProjectOverride database schema, models (User, Character, Room, WorldEntity, etc.), relations, and database-level enums.

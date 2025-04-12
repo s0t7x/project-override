@@ -1,0 +1,1 @@
+// Base class representing any object in the game world (players, NPCs, items, blocks). Manages its components collection. Includes unique ID.

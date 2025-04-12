@@ -1,0 +1,1 @@
+// Handles initial anonymous connections for ProjectOverride, potentially provides server info/version, and guides clients towards authentication (e.g., sending a message indicating AuthRoom is needed).

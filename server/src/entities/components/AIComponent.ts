@@ -1,0 +1,1 @@
+// Implements Artificial Intelligence logic for NPCs and Monsters (e.g., state machines for idle/patrol/attack, pathfinding requests, target selection).

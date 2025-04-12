@@ -1,0 +1,1 @@
+// Initializes and exports the singleton PrismaClient instance for all ProjectOverride database interactions.

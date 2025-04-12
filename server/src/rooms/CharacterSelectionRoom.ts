@@ -1,0 +1,1 @@
+// Requires JWT authentication (`onAuth`). Fetches character list for the user (CharacterRepository), handles 'createCharacter' and 'selectCharacter' messages, updates CharacterSelectState.

@@ -1,0 +1,1 @@
+// Manages combat-related data (attack power, defense, crit chance, attack speed, current target), logic (attack execution, cooldowns), and PvP/faction status.

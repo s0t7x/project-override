@@ -1,0 +1,1 @@
+// (Optional) Abstract base Colyseus Room class to hold common ProjectOverride logic like logging utilities, standard error handling, or access to singleton services.

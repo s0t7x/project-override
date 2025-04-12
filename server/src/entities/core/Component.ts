@@ -1,0 +1,1 @@
+// Abstract base class for all components. Defines the 'update' method interface and holds a reference to its parent Entity.

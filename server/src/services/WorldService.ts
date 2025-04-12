@@ -1,0 +1,1 @@
+// Logic for loading map block data from MapData model for a room, processing valid 'editBlock' requests (checking cost via EconomyService, checking permissions via EditableComponent), updating map state, and persisting changes.

@@ -1,0 +1,1 @@
+// Handles logic for guild creation, invites (potentially requires DB storage for invites), member management (join/leave/promote/demote), permission checks for guild actions.

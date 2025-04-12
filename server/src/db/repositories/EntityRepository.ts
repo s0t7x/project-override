@@ -1,0 +1,1 @@
+// Methods for loading BaseEntity templates and loading/saving persistent WorldEntity state/overrides for specific rooms.

@@ -1,0 +1,1 @@
+// Defines rules for players editing this entity or world block (owner CharacterID, currency cost - Bytes/HackChips, required permissions/items). Used by WorldService/Interaction logic.

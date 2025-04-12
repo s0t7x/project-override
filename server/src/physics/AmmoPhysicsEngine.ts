@@ -1,0 +1,1 @@
+// Wrapper class managing an Ammo.js btDiscreteDynamicsWorld instance per GameRoom. Handles body creation/removal synced with entities, steps the simulation, detects and dispatches collision events.

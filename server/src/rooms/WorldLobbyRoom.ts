@@ -1,0 +1,1 @@
+// Requires JWT authentication (`onAuth`). Fetches list of public/private game rooms (RoomRepository), handles 'joinGameRoom' or 'createPlayerRoom' messages. Uses Colyseus matchMaker to find/create GameRoom instances. Updates WorldLobbyState.

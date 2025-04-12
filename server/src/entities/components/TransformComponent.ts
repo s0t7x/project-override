@@ -1,0 +1,1 @@
+// Manages entity's position (x,y,z), rotation (quaternion or Euler), and potentially scale in the game world. Updated by physics or direct control.

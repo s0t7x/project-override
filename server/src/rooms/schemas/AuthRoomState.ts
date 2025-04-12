@@ -1,0 +1,1 @@
+// Schema defining the state synchronized for the AuthRoom (e.g., string status message like 'Logging in...', 'Success', 'Error: Invalid Credentials'). Minimal state.

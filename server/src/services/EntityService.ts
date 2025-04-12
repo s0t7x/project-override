@@ -1,0 +1,1 @@
+// Logic related to entity creation (instantiating from BaseEntity templates), applying persistent overrides from WorldEntity, saving dynamic entity state (like NPC positions in persistent rooms).

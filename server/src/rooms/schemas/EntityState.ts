@@ -1,0 +1,1 @@
+// Schema defining the data structure for each entity synchronized to clients. Includes transform data (x,y,z,rotY), renderable info (model/spriteId), vital stats subset (current HP), potentially current action state. Minimal data for rendering/prediction.

@@ -1,0 +1,1 @@
+// Manages the state and logic of player-to-player trade sessions (handling offers, acceptance, validation, item transfer). Could be managed within GameRoom or as a separate state machine.

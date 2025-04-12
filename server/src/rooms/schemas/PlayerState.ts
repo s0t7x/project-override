@@ -1,0 +1,1 @@
+// Schema defining the data structure for each player entry within GameRoomState. Includes essential data like character name, ID, potentially guild tag, alongside EntityState data.

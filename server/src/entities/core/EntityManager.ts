@@ -1,0 +1,1 @@
+// Manages the lifecycle (creation from template/data, removal, lookup by ID) of Entity instances within a specific GameRoom context. Runs entity updates.

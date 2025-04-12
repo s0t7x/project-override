@@ -1,0 +1,1 @@
+// Stores the latest validated input state (movement vectors, look direction, button presses) received from a player client for processing during the server tick.

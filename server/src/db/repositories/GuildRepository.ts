@@ -1,0 +1,1 @@
+// Methods for Guild and GuildMember CRUD, handling membership checks and permissions.

@@ -1,0 +1,1 @@
+// Methods for Room model CRUD, finding public rooms, checking player ownership/whitelist, loading associated MapData.

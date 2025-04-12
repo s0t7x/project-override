@@ -1,0 +1,1 @@
+// Configures the Colyseus Arena for ProjectOverride, registers all Room types defined in src/rooms/ (e.g., EntryRoom, AuthRoom, GameRoom).
