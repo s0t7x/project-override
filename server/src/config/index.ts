@@ -1,1 +1,0 @@
-// Loads and exports environment variables (DATABASE_URL, JWT_SECRET, SERVER_PORT, etc.) using dotenv. Provides type-safe access to ProjectOverride server config.
