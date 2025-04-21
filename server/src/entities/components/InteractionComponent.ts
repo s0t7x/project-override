@@ -1,1 +1,0 @@
-// Defines how players can interact with this entity (e.g., 'talk', 'open', 'use', 'edit', 'hack'). Contains logic or triggers for interaction messages.

@@ -1,1 +1,0 @@
-// Manages item instances equipped by the entity in specific slots (from shared/enums/ItemSlot). Handles applying/removing stat modifications from equipped gear.

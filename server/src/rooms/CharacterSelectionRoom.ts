@@ -3,7 +3,8 @@
 // handles character creation and selection messages, updates CharacterSelectState.
 
 import { Room, Client, matchMaker } from 'colyseus';
-import { CharacterSelectState, CharacterSummarySchema } from './schemas/CharacterSelectState'; // Import room's schema
+import { CharacterSelectState } from './schemas/CharacterSelectState'; // Import room's schema
+import { CharacterSummaryState } from './schemas/CharacterSummaryState';
 
 // Import services and repositories
 import { authService, AuthService } from '../services/AuthService';
@@ -17,6 +18,7 @@ import {
     IErrorMessagePayload,
     IInfoMessagePayload
 } from 'shared/types';
+import { CharacterCustomizationState } from './schemas/CharacterCustomizationState';
 
 export class CharacterSelectRoom extends Room<CharacterSelectState> {
     // Max characters per user (example)
@@ -70,20 +72,29 @@ export class CharacterSelectRoom extends Room<CharacterSelectState> {
                  return;
              }
 
+            
+            const characterCustomizationState = new CharacterCustomizationState();
+            if(payload.customization) {
+                characterCustomizationState.assign(
+                    payload.customization
+                );
+            }
+
             // Attempt to create character in DB
             try {
                 const newCharacter = await this.characterRepo.create({
                     userId: userId,
                     name: payload.name,
-                    // Pass appearance data if collected from payload
+                    customization: characterCustomizationState
                 });
 
                 if (newCharacter) {
                     // Add new character summary to room state
-                    const summary = new CharacterSummarySchema().assign({
+                    const summary = new CharacterSummaryState().assign({
                         id: newCharacter.id,
                         name: newCharacter.name,
                         level: newCharacter.level,
+                        customization: characterCustomizationState,
                         // Assign appearance data to schema if applicable
                     });
                     this.state.characters.set(newCharacter.id, summary);
@@ -203,11 +214,12 @@ export class CharacterSelectRoom extends Room<CharacterSelectState> {
             characters.forEach(char => {
                 // Avoid adding duplicates if state already populated by another client's join? Usually not needed.
                 if (!this.state.characters.has(char.id)) {
-                    const summary = new CharacterSummarySchema().assign({
+                    const customization = new CharacterCustomizationState().assign(char.equipmentJson as any || {})
+                    const summary = new CharacterSummaryState().assign({
                         id: char.id,
                         name: char.name,
                         level: char.level,
-                        // Assign appearance data if needed
+                        customization
                     });
                     this.state.characters.set(char.id, summary);
                 }

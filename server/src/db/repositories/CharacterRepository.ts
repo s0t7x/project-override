@@ -2,6 +2,7 @@
 // Methods for Character model CRUD operations (create, findById, findByUserId, update state etc.).
 // Abstracts direct Prisma calls for the Character model.
 
+import { CharacterCustomizationState } from '@/rooms/schemas/CharacterCustomizationState';
 import prisma from '../client'; // Use the singleton Prisma client instance
 import { Character, Prisma } from '@prisma/client'; // Import Character type and Prisma namespace for JsonValue type
 
@@ -9,6 +10,7 @@ import { Character, Prisma } from '@prisma/client'; // Import Character type and
 type CharacterCreationData = {
     userId: string;
     name: string;
+    customization: CharacterCustomizationState;
     // Add optional fields that might be provided at creation (e.g., appearance details)
     // statsJson?: Prisma.JsonValue;
     // inventoryJson?: Prisma.JsonValue;
@@ -84,6 +86,7 @@ export class CharacterRepository {
                 data: {
                     userId: data.userId,
                     name: data.name,
+                    customizationJson: JSON.stringify(data.customization)
                     // Spread any other optional initial data provided
                     // statsJson: data.statsJson ?? Prisma.JsonNull, // Set defaults if needed
                     // inventoryJson: data.inventoryJson ?? Prisma.JsonNull,

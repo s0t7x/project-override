@@ -1,1 +1,0 @@
-// Links the entity to an AmmoJS physics body, defines collision properties (shape, mass, friction, group/mask). Reads simulation results back to TransformComponent.

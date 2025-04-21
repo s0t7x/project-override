@@ -1,1 +1,0 @@
-// Holds data needed by the client to render the entity (e.g., model ID, sprite sheet ID, appearance variations like color tint, current visual state like 'running').

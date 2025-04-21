@@ -41,33 +41,7 @@ export interface IWorldLobbyState {
 export interface IEntityState {
     entityId: string;       // The unique ID of this entity instance
     ownerSessionId?: string;// Colyseus client.sessionId if player controlled, otherwise undefined
-    type: EntityType;
-
-    // Transform Component Data
-    position: IVector3;
-    rotation?: IQuaternion | IVector3; // Use Quaternion preferably, or simple Y rotation number
-
-    // Renderable Component Data
-    renderId: string;       // ID linking to asset (model, sprite sheet)
-    appearanceData?: any;   // Extra visual data (tint, specific frame, scale?) - Keep minimal
-
-    // Vitals Component Data (subset)
-    currentHP?: number;
-    maxHP?: number;
-
-    // Combat Component Data (subset)
-    isInCombat?: boolean;
-    targetId?: string;      // ID of the entity this one is currently targeting
-    isPvPEnabled?: boolean; // Only relevant for players
-
-    // Interaction Component Data
-    interactionOptions?: InteractionType[]; // List of available interactions for this entity
-
-    // Editable Component Data (subset)
-    ownerCharacterId?: string; // ID of the character who owns this editable entity/block
-
-    // Other component states needed by client?
-    currentActionState?: string; // e.g., "attacking", "running", "editing"
+    componentStates?: { [componentKey: string]: any }
 }
 
 /** Structure for synchronized player-specific state, often extending or including entity state. */

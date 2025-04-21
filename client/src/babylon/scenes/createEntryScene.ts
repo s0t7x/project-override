@@ -80,19 +80,20 @@ export function createEntryScene(engine: B.Engine, assetService?: AssetService):
     // --- Camera ---
     // Static or slowly rotating camera might be nice. ArcRotate is easy.
     // Centered slightly above origin, looking down a bit
-    // const camera = new B.ArcRotateCamera("bgMapCamera", Math.PI / 4, Math.PI / 4, 20, new B.Vector3(0, 1, 0), scene);
-    // camera.attachControl(true);
-    // camera.lowerRadiusLimit = 5;
-    // camera.upperRadiusLimit = 50;
-    // camera.wheelPrecision = 20; // Slower zoom
-    // camera.radius = 10;
-    // camera.beta = 1;
-    // camera.lowerBetaLimit = 1;
-    // camera.upperBetaLimit = 1;
-    const camera = new B.FreeCamera('bgMapCamera', new B.Vector3(), scene, true);
+    const camera = new B.ArcRotateCamera("bgMapCamera", Math.PI / 4, Math.PI / 4, 20, new B.Vector3(0, 1, 0), scene);
     camera.attachControl(true);
-    camera.minZ = 0.1
-    camera.maxZ = 30000;
+    camera.lowerRadiusLimit = 5;
+    camera.upperRadiusLimit = 50;
+    camera.wheelPrecision = 20; // Slower zoom
+    camera.radius = 10;
+    camera.beta = 1;
+    camera.lowerBetaLimit = 1;
+    camera.upperBetaLimit = 1;
+
+    // const camera = new B.FreeCamera('bgMapCamera', new B.Vector3(), scene, true);
+    // camera.attachControl(true);
+    // camera.minZ = 0.1
+    // camera.maxZ = 30000;
 
     // --- Lighting ---
     // Simple ambient lighting is often enough for a background
@@ -187,30 +188,31 @@ export function createEntryScene(engine: B.Engine, assetService?: AssetService):
     scene.registerBeforeRender(() => {
         const deltaTime = engine.getDeltaTime() / 1000.0; // Delta time in seconds
         const angleChange = .2 * deltaTime;
-        // camera.alpha += angleChange;
-
+        camera.alpha += angleChange;
+        
         if (useGameStore.getState().currentScreen == 'charSelect') {
             nextCameraTarget = cameraCharTarget
             nextCameraRadius = 8;
+            camera.alpha = 0;
         } else {
             nextCameraTarget = cameraDefaultTarget
             nextCameraRadius = 10;
             if (characterPreview.hasTexture()) characterPreview.updateCharacter(null);
         }
 
-        // if (camera.targetScreenOffset !== nextCameraTarget) {
-        //     camera.targetScreenOffset.x += ((nextCameraTarget.x - camera.targetScreenOffset.x) * cameraTargetLerpFactor) * deltaTime;
-        //     camera.targetScreenOffset.y += ((nextCameraTarget.y - camera.targetScreenOffset.y) * cameraTargetLerpFactor) * deltaTime;
+        if (camera.targetScreenOffset !== nextCameraTarget) {
+            camera.targetScreenOffset.x += ((nextCameraTarget.x - camera.targetScreenOffset.x) * cameraTargetLerpFactor) * deltaTime;
+            camera.targetScreenOffset.y += ((nextCameraTarget.y - camera.targetScreenOffset.y) * cameraTargetLerpFactor) * deltaTime;
 
-        //     if (nextCameraTarget.subtract(camera.targetScreenOffset).length() < 0.01) {
-        //         camera.targetScreenOffset.x = nextCameraTarget.x
-        //         camera.targetScreenOffset.y = nextCameraTarget.y
-        //     }
-        // }
+            if (nextCameraTarget.subtract(camera.targetScreenOffset).length() < 0.01) {
+                camera.targetScreenOffset.x = nextCameraTarget.x
+                camera.targetScreenOffset.y = nextCameraTarget.y
+            }
+        }
 
-        // if (camera.radius !== nextCameraRadius) {
-        //     camera.radius += (nextCameraRadius - camera.radius) * cameraRadiusLerpFactor * deltaTime;
-        // }
+        if (camera.radius !== nextCameraRadius) {
+            camera.radius += (nextCameraRadius - camera.radius) * cameraRadiusLerpFactor * deltaTime;
+        }
 
         // DEBUG: Char4 moving
         // const char4MoveSpeed = 1

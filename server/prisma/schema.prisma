@@ -51,6 +51,7 @@ model Character {
   // Inventory & Equipment (Using JSON initially)
   inventoryJson  Json?       // Example: [{ "baseItemId": "sword_01", "quantity": 1, "instanceId": "unique_sword_instance" }, ...]
   equipmentJson  Json?       // Example: { "HAND_PRIMARY": { "baseItemId": "sword_01", ... }, "CHEST": { ... } }
+  customizationJson Json?
 
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
@@ -71,55 +72,16 @@ model Character {
 
 model BaseEntity {
   id                String       @id @default(cuid())
-  name              String       @unique
-  type              EntityType
+  name              String
   defaultComponents Json
 
-  worldEntities     WorldEntity[]
-  baseItems         BaseItem?
+  entityInstances   InstancedEntity[]
 }
 
-model WorldEntity {
-  id                   String     @id @default(cuid())
-  roomId               String
-  room                 Room       @relation(fields: [roomId], references: [id], onDelete: Cascade)
-
+model InstancedEntity {
+  id                   String   @id @default(cuid())
   baseEntityId         String
   baseEntity           BaseEntity @relation(fields: [baseEntityId], references: [id])
-
-  positionX            Float
-  positionY            Float
-  positionZ            Float
-  rotationY            Float?
-
-  componentOverridesJson Json?
-
-  createdAt            DateTime   @default(now())
-  updatedAt            DateTime   @updatedAt
-
-  @@index([roomId])
-  @@index([baseEntityId])
-}
-
-
-// --- World Structure: Items (Templates & Instances) ---
-
-model BaseItem {
-  id                String       @id @default(cuid())
-  baseEntityId      String       @unique
-  baseEntity        BaseEntity   @relation(fields: [baseEntityId], references: [id])
-
-  slot              ItemSlot?
-  stackable         Boolean     @default(false)
-  maxStackSize      Int?
-
-  itemInstances     ItemInstance[]
-}
-
-model ItemInstance {
-  id                   String   @id @default(cuid())
-  baseItemId           String
-  baseItem             BaseItem @relation(fields: [baseItemId], references: [id])
 
   instanceDataJson     Json?       // Example: { "durability": 85, "enchantment": "fire_damage_1" }
 
@@ -133,7 +95,7 @@ model ItemInstance {
 
   // auctionListing  AuctionListing? @relation(fields: [auctionListingId], references: [id]) // Not needed if using snapshot below
 
-  @@index([baseItemId])
+  @@index([baseEntityId])
 }
 
 
@@ -143,6 +105,9 @@ model World {
   id          String @id @default(cuid())
   name        String @unique
   description String?
+
+  entities    Json?
+
   rooms       Room[]
 }
 
@@ -169,8 +134,6 @@ model Room {
   isPlayerOwned   Boolean    @default(false)
 
   whitelistJson   Json?      // List of character IDs allowed if !isPublic and isPlayerOwned
-
-  entities        WorldEntity[]
 
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
@@ -310,16 +273,6 @@ model AuctionListing {
 
 
 // --- Enums Used in Models ---
-
-enum EntityType {
-  PLAYER
-  NPC
-  MONSTER
-  ITEM
-  OBJECT
-  PROJECTILE
-  PORTAL
-}
 
 enum ItemSlot {
   HEAD

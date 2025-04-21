@@ -69,10 +69,13 @@ export interface ITeleportPayload {
 export interface ICreateCharacterPayload {
     name: string;
     // Include appearance customization data
-    appearance: {
-        spriteBaseId: string;
-        colorPalette: string[]; // Example
-        // Add other customization options
+    customization: {
+        baseSpriteSheet: string;
+        baseHue: number;
+        eyesSpriteSheet: string;
+        eyesHue: number;
+        hairSpriteSheet: string;
+        hairHue: number;
     };
 }
 

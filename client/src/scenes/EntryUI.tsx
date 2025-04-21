@@ -42,12 +42,15 @@ export function EntryUI() {
     useEffect(() => {
             if(roomState && roomState.mapDataJson) {
                 const mapData = JSON.parse(roomState.mapDataJson)
-                useWorldStore.setState({ mapChunks: mapData.blockData})
+                console.log("MapData", mapData)
+                if(mapData.blockData) 
+                    useWorldStore.setState({ mapChunks: mapData.blockData})
                 sceneDirector.setupEntryScene(assetService);
                 sceneDirector.getActiveScene()?.executeWhenReady(async () => {
                     await networkService.joinRoom("auth");
                     setCurrentScreen('login');
                 })
+                
             }
         }, [roomState]);
 

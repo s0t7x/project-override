@@ -1,1 +1,0 @@
-// Manages health points (current/max), possibly energy/mana, and other core stats affecting survival and status effects.

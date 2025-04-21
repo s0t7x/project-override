@@ -23,12 +23,13 @@ export class EntryRoom extends Room<EntryRoomState> { // <<< Use State
                     this.state.mapDataJson = JSON.stringify(blockData); // Stringify the JSON
                     console.log(`[EntryRoom ${this.roomId}] Set background map data on state.`);
                 } else {
-                    console.warn(`[EntryRoom ${this.roomId}] Could not load or invalid block data for background map. State will be null.`);
+                    console.warn(`[EntryRoom ${this.roomId}] Could not load or invalid block data for background map. `);
                     // Attempt to fetch again if cache miss? (WorldService handles caching)
+                    this.state.mapDataJson = JSON.stringify({})
                     this.worldService.getMapDataById(this.worldService.PREDEFINED_MAP_IDS.ENTRY_BACKGROUND)
                     .then(mapData => {
                         if(mapData && typeof mapData.blockData === 'object' && mapData.blockData !== null) {
-                            this.state.mapDataJson = JSON.stringify(mapData.blockData);
+                            this.state.mapDataJson = JSON.stringify(mapData.blockData || {});
                             console.log(`[EntryRoom ${this.roomId}] Background map data set after re-fetch.`);
                         }
                     });

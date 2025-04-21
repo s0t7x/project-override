@@ -1,1 +1,0 @@
-// Manages a collection of item instances (referenced by unique ItemInstance IDs) held by the entity, potentially with capacity limits.

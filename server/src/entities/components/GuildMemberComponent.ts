@@ -1,1 +1,0 @@
-// Links a player entity (Character) to their Guild data, storing rank and potentially guild-specific permissions or status.

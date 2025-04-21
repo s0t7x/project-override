@@ -1,1 +1,0 @@
-// Tracks the status (active, completed) and progress of quests accepted by a player entity. References CharacterQuest data.

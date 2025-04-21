@@ -8,6 +8,11 @@ export interface IVector3 {
     y: number;
     z: number;
   }
+
+  export interface IVector2 {
+    x: number;
+    y: number;
+  }
   
   /** Represents a rotation in 3D space using Euler angles (in radians or degrees, be consistent!). */
   export interface IEulerRotation {
