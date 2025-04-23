@@ -63,140 +63,206 @@ const HueShiftSpriteMaterialSnippet = {
     "editorData": {
         "locations": [
             {
-                "blockId": 10,
+                "blockId": 5023,
                 "x": 840,
                 "y": 140,
                 "isCollapsed": false
             },
             {
-                "blockId": 9,
+                "blockId": 5024,
                 "x": 600,
                 "y": 80,
                 "isCollapsed": false
             },
             {
-                "blockId": 7,
+                "blockId": 5025,
                 "x": 320,
                 "y": 0,
                 "isCollapsed": false
             },
             {
-                "blockId": 5,
+                "blockId": 5026,
                 "x": 0,
                 "y": 0,
                 "isCollapsed": false
             },
             {
-                "blockId": 6,
+                "blockId": 5027,
                 "x": 0,
                 "y": 160,
                 "isCollapsed": false
             },
             {
-                "blockId": 8,
+                "blockId": 5028,
                 "x": 300,
                 "y": 220,
                 "isCollapsed": false
             },
             {
-                "blockId": 12,
-                "x": 2260,
+                "blockId": 5029,
+                "x": 2740,
                 "y": 500,
                 "isCollapsed": false
             },
             {
-                "blockId": 85,
-                "x": 0,
-                "y": 500,
+                "blockId": 5030,
+                "x": 2360,
+                "y": -20,
                 "isCollapsed": false
             },
             {
-                "blockId": 152,
-                "x": 300,
-                "y": 880,
+                "blockId": 5031,
+                "x": 1840,
+                "y": 280,
                 "isCollapsed": false
             },
             {
-                "blockId": 167,
-                "x": 820,
-                "y": 340,
+                "blockId": 5032,
+                "x": 1500,
+                "y": 380,
                 "isCollapsed": false
             },
             {
-                "blockId": 182,
-                "x": 1060,
-                "y": 340,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 213,
-                "x": 760,
-                "y": 840,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 230,
-                "x": 500,
-                "y": 980,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 443,
-                "x": 1120,
-                "y": 860,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 478,
+                "blockId": 5033,
                 "x": 1400,
                 "y": 780,
                 "isCollapsed": false
             },
             {
-                "blockId": 497,
-                "x": 1680,
-                "y": 500,
+                "blockId": 5034,
+                "x": 1120,
+                "y": 860,
                 "isCollapsed": false
             },
             {
-                "blockId": 1161,
-                "x": 1880,
-                "y": 320,
+                "blockId": 5035,
+                "x": 1060,
+                "y": 340,
                 "isCollapsed": false
             },
             {
-                "blockId": 2177,
+                "blockId": 5036,
+                "x": 820,
+                "y": 340,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 5037,
                 "x": 400,
                 "y": 440,
                 "isCollapsed": false
             },
             {
-                "blockId": 2330,
+                "blockId": 5038,
+                "x": 0,
+                "y": 500,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 5039,
+                "x": 760,
+                "y": 840,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 5040,
+                "x": 300,
+                "y": 880,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 5041,
+                "x": 500,
+                "y": 980,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 5042,
+                "x": 2120,
+                "y": -120,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 5043,
+                "x": 2160,
+                "y": -400,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 5044,
+                "x": 1740,
+                "y": -420,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 5045,
+                "x": 1560,
+                "y": -360,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 5046,
+                "x": 1320,
+                "y": -300,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 5047,
+                "x": 1040,
+                "y": -280,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 5048,
+                "x": 1560,
+                "y": -60,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 5049,
+                "x": 1200,
+                "y": 40,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 5050,
+                "x": 860,
+                "y": 600,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 5051,
                 "x": 400,
                 "y": 760,
                 "isCollapsed": false
             },
             {
-                "blockId": 2331,
-                "x": 860,
-                "y": 600,
+                "blockId": 5052,
+                "x": 1840,
+                "y": -180,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 5146,
+                "x": 1860,
+                "y": -40,
                 "isCollapsed": false
             }
         ],
         "frames": [],
-        "x": -451.22357227571536,
-        "y": -2.901152949233392,
-        "zoom": 0.6493207775266274
+        "x": -529.2652835908264,
+        "y": 326.0392125774333,
+        "zoom": 0.6657303360494526
     },
     "customType": "BABYLON.NodeMaterial",
     "outputNodes": [
-        10,
-        12
+        5023,
+        5029
     ],
     "blocks": [
         {
             "customType": "BABYLON.VertexOutputBlock",
-            "id": 10,
+            "id": 5023,
             "name": "VertexOutput",
             "comments": "",
             "visibleInInspector": false,
@@ -206,7 +272,7 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "vector",
                     "inputName": "vector",
-                    "targetBlockId": 9,
+                    "targetBlockId": 5024,
                     "targetConnectionName": "output",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -216,7 +282,7 @@ const HueShiftSpriteMaterialSnippet = {
         },
         {
             "customType": "BABYLON.TransformBlock",
-            "id": 9,
+            "id": 5024,
             "name": "WorldPos * ViewProjectionTransform",
             "comments": "",
             "visibleInInspector": false,
@@ -226,7 +292,7 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "vector",
                     "inputName": "vector",
-                    "targetBlockId": 7,
+                    "targetBlockId": 5025,
                     "targetConnectionName": "output",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -234,7 +300,7 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "transform",
                     "inputName": "transform",
-                    "targetBlockId": 8,
+                    "targetBlockId": 5028,
                     "targetConnectionName": "output",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -253,7 +319,7 @@ const HueShiftSpriteMaterialSnippet = {
         },
         {
             "customType": "BABYLON.TransformBlock",
-            "id": 7,
+            "id": 5025,
             "name": "WorldPos",
             "comments": "",
             "visibleInInspector": false,
@@ -263,7 +329,7 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "vector",
                     "inputName": "vector",
-                    "targetBlockId": 5,
+                    "targetBlockId": 5026,
                     "targetConnectionName": "output",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -271,7 +337,7 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "transform",
                     "inputName": "transform",
-                    "targetBlockId": 6,
+                    "targetBlockId": 5027,
                     "targetConnectionName": "output",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -290,7 +356,7 @@ const HueShiftSpriteMaterialSnippet = {
         },
         {
             "customType": "BABYLON.InputBlock",
-            "id": 5,
+            "id": 5026,
             "name": "position",
             "comments": "",
             "visibleInInspector": false,
@@ -304,7 +370,6 @@ const HueShiftSpriteMaterialSnippet = {
             ],
             "type": 8,
             "mode": 1,
-            "systemValue": null,
             "animationType": 0,
             "min": 0,
             "max": 0,
@@ -317,7 +382,7 @@ const HueShiftSpriteMaterialSnippet = {
         },
         {
             "customType": "BABYLON.InputBlock",
-            "id": 6,
+            "id": 5027,
             "name": "World",
             "comments": "",
             "visibleInInspector": false,
@@ -344,7 +409,7 @@ const HueShiftSpriteMaterialSnippet = {
         },
         {
             "customType": "BABYLON.InputBlock",
-            "id": 8,
+            "id": 5028,
             "name": "ViewProjection",
             "comments": "",
             "visibleInInspector": false,
@@ -371,7 +436,7 @@ const HueShiftSpriteMaterialSnippet = {
         },
         {
             "customType": "BABYLON.FragmentOutputBlock",
-            "id": 12,
+            "id": 5029,
             "name": "FragmentOutput",
             "comments": "",
             "visibleInInspector": false,
@@ -384,15 +449,15 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "rgb",
                     "inputName": "rgb",
-                    "targetBlockId": 1161,
-                    "targetConnectionName": "rgb",
+                    "targetBlockId": 5030,
+                    "targetConnectionName": "output",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
                 },
                 {
                     "name": "a",
                     "inputName": "a",
-                    "targetBlockId": 2331,
+                    "targetBlockId": 5050,
                     "targetConnectionName": "output",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -407,8 +472,48 @@ const HueShiftSpriteMaterialSnippet = {
             "useLogarithmicDepth": false
         },
         {
+            "customType": "BABYLON.LerpBlock",
+            "id": 5030,
+            "name": "Lerp",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 4,
+            "inputs": [
+                {
+                    "name": "left",
+                    "inputName": "left",
+                    "targetBlockId": 5031,
+                    "targetConnectionName": "rgb",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "right",
+                    "inputName": "right",
+                    "targetBlockId": 5042,
+                    "targetConnectionName": "rgb",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "gradient",
+                    "inputName": "gradient",
+                    "targetBlockId": 5048,
+                    "targetConnectionName": "output",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "output"
+                }
+            ]
+        },
+        {
             "customType": "BABYLON.ColorConverterBlock",
-            "id": 1161,
+            "id": 5031,
             "name": "ColorConverter",
             "comments": "",
             "visibleInInspector": false,
@@ -423,7 +528,7 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "hsl ",
                     "inputName": "hsl ",
-                    "targetBlockId": 497,
+                    "targetBlockId": 5032,
                     "targetConnectionName": "xyz",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -440,7 +545,7 @@ const HueShiftSpriteMaterialSnippet = {
         },
         {
             "customType": "BABYLON.VectorMergerBlock",
-            "id": 497,
+            "id": 5032,
             "name": "VectorMerger",
             "comments": "",
             "visibleInInspector": false,
@@ -462,7 +567,7 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "x",
                     "inputName": "x",
-                    "targetBlockId": 478,
+                    "targetBlockId": 5033,
                     "targetConnectionName": "output",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -470,7 +575,7 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "y",
                     "inputName": "y",
-                    "targetBlockId": 182,
+                    "targetBlockId": 5035,
                     "targetConnectionName": "y",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -478,7 +583,7 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "z",
                     "inputName": "z",
-                    "targetBlockId": 182,
+                    "targetBlockId": 5035,
                     "targetConnectionName": "z",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -508,7 +613,7 @@ const HueShiftSpriteMaterialSnippet = {
         },
         {
             "customType": "BABYLON.TrigonometryBlock",
-            "id": 478,
+            "id": 5033,
             "name": "Fract",
             "comments": "",
             "visibleInInspector": false,
@@ -518,7 +623,7 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "input",
                     "inputName": "input",
-                    "targetBlockId": 443,
+                    "targetBlockId": 5034,
                     "targetConnectionName": "output",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -533,7 +638,7 @@ const HueShiftSpriteMaterialSnippet = {
         },
         {
             "customType": "BABYLON.AddBlock",
-            "id": 443,
+            "id": 5034,
             "name": "Add",
             "comments": "",
             "visibleInInspector": false,
@@ -543,7 +648,7 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "left",
                     "inputName": "left",
-                    "targetBlockId": 182,
+                    "targetBlockId": 5035,
                     "targetConnectionName": "x",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -551,7 +656,7 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "right",
                     "inputName": "right",
-                    "targetBlockId": 213,
+                    "targetBlockId": 5039,
                     "targetConnectionName": "output",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -565,7 +670,7 @@ const HueShiftSpriteMaterialSnippet = {
         },
         {
             "customType": "BABYLON.VectorSplitterBlock",
-            "id": 182,
+            "id": 5035,
             "name": "VectorSplitter",
             "comments": "",
             "visibleInInspector": false,
@@ -578,7 +683,7 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "xyz ",
                     "inputName": "xyz ",
-                    "targetBlockId": 167,
+                    "targetBlockId": 5036,
                     "targetConnectionName": "hsl",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -613,7 +718,7 @@ const HueShiftSpriteMaterialSnippet = {
         },
         {
             "customType": "BABYLON.ColorConverterBlock",
-            "id": 167,
+            "id": 5036,
             "name": "ColorConverter",
             "comments": "",
             "visibleInInspector": false,
@@ -623,7 +728,7 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "rgb ",
                     "inputName": "rgb ",
-                    "targetBlockId": 2177,
+                    "targetBlockId": 5037,
                     "targetConnectionName": "rgb",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -643,7 +748,7 @@ const HueShiftSpriteMaterialSnippet = {
         },
         {
             "customType": "BABYLON.TextureBlock",
-            "id": 2177,
+            "id": 5037,
             "name": "diffuseTexture",
             "comments": "",
             "visibleInInspector": false,
@@ -653,7 +758,7 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "uv",
                     "inputName": "uv",
-                    "targetBlockId": 85,
+                    "targetBlockId": 5038,
                     "targetConnectionName": "output",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -698,7 +803,7 @@ const HueShiftSpriteMaterialSnippet = {
         },
         {
             "customType": "BABYLON.InputBlock",
-            "id": 85,
+            "id": 5038,
             "name": "uv",
             "comments": "",
             "visibleInInspector": false,
@@ -712,7 +817,6 @@ const HueShiftSpriteMaterialSnippet = {
             ],
             "type": 4,
             "mode": 1,
-            "systemValue": null,
             "animationType": 0,
             "min": 0,
             "max": 0,
@@ -725,7 +829,7 @@ const HueShiftSpriteMaterialSnippet = {
         },
         {
             "customType": "BABYLON.DivideBlock",
-            "id": 213,
+            "id": 5039,
             "name": "Divide",
             "comments": "",
             "visibleInInspector": false,
@@ -735,7 +839,7 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "left",
                     "inputName": "left",
-                    "targetBlockId": 152,
+                    "targetBlockId": 5040,
                     "targetConnectionName": "output",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -743,7 +847,7 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "right",
                     "inputName": "right",
-                    "targetBlockId": 230,
+                    "targetBlockId": 5041,
                     "targetConnectionName": "output",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -757,7 +861,7 @@ const HueShiftSpriteMaterialSnippet = {
         },
         {
             "customType": "BABYLON.InputBlock",
-            "id": 152,
+            "id": 5040,
             "name": "hueShift",
             "comments": "",
             "visibleInInspector": true,
@@ -771,7 +875,6 @@ const HueShiftSpriteMaterialSnippet = {
             ],
             "type": 1,
             "mode": 0,
-            "systemValue": null,
             "animationType": 0,
             "min": 0,
             "max": 0,
@@ -786,7 +889,7 @@ const HueShiftSpriteMaterialSnippet = {
         },
         {
             "customType": "BABYLON.InputBlock",
-            "id": 230,
+            "id": 5041,
             "name": "Float",
             "comments": "",
             "visibleInInspector": false,
@@ -800,7 +903,6 @@ const HueShiftSpriteMaterialSnippet = {
             ],
             "type": 1,
             "mode": 0,
-            "systemValue": null,
             "animationType": 0,
             "min": 0,
             "max": 0,
@@ -814,8 +916,258 @@ const HueShiftSpriteMaterialSnippet = {
             "value": 360
         },
         {
+            "customType": "BABYLON.ColorConverterBlock",
+            "id": 5042,
+            "name": "ColorConverter",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 4,
+            "inputs": [
+                {
+                    "name": "rgb ",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "hsl ",
+                    "inputName": "hsl ",
+                    "targetBlockId": 5043,
+                    "targetConnectionName": "xyz",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "rgb"
+                },
+                {
+                    "name": "hsl"
+                }
+            ]
+        },
+        {
+            "customType": "BABYLON.VectorMergerBlock",
+            "id": 5043,
+            "name": "VectorMerger",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 4,
+            "inputs": [
+                {
+                    "name": "xyzw "
+                },
+                {
+                    "name": "xyz "
+                },
+                {
+                    "name": "xy "
+                },
+                {
+                    "name": "zw "
+                },
+                {
+                    "name": "x",
+                    "inputName": "x",
+                    "targetBlockId": 5044,
+                    "targetConnectionName": "x",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "y",
+                    "inputName": "y",
+                    "targetBlockId": 5052,
+                    "targetConnectionName": "output",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "z",
+                    "inputName": "z",
+                    "targetBlockId": 5146,
+                    "targetConnectionName": "output",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "w"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "xyzw"
+                },
+                {
+                    "name": "xyz"
+                },
+                {
+                    "name": "xy"
+                },
+                {
+                    "name": "zw"
+                }
+            ],
+            "xSwizzle": "x",
+            "ySwizzle": "y",
+            "zSwizzle": "z",
+            "wSwizzle": "w"
+        },
+        {
+            "customType": "BABYLON.VectorSplitterBlock",
+            "id": 5044,
+            "name": "VectorSplitter",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 4,
+            "inputs": [
+                {
+                    "name": "xyzw"
+                },
+                {
+                    "name": "xyz ",
+                    "inputName": "xyz ",
+                    "targetBlockId": 5045,
+                    "targetConnectionName": "hsl",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "xy "
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "xyz"
+                },
+                {
+                    "name": "xy"
+                },
+                {
+                    "name": "zw"
+                },
+                {
+                    "name": "x"
+                },
+                {
+                    "name": "y"
+                },
+                {
+                    "name": "z"
+                },
+                {
+                    "name": "w"
+                }
+            ]
+        },
+        {
+            "customType": "BABYLON.ColorConverterBlock",
+            "id": 5045,
+            "name": "ColorConverter",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 4,
+            "inputs": [
+                {
+                    "name": "rgb ",
+                    "inputName": "rgb ",
+                    "targetBlockId": 5046,
+                    "targetConnectionName": "rgb",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "hsl "
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "rgb"
+                },
+                {
+                    "name": "hsl"
+                }
+            ]
+        },
+        {
+            "customType": "BABYLON.ColorSplitterBlock",
+            "id": 5046,
+            "name": "ColorSplitter",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 4,
+            "inputs": [
+                {
+                    "name": "rgba",
+                    "inputName": "rgba",
+                    "targetBlockId": 5047,
+                    "targetConnectionName": "output",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "rgb "
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "rgb"
+                },
+                {
+                    "name": "r"
+                },
+                {
+                    "name": "g"
+                },
+                {
+                    "name": "b"
+                },
+                {
+                    "name": "a"
+                }
+            ]
+        },
+        {
+            "customType": "BABYLON.InputBlock",
+            "id": 5047,
+            "name": "targetColor",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 1,
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "output"
+                }
+            ],
+            "type": 64,
+            "mode": 0,
+            "animationType": 0,
+            "min": 0,
+            "max": 0,
+            "isBoolean": false,
+            "matrixMode": 0,
+            "isConstant": false,
+            "groupInInspector": "",
+            "convertToGammaSpace": false,
+            "convertToLinearSpace": false,
+            "valueType": "BABYLON.Color4",
+            "value": [
+                0,
+                0,
+                0,
+                0
+            ]
+        },
+        {
             "customType": "BABYLON.MultiplyBlock",
-            "id": 2331,
+            "id": 5052,
             "name": "Multiply",
             "comments": "",
             "visibleInInspector": false,
@@ -825,7 +1177,71 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "left",
                     "inputName": "left",
-                    "targetBlockId": 2177,
+                    "targetBlockId": 5044,
+                    "targetConnectionName": "y",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "right",
+                    "inputName": "right",
+                    "targetBlockId": 5035,
+                    "targetConnectionName": "y",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "output"
+                }
+            ]
+        },
+        {
+            "customType": "BABYLON.MultiplyBlock",
+            "id": 5146,
+            "name": "Multiply",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 4,
+            "inputs": [
+                {
+                    "name": "left",
+                    "inputName": "left",
+                    "targetBlockId": 5044,
+                    "targetConnectionName": "z",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "right",
+                    "inputName": "right",
+                    "targetBlockId": 5035,
+                    "targetConnectionName": "z",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "output"
+                }
+            ]
+        },
+        {
+            "customType": "BABYLON.DivideBlock",
+            "id": 5048,
+            "name": "Divide",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 4,
+            "inputs": [
+                {
+                    "name": "left",
+                    "inputName": "left",
+                    "targetBlockId": 5046,
                     "targetConnectionName": "a",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -833,7 +1249,7 @@ const HueShiftSpriteMaterialSnippet = {
                 {
                     "name": "right",
                     "inputName": "right",
-                    "targetBlockId": 2330,
+                    "targetBlockId": 5049,
                     "targetConnectionName": "output",
                     "isExposedOnFrame": true,
                     "exposedPortPosition": -1
@@ -847,7 +1263,67 @@ const HueShiftSpriteMaterialSnippet = {
         },
         {
             "customType": "BABYLON.InputBlock",
-            "id": 2330,
+            "id": 5049,
+            "name": "Float2",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 1,
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "output"
+                }
+            ],
+            "type": 1,
+            "mode": 0,
+            "animationType": 0,
+            "min": 0,
+            "max": 0,
+            "isBoolean": false,
+            "matrixMode": 0,
+            "isConstant": true,
+            "groupInInspector": "",
+            "convertToGammaSpace": false,
+            "convertToLinearSpace": false,
+            "valueType": "number",
+            "value": 255
+        },
+        {
+            "customType": "BABYLON.MultiplyBlock",
+            "id": 5050,
+            "name": "Multiply",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 4,
+            "inputs": [
+                {
+                    "name": "left",
+                    "inputName": "left",
+                    "targetBlockId": 5037,
+                    "targetConnectionName": "a",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "right",
+                    "inputName": "right",
+                    "targetBlockId": 5051,
+                    "targetConnectionName": "output",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "output"
+                }
+            ]
+        },
+        {
+            "customType": "BABYLON.InputBlock",
+            "id": 5051,
             "name": "Material alpha",
             "comments": "",
             "visibleInInspector": false,
@@ -1241,17 +1717,30 @@ export class SpriteSheetCharacter {
         }
     }
 
-    // Placeholder for hue shift - requires more advanced material setup
     private applyHueShift(material: StandardMaterial, hue: number): void {
-        // This needs a custom shader or Node Material to implement hue rotation.
-        // StandardMaterial doesn't support hue shift directly.
-        // console.warn("Hue shift not implemented. Requires Custom/Node Material.");
         const inputBlock = material.getBlockByName(HUE_SHIFT_UNIFORM_NAME) as Nullable<B.InputBlock>;
         if (inputBlock) {
             inputBlock.value = hue;
         }
     }
 
+    private colorize(material: StandardMaterial, color: B.Color3, strength: number = 255.0): void {
+        const inputBlock = material.getBlockByName("targetColor") as Nullable<B.InputBlock>;
+        if (inputBlock) {
+            inputBlock.value = new B.Color4(color.r, color.g, color.b, strength);
+        }
+    }
+
+
+    public colorizeBase(color: B.Color3, strength: number = 255.0): void {
+        if (!this.material_base) return;
+        this.colorize(this.material_base, color, strength);
+    }
+
+    public colorizeHair(color: B.Color3, strength: number = 255.0): void {
+        if (!this.material_hair) return;
+        this.colorize(this.material_hair, color, strength);
+    }
 
     public stopAnimation(): void { this.isAnimationPlaying = false; }
     public resumeAnimation(): void { this.isAnimationPlaying = true; }

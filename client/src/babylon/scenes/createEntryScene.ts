@@ -215,10 +215,14 @@ export function createEntryScene(engine: B.Engine, assetService?: AssetService):
             nextCameraRadius = 8;
             if(currentScreen == 'charCreation') {
                 characterPreview.billboard = true;
+                crystal.visibility = 0;
                 if(!userMovedCamera)
                     characterPreview.lookAtCamera();
+            } else {
+                crystal.visibility = 1;
             }
         } else {
+            crystal.visibility = 1;
             nextCameraTarget = cameraDefaultTarget
             nextCameraRadius = 10;
             if (characterPreview.hasTexture()) characterPreview.setCharacter(null);

@@ -6,7 +6,7 @@ import { useGameContext } from "../contexts/GameContext";
 import { useGameStore } from "../state/gameStore";
 import { ICharacterSummary } from "shared";
 import { Button } from "../components/common/Button";
-import { Texture } from "@babylonjs/core";
+import { Texture, Color3 } from "@babylonjs/core";
 import { SpriteSheetFactory } from "../babylon/SpriteSheetFactory";
 import { Input } from "../components/common/Input";
 
@@ -35,6 +35,12 @@ export function CharacterCreationUI() {
     const [ name, setName ] = useState<string>('');
     const [spriteSheetFactory, setSpriteSheetFactory] = useState<SpriteSheetFactory | null>(null);
 
+    const defaultBodyColor = '#E4B8A0'
+    const defaultHairColor = "#7D4513"
+
+    const [currentBodyColor, setCurrentBodyColor] = useState(defaultBodyColor);
+    const [currentHairColor, setCurrentHairColor] = useState(defaultHairColor);
+
     useEffect(() => {
         setSpriteSheetFactory(new SpriteSheetFactory());
         setCharacterCustomization({
@@ -55,6 +61,7 @@ export function CharacterCreationUI() {
             const characterPreview = sceneDirector.getActiveScene()?.metadata?.characterPreview;
             // characterPreview.updateCharacterTexture(texture);
             characterPreview.setCharacter({ customization: characterCustomization })
+            characterPreview.colorizeBase(Color3.FromHexString(currentBodyColor))
             characterPreview.lookAtCamera();
         })();
     }, [characterCustomization])
@@ -167,6 +174,16 @@ export function CharacterCreationUI() {
         setCurrentScreen("charSelect");
     }
 
+    const handleColorizeBase = (event: any) => {
+        setCurrentBodyColor(event.target.value)
+        sceneDirector.getActiveScene()?.metadata?.characterPreview?.colorizeBase(Color3.FromHexString(event.target.value))
+    }
+
+    const handleColorizeHair = (event: any) => {
+        setCurrentHairColor(event.target.value)
+        sceneDirector.getActiveScene()?.metadata?.characterPreview?.colorizeHair(Color3.FromHexString(event.target.value))
+    }
+
     return (
         <>
             {/* <FloatingHeader title="Project Override" width={350} height={50} x={175} y={10}></FloatingHeader> */}
@@ -176,11 +193,9 @@ export function CharacterCreationUI() {
                     <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 10, height: '100%' }}>
                         <div>
                             <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
-                                <Button onClick={previousBody} style={{ maxWidth: 25, maxHeight: 25 }}>&lt;</Button><Text style={{ flexGrow: 1, textAlign: "center" }}>Body Type</Text><Button onClick={nextBody} style={{ maxWidth: 25, maxHeight: 25 }}>&gt;</Button>
+                                <Button onClick={previousBody} style={{ maxWidth: 25, maxHeight: 25 }}>&lt;</Button><Text style={{ flexGrow: 1, textAlign: "center" }}>Body</Text><Button onClick={nextBody} style={{ maxWidth: 25, maxHeight: 25 }}>&gt;</Button>
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
-                                <Button onClick={decreaseBodyHue} style={{ maxWidth: 25, maxHeight: 25 }}>&lt;</Button><Text style={{ flexGrow: 1, textAlign: "center" }}>Skin Tone</Text><Button onClick={increaseBodyHue} style={{ maxWidth: 25, maxHeight: 25 }}>&gt;</Button>
-                            </div>
+                            <input type="color" style={{ height: 50, position: "relative", marginTop: -10 }} value={currentBodyColor} onChange={handleColorizeBase} />
                         </div>
                         <div>
                             <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
@@ -194,9 +209,7 @@ export function CharacterCreationUI() {
                             <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
                                 <Button onClick={previousHair} style={{ maxWidth: 25, maxHeight: 25 }}>&lt;</Button><Text style={{ flexGrow: 1, textAlign: "center" }}>Hair</Text><Button onClick={nextHair} style={{ maxWidth: 25, maxHeight: 25 }}>&gt;</Button>
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
-                                <Button onClick={decreaseHairHue} style={{ maxWidth: 25, maxHeight: 25 }}>&lt;</Button><Text style={{ flexGrow: 1, textAlign: "center" }}>Hair Color</Text><Button onClick={increaseHairHue} style={{ maxWidth: 25, maxHeight: 25 }}>&gt;</Button>
-                            </div>
+                            <input type="color" style={{ height: 50, position: "relative", marginTop: -10 }} value={currentHairColor} onChange={handleColorizeHair} />
                         </div>
                         <div style={{ marginTop: 'auto' }}>
                             <div className="input-group">
