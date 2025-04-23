@@ -9,6 +9,7 @@ import { Button } from "../components/common/Button";
 import { Texture, Color3 } from "@babylonjs/core";
 import { SpriteSheetFactory } from "../babylon/SpriteSheetFactory";
 import { Input } from "../components/common/Input";
+import { IColor3 } from "../../../shared/types";
 
 const characterCustomization_Body: string[] = [
     "/assets/sprites/char_base_a.png",
@@ -45,11 +46,11 @@ export function CharacterCreationUI() {
         setSpriteSheetFactory(new SpriteSheetFactory());
         setCharacterCustomization({
             baseSpriteSheet: characterCustomization_Body[0],
-            baseHue: 0,
+            baseColor: ({r: 228 /255, g: 189/255, b: 167/255} as IColor3),
             eyesSpriteSheet: "",
-            eyesHue: 0,
+            eyesColor: ({r: 0, g: 0, b: 0} as IColor3),
             hairSpriteSheet: "",
-            hairHue: 0,
+            hairColor: ({r: 1, g: 133/255, b: 26/255} as IColor3),
         })
     }, [])
 
@@ -61,7 +62,6 @@ export function CharacterCreationUI() {
             const characterPreview = sceneDirector.getActiveScene()?.metadata?.characterPreview;
             // characterPreview.updateCharacterTexture(texture);
             characterPreview.setCharacter({ customization: characterCustomization })
-            characterPreview.colorizeBase(Color3.FromHexString(currentBodyColor))
             characterPreview.lookAtCamera();
         })();
     }, [characterCustomization])
@@ -82,19 +82,6 @@ export function CharacterCreationUI() {
         setCharacterCustomization({ ...characterCustomization, baseSpriteSheet: characterCustomization_Body[next] })
     }
 
-    const increaseBodyHue = () => {
-        let next = characterCustomization.baseHue + 20;
-        if (next >= 360) next = 0
-        setCharacterCustomization({ ...characterCustomization, baseHue: next });
-    }
-
-    const decreaseBodyHue = () => {
-        let next = characterCustomization.baseHue - 20;
-        if (next < 0) next = 340;
-        setCharacterCustomization({ ...characterCustomization, baseHue: next });
-    }
-
-
     const nextEyes = () => {
         let next = currentEyesIndex + 1;
         if (next >= characterCustomization_Eyes.length)
@@ -111,19 +98,6 @@ export function CharacterCreationUI() {
         setCharacterCustomization({ ...characterCustomization, eyesSpriteSheet: characterCustomization_Eyes[next] })
     }
 
-    const increaseEyesHue = () => {
-        let next = characterCustomization.eyesHue + 20;
-        if (next >= 360) next = 0
-        setCharacterCustomization({ ...characterCustomization, eyesHue: next });
-    }
-
-    const decreaseEyesHue = () => {
-        let next = characterCustomization.eyesHue - 20;
-        if (next < 0) next = 340;
-        setCharacterCustomization({ ...characterCustomization, eyesHue: next });
-    }
-
-
     const nextHair = () => {
         let next = currentHairIndex + 1;
         if (next >= characterCustomization_Hair.length)
@@ -138,18 +112,6 @@ export function CharacterCreationUI() {
             next = characterCustomization_Hair.length - 1;
         setCurrentHairIndex(next)
         setCharacterCustomization({ ...characterCustomization, hairSpriteSheet: characterCustomization_Hair[next] })
-    }
-
-    const increaseHairHue = () => {
-        let next = characterCustomization.hairHue + 20;
-        if (next >= 360) next = 0
-        setCharacterCustomization({ ...characterCustomization, hairHue: next });
-    }
-
-    const decreaseHairHue = () => {
-        let next = characterCustomization.hairHue - 20;
-        if (next < 0) next = 340;
-        setCharacterCustomization({ ...characterCustomization, hairHue: next });
     }
 
     const handleCreate = () => {
@@ -176,12 +138,12 @@ export function CharacterCreationUI() {
 
     const handleColorizeBase = (event: any) => {
         setCurrentBodyColor(event.target.value)
-        sceneDirector.getActiveScene()?.metadata?.characterPreview?.colorizeBase(Color3.FromHexString(event.target.value))
+        setCharacterCustomization({ ...characterCustomization, baseColor: Color3.FromHexString(event.target.value) })
     }
 
     const handleColorizeHair = (event: any) => {
         setCurrentHairColor(event.target.value)
-        sceneDirector.getActiveScene()?.metadata?.characterPreview?.colorizeHair(Color3.FromHexString(event.target.value))
+        setCharacterCustomization({ ...characterCustomization, hairColor: Color3.FromHexString(event.target.value) })
     }
 
     return (
@@ -201,9 +163,7 @@ export function CharacterCreationUI() {
                             <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
                                 <Button onClick={previousEyes} style={{ maxWidth: 25, maxHeight: 25 }}>&lt;</Button><Text style={{ flexGrow: 1, textAlign: "center" }}>Eyes</Text><Button onClick={nextEyes} style={{ maxWidth: 25, maxHeight: 25 }}>&gt;</Button>
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
-                                <Button onClick={decreaseEyesHue} style={{ maxWidth: 25, maxHeight: 25 }}>&lt;</Button><Text style={{ flexGrow: 1, textAlign: "center" }}>Iris Color</Text><Button onClick={increaseEyesHue} style={{ maxWidth: 25, maxHeight: 25 }}>&gt;</Button>
-                            </div>
+
                         </div>
                         <div>
                             <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>

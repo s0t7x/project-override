@@ -9,6 +9,12 @@ export interface IVector3 {
     z: number;
   }
 
+  export interface IColor3 {
+    r: number;
+    g: number;
+    b: number;
+  }
+
   export interface IVector2 {
     x: number;
     y: number;
@@ -56,9 +62,9 @@ export interface IVector3 {
     /** Basic structure for representing stats. */
     export interface ICharacterCustomization {
       baseSpriteSheet: string;
-      baseHue: number;
+      baseColor: IColor3;
       eyesSpriteSheet: string;
-      eyesHue: number;
+      eyesColor: IColor3;
       hairSpriteSheet: string;
-     hairHue: number;
+      hairColor: IColor3;
   }

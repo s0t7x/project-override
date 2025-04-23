@@ -19,6 +19,7 @@ import {
     IInfoMessagePayload
 } from 'shared/types';
 import { CharacterCustomizationState } from './schemas/CharacterCustomizationState';
+import { Color3Schema } from './schemas/Color3Schema';
 
 export class CharacterSelectRoom extends Room<CharacterSelectState> {
     // Max characters per user (example)
@@ -75,9 +76,14 @@ export class CharacterSelectRoom extends Room<CharacterSelectState> {
             
             const characterCustomizationState = new CharacterCustomizationState();
             if(payload.customization) {
-                characterCustomizationState.assign(
-                    payload.customization
-                );
+                characterCustomizationState.assign({ 
+                    baseSpriteSheet: payload.customization.baseSpriteSheet,
+                    baseColor: new Color3Schema(payload.customization.baseColor.r, payload.customization.baseColor.g, payload.customization.baseColor.b),
+                    eyesSpriteSheet: payload.customization.eyesSpriteSheet,
+                    eyesColor: new Color3Schema(payload.customization.eyesColor.r, payload.customization.eyesColor.g, payload.customization.eyesColor.b),
+                    hairSpriteSheet: payload.customization.hairSpriteSheet,
+                    hairColor: new Color3Schema(payload.customization.hairColor.r, payload.customization.hairColor.g, payload.customization.hairColor.b),
+                });
             }
 
             // Attempt to create character in DB
@@ -191,7 +197,11 @@ export class CharacterSelectRoom extends Room<CharacterSelectState> {
             characters.forEach(char => {
                 // Avoid adding duplicates if state already populated by another client's join? Usually not needed.
                 if (!this.state.characters.has(char.id)) {
-                    const customization = new CharacterCustomizationState().assign(JSON.parse(char.customizationJson as any || '') || {})
+                    const customRaw = JSON.parse(char.customizationJson as any || '');
+                    customRaw.baseColor = new Color3Schema(customRaw.baseColor.r, customRaw.baseColor.g, customRaw.baseColor.b)
+                    customRaw.eyesColor = new Color3Schema(customRaw.eyesColor.r, customRaw.eyesColor.g, customRaw.eyesColor.b)
+                    customRaw.hairColor = new Color3Schema(customRaw.hairColor.r, customRaw.hairColor.g, customRaw.hairColor.b)
+                    const customization = new CharacterCustomizationState().assign(customRaw)
                     const summary = new CharacterSummaryState().assign({
                         id: char.id,
                         name: char.name,

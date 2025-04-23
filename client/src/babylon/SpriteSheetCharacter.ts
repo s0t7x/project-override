@@ -1711,9 +1711,11 @@ export class SpriteSheetCharacter {
 
         // Apply hue shift if needed (requires custom shader or node material)
         if (characterSummary?.customization) {
-            this.applyHueShift(this.material_base, characterSummary?.customization?.baseHue);
-            this.applyHueShift(this.material_eyes, characterSummary?.customization?.eyesHue);
-            this.applyHueShift(this.material_hair, characterSummary?.customization?.hairHue);
+            // this.applyHueShift(this.material_base, characterSummary?.customization?.baseHue);
+            // this.applyHueShift(this.material_eyes, characterSummary?.customization?.eyesHue);
+            // this.applyHueShift(this.material_hair, characterSummary?.customization?.hairHue);
+            this.colorizeBase(characterSummary?.customization?.baseColor)
+            this.colorizeHair(characterSummary?.customization?.hairColor)
         }
     }
 
