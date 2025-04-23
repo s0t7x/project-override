@@ -72,7 +72,7 @@ export default config({
             .then(() => {
                 console.log('✅ Connected to database successfully.');
             })
-            .catch((err) => {
+            .catch((err: any) => {
                 console.error('[Prisma] Failed to connect to database:', err);
                 process.exit(1);
             })

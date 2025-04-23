@@ -110,8 +110,7 @@ export class CharacterSelectRoom extends Room<CharacterSelectState> {
             }
         });
 
-        // Handle Character Selection Request
-        this.onMessage<ISelectCharacterPayload>("selectCharacter", async (client, payload) => {
+        this.onMessage<ISelectCharacterPayload>("deleteCharacter", async (client, payload) => {
             const data = this.clientData.get(client.sessionId);
             if (!data) {
                 client.send(ServerMessageType.ERROR_MESSAGE, { message: "Authentication data not found." });
@@ -120,49 +119,27 @@ export class CharacterSelectRoom extends Room<CharacterSelectState> {
             const { userId } = data;
             const { characterId } = payload;
 
-            console.log(`[CharSelectRoom ${this.roomId}] User ${userId} selected character ${characterId}`);
+            console.log(`[CharSelectRoom ${this.roomId}] User ${userId} deletes character ${characterId}`);
 
             // Validate selection
             const characterSummary = this.state.characters.get(characterId);
             if (!characterSummary) {
-                 client.send(ServerMessageType.ERROR_MESSAGE, { message: "Invalid character selection." });
+                 client.send(ServerMessageType.ERROR_MESSAGE, { message: "Invalid character." });
                  return;
             }
 
             // Double-check ownership in DB for security (optional but recommended)
             const characterDb = await this.characterRepo.findById(characterId);
             if (!characterDb || characterDb.userId !== userId) {
-                console.warn(`[CharSelectRoom ${this.roomId}] Security warning: Client ${client.sessionId} tried to select character ${characterId} not owned by user ${userId}.`);
+                console.warn(`[CharSelectRoom ${this.roomId}] Security warning: Client ${client.sessionId} tried to delete character ${characterId} not owned by user ${userId}.`);
                 client.send(ServerMessageType.ERROR_MESSAGE, { message: "Character selection mismatch." });
                 return;
             }
 
-            // --- Proceed to next stage (World Lobby) ---
-            console.log(`[CharSelectRoom ${this.roomId}] Character ${characterId} confirmed for user ${userId}. Proceeding to lobby...`);
-            try {
-                // Option 1: Send success and let client join lobby manually
-                // client.send("character_selected", { characterId: characterId });
+            await this.characterRepo.delete(characterId);
+            this.state.characters.delete(characterId);
 
-                // Option 2: Get reservation for WorldLobbyRoom and send it back
-                const matchMakingOptions = {
-                    userId: userId,
-                    characterId: characterId,
-                    // Pass the original JWT token so WorldLobbyRoom can re-authenticate
-                    token: client.auth?.token // Access token stored during onAuth
-                };
-                const reservation = await matchMaker.joinOrCreate("world_lobby_room", matchMakingOptions);
-
-                console.log(`[CharSelectRoom ${this.roomId}] Sending reservation for WorldLobbyRoom to ${client.sessionId}`);
-                client.send("lobby_reservation", reservation); // Send Colyseus reservation data
-
-                // Optionally disconnect the client after sending reservation to ensure they move
-                // client.leave();
-
-            } catch (error) {
-                 console.error(`[CharSelectRoom ${this.roomId}] Error preparing lobby transition for ${client.sessionId}:`, error);
-                 client.send(ServerMessageType.ERROR_MESSAGE, { message: "Failed to prepare transition to world lobby." });
-            }
-
+            client.send(ServerMessageType.INFO_MESSAGE, { message: `Character "${characterDb.name}" deleted!`, characterId: characterId });
         });
 
          // Catch-all for unhandled message types

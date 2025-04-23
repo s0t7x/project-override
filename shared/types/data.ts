@@ -52,3 +52,13 @@ export interface IVector3 {
       attackSpeed: number;
       // Add other stats relevant to ProjectOverride (e.g., hacking skill, edit efficiency)
   }
+
+    /** Basic structure for representing stats. */
+    export interface ICharacterCustomization {
+      baseSpriteSheet: string;
+      baseHue: number;
+      eyesSpriteSheet: string;
+      eyesHue: number;
+      hairSpriteSheet: string;
+     hairHue: number;
+  }

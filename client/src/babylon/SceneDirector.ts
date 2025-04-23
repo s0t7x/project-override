@@ -51,8 +51,8 @@ export class SceneDirector {
         this.engine = engine;
         this.isEngineReady = true;
         // Now setup the initial scene based on the *current* game state
-        const initialScreen = useGameStore.getState().currentScreen;
-        this.handleScreenChange(initialScreen, true); // Force initial setup
+        // const initialScreen = useGameStore.getState().currentScreen;
+        // this.handleScreenChange(initialScreen, true); // Force initial setup
     }
 
     public getActiveScene(): B.Scene | null {

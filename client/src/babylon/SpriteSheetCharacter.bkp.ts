@@ -1,21 +1,19 @@
-// client/src/babylon/character/SpriteSheetCharacter.ts
-// Manages displaying an animated 2D character using a spritesheet on a Plane mesh.
-// Handles camera-relative direction updates for animations AND adds limited Y-axis rotation for perspective.
-
 import * as B from '@babylonjs/core';
-import { AssetService } from '../services/AssetService'; // Adjust path if needed
-import { Vector3, TmpVectors, Plane, Observer, Nullable, Matrix, Quaternion, Color3 } from '@babylonjs/core'; // Import necessary classes
+import { AssetService } from '../services/AssetService';
+import { Vector3, TmpVectors, Observer, Nullable, Quaternion, Color3 } from '@babylonjs/core';
+import { ICharacterCustomization, ICharacterSummary } from '../../../shared/types';
 
-// --- Configuration (YOURS - Keeping as provided) ---
-const FRAME_WIDTH = 64;
-const FRAME_HEIGHT = 64;
 const SHEET_COLUMNS = 24;
 const SHEET_ROWS = 66;
 const ANIMATION_DEFINITIONS = {
-    'walk_up': { startRow: 8, frames: 9, columnOffset: 0, durationMultiplier: 1.0 },
-    'walk_left': { startRow: 9, frames: 9, columnOffset: 0, durationMultiplier: 1.0 },
-    'walk_down': { startRow: 10, frames: 9, columnOffset: 0, durationMultiplier: 1.0 },
-    'walk_right': { startRow: 11, frames: 9, columnOffset: 0, durationMultiplier: 1.0 },
+    'test_up': { startRow: 65, frames: 6, columnOffset: 0, durationMultiplier: 3.0 },
+    'test_left': { startRow: 64, frames: 6, columnOffset: 0, durationMultiplier: 3.0 },
+    'test_down': { startRow: 63, frames: 6, columnOffset: 0, durationMultiplier: 3.0 },
+    'test_right': { startRow: 62, frames: 6, columnOffset: 0, durationMultiplier: 3.0 },
+    'walk_up': { startRow: 57, frames: 8, columnOffset: 1, durationMultiplier: 1.0 },
+    'walk_left': { startRow: 56, frames: 8, columnOffset: 1, durationMultiplier: 1.0 },
+    'walk_down': { startRow: 55, frames: 8, columnOffset: 1, durationMultiplier: 1.0 },
+    'walk_right': { startRow: 54, frames: 8, columnOffset: 1, durationMultiplier: 1.0 },
     'idle_up': { startRow: 43, frames: 2, columnOffset: 0, durationMultiplier: 4.0 },
     'idle_left': { startRow: 42, frames: 2, columnOffset: 0, durationMultiplier: 4.0 },
     'idle_down': { startRow: 41, frames: 2, columnOffset: 0, durationMultiplier: 4.0 },
@@ -23,39 +21,51 @@ const ANIMATION_DEFINITIONS = {
 };
 type AnimationName = keyof typeof ANIMATION_DEFINITIONS;
 const DEFAULT_ANIMATION: AnimationName = 'idle_down';
-const BASE_FRAME_DURATION = 120 / 1000; // Base duration (120ms) in seconds per frame
-const MAX_Y_PERSPECTIVE_ANGLE = Math.PI / 3; // Max perspective yaw = 45 degrees (PI / 4 radians)
+const BASE_FRAME_DURATION = 120 / 1000;
 
-// --- Character Direction Enum ---
 export enum CharacterDirection {
-    Up = 'up',       // Facing +Z (Back to default camera)
-    Down = 'down',   // Facing -Z (Front to default camera)
-    Left = 'left',   // Facing -X (Right side to default camera)
-    Right = 'right'  // Facing +X (Left side to default camera)
+    Up = 'up',
+    Down = 'down',
+    Left = 'left',
+    Right = 'right'
 }
-const DEFAULT_DIRECTION = CharacterDirection.Down; // Default logical forward (-Z)
-const LEAN_X_ANGLE = -0.2
-const TURN_TOWARDS_FACTOR = 0
+const DEFAULT_DIRECTION = CharacterDirection.Down;
 
-//----------------------------------------------------------------
+//---
 
 export class SpriteSheetCharacter {
     private scene: B.Scene;
     private assetService?: AssetService;
     public name: string;
     public plane: B.Mesh;
-    private material: B.StandardMaterial;
+    private material: B.MultiMaterial;
+
+    private material_base: B.CustomMaterial;
+    private material_eyes: B.CustomMaterial;
+    private material_hair: B.CustomMaterial;
+
     private texture: B.Texture | null = null;
+    private texture_base: B.Texture | null = null;
+    private texture_eyes: B.Texture | null = null;
+    private texture_hair: B.Texture | null = null;
 
-    // Public state control
-    public lookAtTarget: B.Vector3 | null = null;
+    private customization: ICharacterCustomization = {
+        baseSpriteSheet: "",
+        baseHue: 0,
+        eyesSpriteSheet: "", 
+        eyesHue: 0,
+        hairSpriteSheet: "",
+        hairHue: 0
+    }
+
+    // Logical view direction
+    public lookDirection: CharacterDirection = DEFAULT_DIRECTION;
+    private currentDirection: CharacterDirection = DEFAULT_DIRECTION; // Direction for sprite choice
+
+    // Animation State
     public animationState: string | null = null;
-
-    // Internal Animation State
     private currentFullAnimation: AnimationName = DEFAULT_ANIMATION;
-    private currentLogicalDirection: CharacterDirection = DEFAULT_DIRECTION; // Which sprite set to use (Up/Down/Left/Right)
     private currentFrameIndex: number = 0;
-    private currentSnappedDirection: CharacterDirection = DEFAULT_DIRECTION; // Direction for sprite choice
     private animationTimer: number = 0;
     private currentFrameDuration: number = BASE_FRAME_DURATION;
     private isAnimationPlaying: boolean = true;
@@ -63,6 +73,11 @@ export class SpriteSheetCharacter {
     private readonly uvScaleX: number = 1 / SHEET_COLUMNS;
     private readonly uvScaleY: number = 1 / SHEET_ROWS;
     private updateObserver: Nullable<Observer<B.Scene>> = null;
+
+    private debugArrow: B.LinesMesh | null = null;
+    private debugArrowOptions: any;
+
+    public billboard: boolean = false;
 
     constructor(
         name: string,
@@ -74,177 +89,316 @@ export class SpriteSheetCharacter {
         this.scene = scene;
         this.assetService = assetService;
 
-        this.plane = B.MeshBuilder.CreatePlane(`${name}_plane`, { width: 2, height: 2 }, this.scene);
+        this.plane = B.MeshBuilder.CreatePlane(`${name}_plane`, { size: 2 }, this.scene);
         this.plane.position = initialPosition.clone();
         this.plane.billboardMode = B.Mesh.BILLBOARDMODE_NONE; // Manual rotation
         this.plane.isPickable = false;
         this.plane.rotationQuaternion = Quaternion.Identity(); // Use Quaternion
+        this.plane.visibility = 0;
 
-        this.material = new B.StandardMaterial(`${name}_mat`, this.scene);
-        this.material.backFaceCulling = false;
-        this.material.disableLighting = false;
-        // this.material.emissiveColor = B.Color3.White();
-        this.material.useAlphaFromDiffuseTexture = true;
-        // this.material.needDepthPrePass = true;
-        this.material.disableDepthWrite = true;
+        this.material_base = this.createLayerMaterial(`${name}_mat_base`);
+        this.material_eyes = this.createLayerMaterial(`${name}_mat_eyes`);
+        this.material_hair = this.createLayerMaterial(`${name}_mat_hair`);
+
+        this.material = new B.MultiMaterial(`${name}_mat`, this.scene);
+        this.material.subMaterials.push(this.material_base);
+        this.material.subMaterials.push(this.material_eyes);
+        this.material.subMaterials.push(this.material_hair);
+
         this.plane.material = this.material;
+
+        // const forward = new Vector3(0, 0, 1); // local +Z direction
+        // const worldForward = Vector3.TransformNormal(forward, this.plane.getWorldMatrix());
+        // this.forwardArrowOptions = {
+        //     points: [
+        //         this.plane.position,
+        //         this.plane.position.add(worldForward.scale(0.5))
+        //     ],
+        //     updatable: true
+        // }
+        // this.forwardArrow = B.MeshBuilder.CreateLines("arrow", this.forwardArrowOptions, scene);
+        // this.forwardArrow.color = Color3.Red();
 
         this.updateObserver = this.scene.onBeforeRenderObservable.add(this.update);
         console.log(`[SpriteSheetCharacter:${this.name}] Initialized.`);
     }
 
-    /** Loads/Updates the character's spritesheet texture and resets animation. */
+    private createLayerMaterial(name: string) {
+        const material = new B.StandardMaterial(name, this.scene);
+        
+        material.backFaceCulling = true;
+        material.disableLighting = false;
+        material.emissiveColor = new Color3(0.2, 0.2, 0.2);
+        material.useAlphaFromDiffuseTexture = true;
+
+        return material;
+    }
+
+    public async setCharacter(characterSummary: ICharacterSummary | null, initialAnimation?: AnimationName) {
+        console.log(`[SpriteSheetCharacter:${this.name}] Updating character customization.`, characterSummary?.customization, (characterSummary?.customization?.baseSpriteSheet && characterSummary.customization.baseSpriteSheet.length));
+        const scene = this.scene;
+        if(
+            characterSummary?.customization?.baseSpriteSheet &&
+            characterSummary.customization.baseSpriteSheet.length
+        ) {
+            let newTexture: B.Texture | null = null;
+            if (this.assetService) { newTexture = await this.assetService.loadTexture(characterSummary.customization.baseSpriteSheet); }
+            else { newTexture = new B.Texture(characterSummary.customization.baseSpriteSheet, scene, false, true, B.Texture.NEAREST_SAMPLINGMODE); }
+            if (newTexture) {
+                this.texture_base = newTexture;
+                this.texture_base.hasAlpha = true;
+                this._updateUVs();
+                this.material.subMaterials[0].diffuseTexture = this.texture_base;
+                console.log(`[SpriteSheetCharacter:${this.name}] Base Texture updated.`);
+            } else { console.error(`[SpriteSheetCharacter:${this.name}] Base Texture update failed: ${characterSummary.customization.baseSpriteSheet}`); }
+        } else {
+            this.texture_base = null;
+            this.material_base.diffuseTexture = null; 
+        }
+
+        if(
+            characterSummary?.customization?.hairSpriteSheet &&
+            characterSummary.customization.hairSpriteSheet.length
+        ) {
+            let newTexture: B.Texture | null = null;
+            
+            if (this.assetService) { newTexture = await this.assetService.loadTexture(characterSummary.customization.hairSpriteSheet); }
+            else { newTexture = new B.Texture(characterSummary.customization.hairSpriteSheet, scene, false, true, B.Texture.NEAREST_SAMPLINGMODE); }
+            if (newTexture) {
+                this.texture_hair = newTexture;
+                this.texture_hair.hasAlpha = true;
+                this.material_hair.diffuseTexture = this.texture_hair;
+                console.log(`[SpriteSheetCharacter:${this.name}] Hair Texture updated.`);
+            } else { console.error(`[SpriteSheetCharacter:${this.name}] Hair Texture update failed: ${characterSummary.customization.hairSpriteSheet}`); }
+        } else {
+            this.texture_hair = null;
+            this.material_hair.diffuseTexture = null;
+        }
+
+        if(characterSummary) {
+            if (!this.isAnimationPlaying && initialAnimation) this.setAnimationInternal(initialAnimation, true);
+            this.plane.visibility = 1;
+            console.log("update uvs")
+            this._updateUVs();
+        } else {
+            this.plane.visibility = 0;
+            this.stopAnimation();
+        }
+    }
+
+    // DEPRECATED
     public async updateCharacter(spriteSheetUrl: string | null, initialAnimation?: AnimationName): Promise<void> {
         const oldTexture = this.texture;
         if (!spriteSheetUrl) {
             console.log(`[SpriteSheetCharacter:${this.name}] Clearing texture.`);
-            this.material.diffuseTexture = null; this.texture = null; this.stopAnimation();
+            this.material.diffuseTexture = null; this.texture = null; this.stopAnimation(); this.plane.visibility = 0;
         } else {
             console.log(`[SpriteSheetCharacter:${this.name}] Updating texture: ${spriteSheetUrl}`);
             try {
                 let newTexture: B.Texture | null = null; const scene = this.scene;
-                if (this.assetService) { newTexture = new B.Texture(spriteSheetUrl, scene, false, true, B.Texture.NEAREST_SAMPLINGMODE); } // TODO: Use AssetService with options
+                if (this.assetService) { newTexture = await this.assetService.loadTexture(spriteSheetUrl); } // TODO: Use AssetService with options
                 else { newTexture = new B.Texture(spriteSheetUrl, scene, false, true, B.Texture.NEAREST_SAMPLINGMODE); } // invertY=true
                 if (newTexture) {
-                    this.texture = newTexture; this.texture.hasAlpha = true; this.material.diffuseTexture = this.texture;
-                    this.applyRotation(0, 0);
+                    this.texture = newTexture;
+                    this.texture.hasAlpha = true;
+                    this.material.diffuseTexture = this.texture;
                     console.log(`[SpriteSheetCharacter:${this.name}] Texture updated.`);
-                    if (initialAnimation) this.setAnimationInternal(initialAnimation, true);
+                    if (!this.isAnimationPlaying && initialAnimation) this.setAnimationInternal(initialAnimation, true);
+                    this._updateUVs();
+                    this.plane.visibility = 1;
                 } else { console.error(`[SpriteSheetCharacter:${this.name}] Texture update failed: ${spriteSheetUrl}`); }
             } catch (error) { console.error(`[SpriteSheetCharacter:${this.name}] Error updating texture ${spriteSheetUrl}:`, error); this.texture = null; this.material.diffuseTexture = null; }
         }
         if (oldTexture && oldTexture !== this.texture && !this.assetService) { oldTexture.dispose(); }
     }
 
-    /** Sets the movement state (walking or idle). */
-    public setMoving(isMoving: boolean): void {
-        if (this.isMoving !== isMoving) { this.isMoving = isMoving; this.determineAndSetAnimationName(); }
+    // DEPRECATED
+    public async updateCharacterTexture(spritesheetTexture: B.Texture, initialAnimation?: AnimationName): Promise<void> {
+        const oldTexture = this.texture;
+        console.log(`[SpriteSheetCharacter:${this.name}] Updating texture: ${spritesheetTexture.name}`);
+        try {
+            let newTexture: B.Texture | null = spritesheetTexture;
+            if (newTexture) {
+                this.texture = newTexture;
+                this.texture.hasAlpha = true;
+                this.material.diffuseTexture = this.texture;
+                console.log(`[SpriteSheetCharacter:${this.name}] Texture updated.`);
+                if (!this.isAnimationPlaying && initialAnimation) this.setAnimationInternal(initialAnimation, true);
+                this._updateUVs();
+                this.plane.visibility = 1;
+            } else { console.error(`[SpriteSheetCharacter:${this.name}] Texture update failed: ${spritesheetTexture.name}`); }
+        } catch (error) { console.error(`[SpriteSheetCharacter:${this.name}] Error updating texture ${spritesheetTexture.name}:`, error); this.texture = null; this.material.diffuseTexture = null; }
+        if (oldTexture && oldTexture !== this.texture && !this.assetService) { oldTexture.dispose(); }
     }
 
-    /** Sets an optional target point the character logically faces. */
-    public setLookAtTarget(targetPoint: B.Vector3 | null): void {
-        const targetChanged = (!this.lookAtTarget && targetPoint) || (this.lookAtTarget && !targetPoint) || (this.lookAtTarget && targetPoint && !this.lookAtTarget.equals(targetPoint));
-        if (targetChanged) { this.lookAtTarget = targetPoint ? targetPoint.clone() : null; }
-    }
-
-    /** Pauses the frame advancement timer. */
     public stopAnimation(): void { this.isAnimationPlaying = false; }
-    /** Resumes the frame advancement timer. */
     public resumeAnimation(): void { this.isAnimationPlaying = true; }
-    /** Updates the character's world position. */
     public setPosition(position: B.Vector3): void { this.plane.position.copyFrom(position); }
-    /** Gets the character's world position */
     public getPosition(): B.Vector3 { return this.plane.position; }
+    public hasTexture(): Boolean { return this.texture !== null; }
 
-    // --- Internal Logic ---
-
-
-    /** Main update loop called by scene.registerBeforeRender */
     private update = (): void => {
-        // 1. Calculate Snapped Direction, Target Yaw, and Sprite Direction
-        const { snappedYaw, subtleTurnYaw, spriteDirection } = this.calculateTargetRotationAndDirection();
+        this.updateCurrentDirection();
 
-        // 2. Apply the calculated rotation to the plane mesh
-        this.applyRotation(snappedYaw, subtleTurnYaw);
-
-        // 3. Update the internal state for sprite direction if changed
-        if (this.currentSnappedDirection !== spriteDirection) {
-            // console.log(`[${this.name} DEBUG SpriteDir] *** Sprite Dir CHANGED to ${spriteDirection} ***`);
-            this.currentSnappedDirection = spriteDirection;
-        }
-
-        // 4. Determine the full animation name based on sprite direction & movement
-        this.determineAndSetAnimationName();
-
-        // 5. Advance the frame timer
+        // Sprite Animation
+        this.updateAnimationName();
         this.advanceAnimationFrame();
     }
 
-    /**
-     * Calculates the target rotation angles and the sprite direction based on camera view
-     * relative to the character's logical forward direction.
-     * @returns An object containing { snappedYaw, subtleTurnYaw, spriteDirection }
-     */
-    private calculateTargetRotationAndDirection(): { snappedYaw: number, subtleTurnYaw: number, spriteDirection: CharacterDirection } {
+    private updateCurrentDirection(): void {
         const cam = this.scene.activeCamera;
         const charPos = this.plane.position;
-        let snappedYaw = 0; // Default world Y rotation if calculation fails
-        let subtleTurnYaw = 0; // Additional small turn towards camera
-        let spriteDirection = this.currentSnappedDirection; // Default to current
 
-        if (cam && cam.getViewMatrix()) { // Need camera and its view matrix
-            // 1. Logical Forward vector (where character *wants* to face)
-            const logicalForwardWorld = TmpVectors.Vector3[0];
-            this.getLogicalForward(logicalForwardWorld); // Gets normalized vector
+        if (!cam || !cam.getViewMatrix() || !this.plane.rotationQuaternion) return;
 
-            // 2. View Direction vector (character to camera, XZ plane)
-            const viewDirectionXZ = TmpVectors.Vector3[1];
-            cam.globalPosition.subtractToRef(charPos, viewDirectionXZ);
-            viewDirectionXZ.y = 0;
-            if (viewDirectionXZ.lengthSquared() < 0.001) { // Avoid zero vector if camera overhead
-                viewDirectionXZ.copyFrom(this.getDirectionVector(this.currentSnappedDirection)); // Use last direction's vector
-                viewDirectionXZ.negateInPlace(); // Point towards character from previous direction
-            }
-            viewDirectionXZ.normalize();
+        const viewDirectionXZ = TmpVectors.Vector3[1];
+        cam.globalPosition.subtractToRef(charPos, viewDirectionXZ);
+        viewDirectionXZ.y = 0; // Project onto XZ plane
 
-            // 3. Relative Angle (Angle FROM Logical Forward TO View Direction)
-            const dot = Vector3.Dot(logicalForwardWorld, viewDirectionXZ);
-            const crossY = logicalForwardWorld.z * viewDirectionXZ.x - logicalForwardWorld.x * viewDirectionXZ.z;
-            let relativeAngle = Math.atan2(crossY, dot); // -PI to PI
-            
-            // 4. Determine Snapped Direction and Snapped World Yaw Angle
-            const PI_4 = Math.PI / 4; const PI_34 = 3 * Math.PI / 4;
-            const PI_2 = Math.PI/2;
+        if (viewDirectionXZ.lengthSquared() < 0.001) {
+            // Camera is directly above or below, maintain last rotation or default
+            // Or use the character's lookDirection to decide a default facing
+            viewDirectionXZ.copyFrom(SpriteSheetCharacter.getDirectionVector(this.lookDirection));
+            viewDirectionXZ.negateInPlace(); // Point towards character
+            if (viewDirectionXZ.lengthSquared() < 0.001) { viewDirectionXZ.set(0, 0, -1); } // Ultimate fallback
+        }
+        viewDirectionXZ.normalize(); // Vector FROM character TOWARDS camera (on XZ plane)
 
-            // Determine the SPRITE direction based on the RELATIVE angle
-            if (relativeAngle >= -PI_4 && relativeAngle < PI_4) {             // Camera is ~in front
-                spriteDirection = CharacterDirection.Down;
-                snappedYaw = this.getAngleFromDirection(CharacterDirection.Down); // Face world -Z
-            } else if (relativeAngle >= PI_4 && relativeAngle < PI_34) {      // Camera is ~to the right
-                spriteDirection = CharacterDirection.Right;
-                snappedYaw = this.getAngleFromDirection(CharacterDirection.Right); // Face world +X
-            } else if (relativeAngle >= PI_34 || relativeAngle < -PI_34) {   // Camera is ~behind
-                spriteDirection = CharacterDirection.Up;
-                snappedYaw = this.getAngleFromDirection(CharacterDirection.Up);   // Face world +Z
-            } else { // angle >= -3*PI/4 && angle < -PI/4                    // Camera is ~to the left
-                spriteDirection = CharacterDirection.Left;
-                snappedYaw = this.getAngleFromDirection(CharacterDirection.Left);  // Face world -X
-            }
+        const cameraAngle = Math.atan2(viewDirectionXZ.x, viewDirectionXZ.z);
 
+        // Snap this angle to the nearest 90 degrees (PI/2 radians)
+        const snappedAngle = Math.round(cameraAngle / (Math.PI / 2)) * (Math.PI / 2);
 
-            // 5. Calculate Subtle Turn Towards Camera
-            // Find the angle difference between the snapped direction and the actual view direction
-            const snappedForwardWorld = this.getDirectionVector(spriteDirection, TmpVectors.Vector3[2]);
-            const dotSnap = Vector3.Dot(snappedForwardWorld, viewDirectionXZ);
-            const crossSnapY = snappedForwardWorld.z * viewDirectionXZ.x - snappedForwardWorld.x * viewDirectionXZ.z;
-            const angleDiff = Math.atan2(crossSnapY, dotSnap); // Angle FROM snapped dir TO actual view dir
+        const finalPlaneAngle = snappedAngle + Math.PI;
+        
+        if(this.billboard)
+            Quaternion.RotationYawPitchRollToRef(cameraAngle + Math.PI, 0.1, 0, this.plane.rotationQuaternion);
+        else
+            Quaternion.RotationYawPitchRollToRef(finalPlaneAngle, 0.1, 0, this.plane.rotationQuaternion);
+        
+        const characterLookVector = TmpVectors.Vector3[2]; // Use a different temp vector
+        SpriteSheetCharacter.getDirectionVector(this.lookDirection, characterLookVector); // Get the character's intended facing direction
 
-            // Apply only a fraction of this difference for the subtle turn
-            subtleTurnYaw = angleDiff * TURN_TOWARDS_FACTOR;
-            snappedYaw = 0;
+        const dot = Vector3.Dot(characterLookVector, viewDirectionXZ);
+        const crossY = characterLookVector.z * viewDirectionXZ.x - characterLookVector.x * viewDirectionXZ.z;
+        let relativeAngle = Math.atan2(crossY, dot); // Angle from characterLookVector to viewDirectionXZ (-PI to PI)
+        
+
+        const PI_4 = Math.PI / 4;
+        const PI_34 = 3 * Math.PI / 4;
+        let newSpriteDirection = this.currentDirection;
+
+        if (relativeAngle >= -PI_4 && relativeAngle < PI_4) {             // Camera is relatively in FRONT of where the character is looking
+            newSpriteDirection = CharacterDirection.Down;
+        } else if (relativeAngle >= PI_4 && relativeAngle < PI_34) {      // Camera is relatively to the RIGHT
+            newSpriteDirection = CharacterDirection.Right;
+        } else if (relativeAngle >= PI_34 || relativeAngle < -PI_34) {   // Camera is relatively BEHIND
+            newSpriteDirection = CharacterDirection.Up;
+        } else { // angle >= -PI_34 && angle < -PI_4                     // Camera is relatively to the LEFT
+            newSpriteDirection = CharacterDirection.Left;
         }
 
-        return { snappedYaw, subtleTurnYaw, spriteDirection };
+        this.currentDirection = newSpriteDirection;
+
+        // // Make the debug arrow represent the characters lookDirection in world space
+        // if(this.forwardArrow) {
+        //     const logicalForwardWorld = TmpVectors.Vector3[3]; // Use another temp vector
+        //     SpriteSheetCharacter.getDirectionVector(this.lookDirection, logicalForwardWorld); // Get the pure world direction vector
+
+        //     // If you want the arrow to rotate with the character's body *rotation* (which we don't set directly anymore based on lookDirection)
+        //     // you might need to transform the local forward (0,0,-1 maybe?) by the plane's *current* world matrix.
+        //     // However, showing the intended logical direction might be more useful for debugging.
+        //      const arrowEnd = this.plane.position.add(logicalForwardWorld.scale(0.5)); // Show logical direction from center
+
+        //      // Check if MeshBuilder.CreateLines needs points array directly or an options object
+        //      // Assuming it modifies the instance if 'instance' is provided correctly:
+        //      this.forwardArrowOptions.points[0] = this.plane.position; // Update start point in case character moved
+        //      this.forwardArrowOptions.points[1] = arrowEnd;
+        //      this.forwardArrow = B.MeshBuilder.CreateLines("arrow", {points: this.forwardArrowOptions.points, instance: this.forwardArrow }); // Update existing instance
+        // }
     }
 
-    /** Applies the rotation to the plane mesh using quaternions */
-    private applyRotation(snappedYaw: number, subtleTurnYaw: number): void {
-        if (!this.plane.rotationQuaternion) return;
-
-        // Rotation for the snapped base direction
-        const snappedRotation = TmpVectors.Quaternion[0];
-        Quaternion.RotationAxisToRef(Vector3.UpReadOnly, snappedYaw, snappedRotation);
-
-        // Rotation for the subtle additional turn towards the camera
-        const subtleTurnRotation = TmpVectors.Quaternion[1];
-        Quaternion.RotationAxisToRef(Vector3.UpReadOnly, subtleTurnYaw, subtleTurnRotation);
-
-        // Combine: Base snapped rotation * subtle turn
-        snappedRotation.multiplyToRef(subtleTurnRotation, this.plane.rotationQuaternion);
+    public applyAssetService(assetService: AssetService) {
+        this.assetService = assetService;
     }
 
-    /** Helper to get the corresponding world Y angle (radians) for a CharacterDirection */
-    private getAngleFromDirection(direction: CharacterDirection): number {
+    public turnAtCamera(): void {
+        const cam = this.scene.activeCamera;
+        const charPos = this.plane.position;
+
+        if (!cam || !cam.getViewMatrix()) return;
+
+        const viewDirectionXZ = TmpVectors.Vector3[4]; // Use a spare tmp vector
+        cam.globalPosition.subtractToRef(charPos, viewDirectionXZ);
+        viewDirectionXZ.y = 0;
+        if (viewDirectionXZ.lengthSquared() < 0.001) return;
+
+        viewDirectionXZ.normalize();
+
+        const dot = Vector3.Dot(this.plane.forward, viewDirectionXZ);
+        const crossY = this.plane.forward.z * viewDirectionXZ.x - this.plane.forward.x * viewDirectionXZ.z;
+        let relativeAngle = Math.atan2(crossY, dot); // Angle from characterLookVector to viewDirectionXZ (-PI to PI)
+
+        if (this.plane.rotationQuaternion)
+            Quaternion.RotationYawPitchRollToRef(relativeAngle, 0.1, 0, this.plane.rotationQuaternion);
+
+    }
+
+    public lookAtCamera(): void {
+        const cam = this.scene.activeCamera;
+        const charPos = this.plane.position;
+
+        if (!cam || !cam.getViewMatrix()) return;
+
+        const viewDirectionXZ = TmpVectors.Vector3[4]; // Use a spare tmp vector
+        cam.globalPosition.subtractToRef(charPos, viewDirectionXZ);
+        viewDirectionXZ.y = 0;
+        if (viewDirectionXZ.lengthSquared() < 0.001) return;
+
+        viewDirectionXZ.normalize();
+
+        // Convert direction vector to closest cardinal enum
+        const angle = Math.atan2(viewDirectionXZ.x, viewDirectionXZ.z);
+
+        const PI_4 = Math.PI / 4;
+        let newDirection: CharacterDirection;
+
+        if (angle >= -PI_4 && angle < PI_4) {
+            newDirection = CharacterDirection.Up;
+        } else if (angle >= PI_4 && angle < 3 * PI_4) {
+            newDirection = CharacterDirection.Right;
+        } else if (angle >= -3 * PI_4 && angle < -PI_4) {
+            newDirection = CharacterDirection.Left;
+        } else {
+            newDirection = CharacterDirection.Down;
+        }
+
+        this.lookDirection = newDirection;
+    }
+
+    public static getDirectionVector(direction: CharacterDirection, resultVector?: Vector3): B.Vector3 {
+        const vec = resultVector || TmpVectors.Vector3[3]; // Use temp or provided vector
+        switch (direction) {
+            case CharacterDirection.Up: vec.set(0, 0, 1); break;  // World +Z
+            case CharacterDirection.Down: vec.set(0, 0, -1); break; // World -Z
+            case CharacterDirection.Left: vec.set(-1, 0, 0); break; // World -X
+            case CharacterDirection.Right: vec.set(1, 0, 0); break;  // World +X
+            default: vec.set(0, 0, -1); // Default to Down/-Z
+        }
+        return vec;
+    }
+
+    public static inverseDirection(direction: CharacterDirection): CharacterDirection {
+        switch (direction) {
+            case CharacterDirection.Up: return CharacterDirection.Down;
+            case CharacterDirection.Down: return CharacterDirection.Up;
+            case CharacterDirection.Left: return CharacterDirection.Right;
+            case CharacterDirection.Right: return CharacterDirection.Left;
+            default: return DEFAULT_DIRECTION;
+        }
+    }
+
+    public static getAngleFromDirection(direction: CharacterDirection): number {
         switch (direction) {
             case CharacterDirection.Up: return 0;          // Face +Z
             case CharacterDirection.Down: return Math.PI;      // Face -Z
@@ -254,34 +408,12 @@ export class SpriteSheetCharacter {
         }
     }
 
-    /** Helper to get the normalized logical forward vector in world space */
-    private getLogicalForward(resultVector: Vector3): void {
-        if (this.lookAtTarget) {
-            this.lookAtTarget.subtractToRef(this.plane.position, resultVector);
-        } else {
-            resultVector.set(0, 0, -1); // Default: World -Z (Facing away from standard camera start)
-        }
-        resultVector.y = 0;
-        if (resultVector.lengthSquared() < 0.001) {
-            resultVector.copyFrom(this.getDirectionVector(this.currentSnappedDirection)); return; // Use last valid
-        }
-        if(Math.abs(resultVector.x) > Math.abs(resultVector.z))
-            resultVector.z = 0;
-        else 
-            resultVector.x = 0;
-        resultVector.normalize();
-
-    }
-
-    /** Determines and sets the correct full animation name based on current state */
-    private determineAndSetAnimationName(forceUpdateUV: boolean = false): void {
+    private updateAnimationName(forceUpdateUV: boolean = false): void {
         const prefix = this.animationState || 'idle';
-        // Use the updated currentSnappedDirection
-        const newAnimationName = `${prefix}_${this.currentSnappedDirection}` as AnimationName;
+        const newAnimationName = `${prefix}_${this.currentDirection}` as AnimationName;
         this.setAnimationInternal(newAnimationName, forceUpdateUV);
     }
 
-    /** INTERNAL method that actually changes animation state and UVs */
     private setAnimationInternal(name: AnimationName, forceUpdateUV: boolean = false): void {
         if (!this.texture) return;
         let animDef = ANIMATION_DEFINITIONS[name];
@@ -292,12 +424,11 @@ export class SpriteSheetCharacter {
         // console.log(`[DEBUG Anim] SetAnimInternal: UPDATING Animation from ${this.currentFullAnimation} to ${name}`);
         this.currentFullAnimation = name;
         this.currentFrameDuration = (animDef.durationMultiplier || 1.0) * BASE_FRAME_DURATION;
-        if (nameChanged) { this.currentFrameIndex = 0; this.animationTimer = 0; }
+        if (this.animationState != name.split('_')[0]) { this.currentFrameIndex = 0; this.animationTimer = 0; }
         this.isAnimationPlaying = true;
         this._updateUVs();
     }
 
-    /** Advances the animation frame if playing */
     private advanceAnimationFrame(): void {
         if (!this.isAnimationPlaying || !this.texture || !this.scene || !this.currentFullAnimation) return;
         const deltaTime = this.scene.getEngine().getDeltaTime() / 1000.0;
@@ -311,7 +442,6 @@ export class SpriteSheetCharacter {
         }
     }
 
-    /** Calculates and updates the texture UV offsets and scales */
     private _updateUVs(): void {
         if (!this.texture || !this.currentFullAnimation) return;
         const animDef = ANIMATION_DEFINITIONS[this.currentFullAnimation];
@@ -321,28 +451,19 @@ export class SpriteSheetCharacter {
         const row = animDef.startRow;
         const uOffset = column * this.uvScaleX;
         const vOffset = row * this.uvScaleY;
-        // console.log(`[DEBUG UV] Update: Anim=${this.currentFullAnimation}, Frame=${frameIndexInSequence}, Col=${column}, Row=${row}, uOff=${uOffset.toFixed(3)}, vOff=${vOffset.toFixed(3)}`);
-        this.texture.uOffset = uOffset; this.texture.vOffset = vOffset;
-        this.texture.uScale = this.uvScaleX; this.texture.vScale = this.uvScaleY;
+        this.texture_base.uOffset = uOffset; this.texture.vOffset = vOffset;
+        this.texture_base.uScale = this.uvScaleX; this.texture.vScale = this.uvScaleY;
+        this.texture_eyes.uOffset = uOffset; this.texture.vOffset = vOffset;
+        this.texture_eyes.uScale = this.uvScaleX; this.texture.vScale = this.uvScaleY;
+        this.texture_hair.uOffset = uOffset; this.texture.vOffset = vOffset;
+        this.texture_hair.uScale = this.uvScaleX; this.texture.vScale = this.uvScaleY;
     }
 
-    private getDirectionVector(direction: CharacterDirection, resultVector?: Vector3): B.Vector3 {
-        const vec = resultVector || TmpVectors.Vector3[3]; // Use temp or provided vector
-        switch (direction) {
-            case CharacterDirection.Up: vec.set(0, 0, 1); break;  // World +Z
-            case CharacterDirection.Down: vec.set(0, 0, -1); break; // World -Z
-            case CharacterDirection.Left: vec.set(-1, 0, 0); break; // World -X
-            case CharacterDirection.Right: vec.set(1, 0, 0); break;  // World +X
-            default: vec.set(0, 0, -1); // Default to Down/-Z
-        }
-        return vec;
-    }
-
-    /** Cleans up resources */
     public dispose(): void {
         console.log(`[SpriteSheetCharacter:${this.name}] Disposing...`);
         if (this.updateObserver) { this.scene.onBeforeRenderObservable.remove(this.updateObserver); this.updateObserver = null; }
         this.plane.dispose(false, true); this.material.dispose();
+        if (this.debugArrow) this.debugArrow.dispose();
         if (!this.assetService && this.texture) { this.texture.dispose(); }
         this.texture = null;
         console.log(`[SpriteSheetCharacter:${this.name}] Disposed.`);

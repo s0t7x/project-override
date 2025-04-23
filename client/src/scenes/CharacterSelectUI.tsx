@@ -11,23 +11,30 @@ import { SpriteSheetFactory } from "../babylon/SpriteSheetFactory";
 
 export function CharacterSelectUI() {
     const { networkService, sceneDirector, assetService } = useGameContext(); // Get the network service from context
-    const { currentScreen, setCurrentScreen, resetAuth, roomState, selectedCharacterId, setSelectedCharacter } = useGameStore();
+    const { currentScreen, setCurrentScreen, resetAuth, roomState, selectedCharacterId, setSelectedCharacter, characterList } = useGameStore();
 
-    const [characterList, setCharacterList] = useState<any>(null);
     const [spriteSheetFactory] = useState(new SpriteSheetFactory);
 
-    useEffect(() => {
-        if (roomState && roomState.characters) {
-            const chars: any[] = [];
-            roomState.characters.forEach((e: any) => {
-                chars.push(e);
-            })
-            setCharacterList(chars);
-        }
-    }, [roomState, currentScreen]);
+    function updateCharacterList(roomState: any) {
+        const chars: any[] = [];
+        roomState.characters.forEach((e: any) => {
+            chars.push(e);
+        })
+        // setCharacterList(chars);
+    }
 
     useEffect(() => {
-        console.log('i just ran')
+        networkService.addMessageListener("", updateCharacterList)
+    }, [])
+
+    useEffect(() => {
+        if (characterList) {
+            console.log("characterList changed", characterList)
+            // updateCharacterList(roomState)
+        }
+    }, [characterList]);
+
+    useEffect(() => {
         if(selectedCharacterId && selectedCharacterId.length > 1)
             handleSelectCharacter(selectedCharacterId || '');
     }, [characterList])
@@ -35,26 +42,27 @@ export function CharacterSelectUI() {
     const handleSelectCharacter = async (charId: string) => {
         console.log('Handle select char', charId);
 
-        const char = characterList?.find((e: any) => e.id == charId);
+        const char = characterList.find((char: any) => char.id == charId);
         if (!char) return;
         
         setSelectedCharacter(charId);
 
-        const spriteComposition = [
-            { url: char.customization.baseSpriteSheet || '', hueShift: char.customization.baseHue || 0 },
-            { url: char.customization.eyesSpriteSheet || '', hueShift: char.customization.eyesHue || 0 },
-            { url: char.customization.hairSpriteSheet || '', hueShift: char.customization.hairHue || 0 },
-        ];
+        // const spriteComposition = [
+        //     { url: char.customization.baseSpriteSheet || '', hueShift: char.customization.baseHue || 0 },
+        //     { url: char.customization.eyesSpriteSheet || '', hueShift: char.customization.eyesHue || 0 },
+        //     { url: char.customization.hairSpriteSheet || '', hueShift: char.customization.hairHue || 0 },
+        // ];
 
-        const cacheKey = spriteSheetFactory.generateCacheKey(spriteComposition);
-        let texture: any = assetService.loadTextureFromCache(cacheKey);
-        if (!texture) {
-            const comp = await spriteSheetFactory.createComposite(spriteComposition);
-            texture = await assetService.loadTextureFromComposition(comp);
-        }
+        // const cacheKey = spriteSheetFactory.generateCacheKey(spriteComposition);
+        // let texture: any = assetService.loadTextureFromCache(cacheKey);
+        // if (!texture) {
+        //     const comp = await spriteSheetFactory.createComposite(spriteComposition);
+        //     texture = await assetService.loadTextureFromComposition(comp);
+        // }
 
         const characterPreview = sceneDirector.getActiveScene()?.metadata?.characterPreview;
-        characterPreview.updateCharacterTexture(texture);
+        // characterPreview.updateCharacterTexture(texture);
+        characterPreview.setCharacter(char)
         characterPreview.lookAtCamera();
     };
 
@@ -68,6 +76,25 @@ export function CharacterSelectUI() {
         networkService.joinRoom("auth");
     }
 
+    const handleJoin = () => {
+
+    }
+
+    const handleDelete = () => {
+        (async () => {
+            networkService.onMessageOnce('INFO_MESSAGE', (payload: any) => {
+                if(payload.message?.endsWith('deleted!')) {
+                    sceneDirector.getActiveScene()?.metadata?.characterPreview?.setCharacter(null);
+                    setSelectedCharacter(null);
+                }
+            })
+
+            networkService.sendMessage('deleteCharacter', {
+                characterId: selectedCharacterId,
+            })
+        })();
+    }
+
     return (
         <>
             {/* <FloatingHeader title="Project Override" width={350} height={50} x={175} y={10}></FloatingHeader> */}
@@ -78,17 +105,18 @@ export function CharacterSelectUI() {
                         {characterList && characterList.map((char: any) => {
                             const isSelected = char.id === selectedCharacterId;
                             return (
-                                // Use character ID as the unique key for React reconciliation
-                                <Button id={`btn-${char.id}`} key={char.id} className={`char-list-item ${isSelected ? 'selected' : ''}`} style={{ width: '100%' }} onClick={() => handleSelectCharacter(char.id)}>
-                                    {/* Display character info */}
-                                    <div style={{ padding: 10, backgroundColor: 'rgba(1,1,1,0.1)' }}>
-                                        <div className="char-info" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 10 }}>
-                                            <span className="char-name">{char.name}</span>
-                                            <span className="char-level">Lv. {char.level}</span>
-                                            {/* Add appearance preview later */}
+                                <>
+                                    <Button id={`btn-${char.id}`} key={char.id} className={`char-list-item ${isSelected ? 'selected' : ''}`} style={{ width: '100%' }} onClick={() => handleSelectCharacter(char.id)}>
+                                        {/* Display character info */}
+                                        <div style={{ padding: 10, backgroundColor: 'rgba(1,1,1,0.1)' }}>
+                                            <div className="char-info" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 10 }}>
+                                                <span className="char-name">{char.name}</span>
+                                                <span className="char-level">Lv. {char.level}</span>
+                                                {/* Add appearance preview later */}
+                                            </div>
                                         </div>
-                                    </div>
-                                </Button>
+                                    </Button>
+                                </>
                             )
                         })}
                     </div>
@@ -102,6 +130,17 @@ export function CharacterSelectUI() {
                     </div>
                 </div>
             </Window>
+            { selectedCharacterId && 
+            <Window title={characterList.find((char: any) => char.id == selectedCharacterId).name} width={300} height={140} x={'calc(50vw - 150px)'} y={'70vw'}  className="login-window">
+                <Button type="button" onClick={handleJoin} style={{ marginTop: '15px' }}>
+                    <Text>Join Server</Text>
+                </Button>
+                <Button type="button" onClick={handleDelete} className="danger" style={{ lineHeight: '0' }}>
+                    <Text>Delete</Text>
+                </Button>
+            </Window>
+            }
+            
         </>
     );
 }

@@ -3,7 +3,7 @@
 // They help ensure client and server logic agree on the shape of synchronized data.
 
 import { EntityType, ItemSlot, QuestStatus, CurrencyType, GuildRank, InteractionType } from './enums';
-import { IVector3, IQuaternion, ICharacterStats, IItemStack } from './data';
+import { IVector3, IQuaternion, ICharacterStats, IItemStack, ICharacterCustomization } from './data';
 
 /** Data structure for a simplified character summary, used in CharacterSelectState. */
 export interface ICharacterSummary {
@@ -12,6 +12,7 @@ export interface ICharacterSummary {
     level: number;
     // Add appearance preview data if needed (e.g., sprite ID, main colors)
     previewSpriteId?: string;
+    customization?: ICharacterCustomization
 }
 
 /** State synchronized for the Character Selection Room. */

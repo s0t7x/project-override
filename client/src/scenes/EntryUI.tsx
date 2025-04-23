@@ -18,6 +18,11 @@ export function EntryUI() {
     useEffect(() => {
         (async ()=>{
             await networkService.joinRoom("entry");
+            await sceneDirector.setupEntryScene(assetService);
+            sceneDirector.getActiveScene()?.executeWhenReady(async () => {
+                await networkService.joinRoom("auth");
+                setCurrentScreen('login');
+            })
         })();
         BgmPlayer.play({
             name: "menu_theme",
@@ -28,29 +33,14 @@ export function EntryUI() {
     }, []);
 
     const { connectionStatus, setCurrentScreen } = useGameStore();
-    useEffect(() => {
-        // console.log(connectionStatus, networkService.currentRoom?.name)
-        // if(connectionStatus == 'connected' && networkService.currentRoom?.name == 'entry') {
-        //     sceneDirector.setupEntryScene();
-        //     sceneDirector.getActiveScene()?.executeWhenReady(async () => {
-        //         await networkService.joinRoom("auth");
-        //         setCurrentScreen('login');
-        //     })
-        // }
-    }, [connectionStatus]);
 
     useEffect(() => {
-            if(roomState && roomState.mapDataJson) {
+        console.log("hehe", roomState)
+            if(roomState && roomState.mapDataJson && connectionStatus == "connected") {
+                console.log("haha")
                 const mapData = JSON.parse(roomState.mapDataJson)
-                console.log("MapData", mapData)
                 if(mapData.blockData) 
                     useWorldStore.setState({ mapChunks: mapData.blockData})
-                sceneDirector.setupEntryScene(assetService);
-                sceneDirector.getActiveScene()?.executeWhenReady(async () => {
-                    await networkService.joinRoom("auth");
-                    setCurrentScreen('login');
-                })
-                
             }
         }, [roomState]);
 

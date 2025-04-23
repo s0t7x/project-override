@@ -1,7 +1,10 @@
 import * as B from '@babylonjs/core';
+import * as BABYLON from '@babylonjs/core';
 import { AssetService } from '../services/AssetService';
-import { Vector3, TmpVectors, Observer, Nullable, Quaternion, Color3 } from '@babylonjs/core';
+import { Vector3, TmpVectors, Observer, Nullable, Quaternion, Color3, SubMesh, StandardMaterial, MultiMaterial, Texture, MeshBuilder, Mesh } from '@babylonjs/core';
+import { ICharacterCustomization, ICharacterSummary } from '../../../shared/types';
 
+// --- Constants (keep as they are) ---
 const SHEET_COLUMNS = 24;
 const SHEET_ROWS = 66;
 const ANIMATION_DEFINITIONS = {
@@ -30,22 +33,876 @@ export enum CharacterDirection {
 }
 const DEFAULT_DIRECTION = CharacterDirection.Down;
 
-//---
+const HueShiftSpriteMaterialSnippet = {
+    "tags": null,
+    "ignoreAlpha": false,
+    "maxSimultaneousLights": 4,
+    "mode": 0,
+    "forceAlphaBlending": false,
+    "id": "node",
+    "name": "node",
+    "checkReadyOnEveryCall": false,
+    "checkReadyOnlyOnce": false,
+    "state": "",
+    "alpha": 1,
+    "backFaceCulling": true,
+    "cullBackFaces": true,
+    "alphaMode": 2,
+    "_needDepthPrePass": false,
+    "disableDepthWrite": false,
+    "disableColorWrite": false,
+    "forceDepthWrite": false,
+    "depthFunction": 0,
+    "separateCullingPass": false,
+    "fogEnabled": true,
+    "pointSize": 1,
+    "zOffset": 0,
+    "zOffsetUnits": 0,
+    "pointsCloud": false,
+    "fillMode": 0,
+    "editorData": {
+        "locations": [
+            {
+                "blockId": 10,
+                "x": 840,
+                "y": 140,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 9,
+                "x": 600,
+                "y": 80,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 7,
+                "x": 320,
+                "y": 0,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 5,
+                "x": 0,
+                "y": 0,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 6,
+                "x": 0,
+                "y": 160,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 8,
+                "x": 300,
+                "y": 220,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 12,
+                "x": 2260,
+                "y": 500,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 85,
+                "x": 0,
+                "y": 500,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 152,
+                "x": 300,
+                "y": 880,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 167,
+                "x": 820,
+                "y": 340,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 182,
+                "x": 1060,
+                "y": 340,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 213,
+                "x": 760,
+                "y": 840,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 230,
+                "x": 500,
+                "y": 980,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 443,
+                "x": 1120,
+                "y": 860,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 478,
+                "x": 1400,
+                "y": 780,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 497,
+                "x": 1680,
+                "y": 500,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 1161,
+                "x": 1880,
+                "y": 320,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 2177,
+                "x": 400,
+                "y": 440,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 2330,
+                "x": 400,
+                "y": 760,
+                "isCollapsed": false
+            },
+            {
+                "blockId": 2331,
+                "x": 860,
+                "y": 600,
+                "isCollapsed": false
+            }
+        ],
+        "frames": [],
+        "x": -451.22357227571536,
+        "y": -2.901152949233392,
+        "zoom": 0.6493207775266274
+    },
+    "customType": "BABYLON.NodeMaterial",
+    "outputNodes": [
+        10,
+        12
+    ],
+    "blocks": [
+        {
+            "customType": "BABYLON.VertexOutputBlock",
+            "id": 10,
+            "name": "VertexOutput",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 1,
+            "inputs": [
+                {
+                    "name": "vector",
+                    "inputName": "vector",
+                    "targetBlockId": 9,
+                    "targetConnectionName": "output",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "customType": "BABYLON.TransformBlock",
+            "id": 9,
+            "name": "WorldPos * ViewProjectionTransform",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 1,
+            "inputs": [
+                {
+                    "name": "vector",
+                    "inputName": "vector",
+                    "targetBlockId": 7,
+                    "targetConnectionName": "output",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "transform",
+                    "inputName": "transform",
+                    "targetBlockId": 8,
+                    "targetConnectionName": "output",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "output"
+                },
+                {
+                    "name": "xyz"
+                }
+            ],
+            "complementZ": 0,
+            "complementW": 1
+        },
+        {
+            "customType": "BABYLON.TransformBlock",
+            "id": 7,
+            "name": "WorldPos",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 1,
+            "inputs": [
+                {
+                    "name": "vector",
+                    "inputName": "vector",
+                    "targetBlockId": 5,
+                    "targetConnectionName": "output",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "transform",
+                    "inputName": "transform",
+                    "targetBlockId": 6,
+                    "targetConnectionName": "output",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "output"
+                },
+                {
+                    "name": "xyz"
+                }
+            ],
+            "complementZ": 0,
+            "complementW": 1
+        },
+        {
+            "customType": "BABYLON.InputBlock",
+            "id": 5,
+            "name": "position",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 1,
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "output"
+                }
+            ],
+            "type": 8,
+            "mode": 1,
+            "systemValue": null,
+            "animationType": 0,
+            "min": 0,
+            "max": 0,
+            "isBoolean": false,
+            "matrixMode": 0,
+            "isConstant": false,
+            "groupInInspector": "",
+            "convertToGammaSpace": false,
+            "convertToLinearSpace": false
+        },
+        {
+            "customType": "BABYLON.InputBlock",
+            "id": 6,
+            "name": "World",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 1,
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "output"
+                }
+            ],
+            "type": 128,
+            "mode": 0,
+            "systemValue": 1,
+            "animationType": 0,
+            "min": 0,
+            "max": 0,
+            "isBoolean": false,
+            "matrixMode": 0,
+            "isConstant": false,
+            "groupInInspector": "",
+            "convertToGammaSpace": false,
+            "convertToLinearSpace": false
+        },
+        {
+            "customType": "BABYLON.InputBlock",
+            "id": 8,
+            "name": "ViewProjection",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 1,
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "output"
+                }
+            ],
+            "type": 128,
+            "mode": 0,
+            "systemValue": 4,
+            "animationType": 0,
+            "min": 0,
+            "max": 0,
+            "isBoolean": false,
+            "matrixMode": 0,
+            "isConstant": false,
+            "groupInInspector": "",
+            "convertToGammaSpace": false,
+            "convertToLinearSpace": false
+        },
+        {
+            "customType": "BABYLON.FragmentOutputBlock",
+            "id": 12,
+            "name": "FragmentOutput",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 2,
+            "inputs": [
+                {
+                    "name": "rgba"
+                },
+                {
+                    "name": "rgb",
+                    "inputName": "rgb",
+                    "targetBlockId": 1161,
+                    "targetConnectionName": "rgb",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "a",
+                    "inputName": "a",
+                    "targetBlockId": 2331,
+                    "targetConnectionName": "output",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "glow"
+                }
+            ],
+            "outputs": [],
+            "convertToGammaSpace": false,
+            "convertToLinearSpace": false,
+            "useLogarithmicDepth": false
+        },
+        {
+            "customType": "BABYLON.ColorConverterBlock",
+            "id": 1161,
+            "name": "ColorConverter",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 4,
+            "inputs": [
+                {
+                    "name": "rgb ",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "hsl ",
+                    "inputName": "hsl ",
+                    "targetBlockId": 497,
+                    "targetConnectionName": "xyz",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "rgb"
+                },
+                {
+                    "name": "hsl"
+                }
+            ]
+        },
+        {
+            "customType": "BABYLON.VectorMergerBlock",
+            "id": 497,
+            "name": "VectorMerger",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 4,
+            "inputs": [
+                {
+                    "name": "xyzw "
+                },
+                {
+                    "name": "xyz "
+                },
+                {
+                    "name": "xy "
+                },
+                {
+                    "name": "zw "
+                },
+                {
+                    "name": "x",
+                    "inputName": "x",
+                    "targetBlockId": 478,
+                    "targetConnectionName": "output",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "y",
+                    "inputName": "y",
+                    "targetBlockId": 182,
+                    "targetConnectionName": "y",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "z",
+                    "inputName": "z",
+                    "targetBlockId": 182,
+                    "targetConnectionName": "z",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "w"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "xyzw"
+                },
+                {
+                    "name": "xyz"
+                },
+                {
+                    "name": "xy"
+                },
+                {
+                    "name": "zw"
+                }
+            ],
+            "xSwizzle": "x",
+            "ySwizzle": "y",
+            "zSwizzle": "z",
+            "wSwizzle": "w"
+        },
+        {
+            "customType": "BABYLON.TrigonometryBlock",
+            "id": 478,
+            "name": "Fract",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 4,
+            "inputs": [
+                {
+                    "name": "input",
+                    "inputName": "input",
+                    "targetBlockId": 443,
+                    "targetConnectionName": "output",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "output"
+                }
+            ],
+            "operation": 14
+        },
+        {
+            "customType": "BABYLON.AddBlock",
+            "id": 443,
+            "name": "Add",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 4,
+            "inputs": [
+                {
+                    "name": "left",
+                    "inputName": "left",
+                    "targetBlockId": 182,
+                    "targetConnectionName": "x",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "right",
+                    "inputName": "right",
+                    "targetBlockId": 213,
+                    "targetConnectionName": "output",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "output"
+                }
+            ]
+        },
+        {
+            "customType": "BABYLON.VectorSplitterBlock",
+            "id": 182,
+            "name": "VectorSplitter",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 4,
+            "inputs": [
+                {
+                    "name": "xyzw"
+                },
+                {
+                    "name": "xyz ",
+                    "inputName": "xyz ",
+                    "targetBlockId": 167,
+                    "targetConnectionName": "hsl",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "xy "
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "xyz"
+                },
+                {
+                    "name": "xy"
+                },
+                {
+                    "name": "zw"
+                },
+                {
+                    "name": "x"
+                },
+                {
+                    "name": "y"
+                },
+                {
+                    "name": "z"
+                },
+                {
+                    "name": "w"
+                }
+            ]
+        },
+        {
+            "customType": "BABYLON.ColorConverterBlock",
+            "id": 167,
+            "name": "ColorConverter",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 4,
+            "inputs": [
+                {
+                    "name": "rgb ",
+                    "inputName": "rgb ",
+                    "targetBlockId": 2177,
+                    "targetConnectionName": "rgb",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "hsl "
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "rgb"
+                },
+                {
+                    "name": "hsl"
+                }
+            ]
+        },
+        {
+            "customType": "BABYLON.TextureBlock",
+            "id": 2177,
+            "name": "diffuseTexture",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 3,
+            "inputs": [
+                {
+                    "name": "uv",
+                    "inputName": "uv",
+                    "targetBlockId": 85,
+                    "targetConnectionName": "output",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "source"
+                },
+                {
+                    "name": "layer"
+                },
+                {
+                    "name": "lod"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "rgba"
+                },
+                {
+                    "name": "rgb"
+                },
+                {
+                    "name": "r"
+                },
+                {
+                    "name": "g"
+                },
+                {
+                    "name": "b"
+                },
+                {
+                    "name": "a"
+                },
+                {
+                    "name": "level"
+                }
+            ],
+            "convertToGammaSpace": false,
+            "convertToLinearSpace": false,
+            "fragmentOnly": false,
+            "disableLevelMultiplication": false
+        },
+        {
+            "customType": "BABYLON.InputBlock",
+            "id": 85,
+            "name": "uv",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 1,
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "output"
+                }
+            ],
+            "type": 4,
+            "mode": 1,
+            "systemValue": null,
+            "animationType": 0,
+            "min": 0,
+            "max": 0,
+            "isBoolean": false,
+            "matrixMode": 0,
+            "isConstant": false,
+            "groupInInspector": "",
+            "convertToGammaSpace": false,
+            "convertToLinearSpace": false
+        },
+        {
+            "customType": "BABYLON.DivideBlock",
+            "id": 213,
+            "name": "Divide",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 4,
+            "inputs": [
+                {
+                    "name": "left",
+                    "inputName": "left",
+                    "targetBlockId": 152,
+                    "targetConnectionName": "output",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "right",
+                    "inputName": "right",
+                    "targetBlockId": 230,
+                    "targetConnectionName": "output",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "output"
+                }
+            ]
+        },
+        {
+            "customType": "BABYLON.InputBlock",
+            "id": 152,
+            "name": "hueShift",
+            "comments": "",
+            "visibleInInspector": true,
+            "visibleOnFrame": false,
+            "target": 1,
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "output"
+                }
+            ],
+            "type": 1,
+            "mode": 0,
+            "systemValue": null,
+            "animationType": 0,
+            "min": 0,
+            "max": 0,
+            "isBoolean": false,
+            "matrixMode": 0,
+            "isConstant": false,
+            "groupInInspector": "",
+            "convertToGammaSpace": false,
+            "convertToLinearSpace": false,
+            "valueType": "number",
+            "value": 120
+        },
+        {
+            "customType": "BABYLON.InputBlock",
+            "id": 230,
+            "name": "Float",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 1,
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "output"
+                }
+            ],
+            "type": 1,
+            "mode": 0,
+            "systemValue": null,
+            "animationType": 0,
+            "min": 0,
+            "max": 0,
+            "isBoolean": false,
+            "matrixMode": 0,
+            "isConstant": true,
+            "groupInInspector": "",
+            "convertToGammaSpace": false,
+            "convertToLinearSpace": false,
+            "valueType": "number",
+            "value": 360
+        },
+        {
+            "customType": "BABYLON.MultiplyBlock",
+            "id": 2331,
+            "name": "Multiply",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 4,
+            "inputs": [
+                {
+                    "name": "left",
+                    "inputName": "left",
+                    "targetBlockId": 2177,
+                    "targetConnectionName": "a",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                },
+                {
+                    "name": "right",
+                    "inputName": "right",
+                    "targetBlockId": 2330,
+                    "targetConnectionName": "output",
+                    "isExposedOnFrame": true,
+                    "exposedPortPosition": -1
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "output"
+                }
+            ]
+        },
+        {
+            "customType": "BABYLON.InputBlock",
+            "id": 2330,
+            "name": "Material alpha",
+            "comments": "",
+            "visibleInInspector": false,
+            "visibleOnFrame": false,
+            "target": 1,
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "output"
+                }
+            ],
+            "type": 1,
+            "mode": 0,
+            "systemValue": 11,
+            "animationType": 0,
+            "min": 0,
+            "max": 0,
+            "isBoolean": false,
+            "matrixMode": 0,
+            "isConstant": false,
+            "groupInInspector": "",
+            "convertToGammaSpace": false,
+            "convertToLinearSpace": false
+        }
+    ],
+    "uniqueId": 4
+}
+const HUE_SHIFT_TEXTURE_SAMPLER_NAME = "diffuseTexture";
+const HUE_SHIFT_UNIFORM_NAME = "hueShift";
+
+// ---
 
 export class SpriteSheetCharacter {
     private scene: B.Scene;
     private assetService?: AssetService;
     public name: string;
     public plane: B.Mesh;
-    private material: B.StandardMaterial;
-    private texture: B.Texture | null = null;
+    private multiMaterial: B.MultiMaterial; // Renamed for clarity
+
+    // Use StandardMaterial as created
+    private material_base: B.StandardMaterial;
+    private material_eyes: B.StandardMaterial;
+    private material_hair: B.StandardMaterial;
+
+    // Keep separate texture references for each layer
+    private texture_base: B.Texture | null = null;
+    private texture_eyes: B.Texture | null = null;
+    private texture_hair: B.Texture | null = null;
 
     // Logical view direction
     public lookDirection: CharacterDirection = DEFAULT_DIRECTION;
     private currentDirection: CharacterDirection = DEFAULT_DIRECTION; // Direction for sprite choice
 
     // Animation State
-    public animationState: string | null = null;
+    public animationState: string | null = null; // e.g., 'walk', 'idle'
     private currentFullAnimation: AnimationName = DEFAULT_ANIMATION;
     private currentFrameIndex: number = 0;
     private animationTimer: number = 0;
@@ -56,8 +913,7 @@ export class SpriteSheetCharacter {
     private readonly uvScaleY: number = 1 / SHEET_ROWS;
     private updateObserver: Nullable<Observer<B.Scene>> = null;
 
-    private debugArrow: B.LinesMesh | null = null;
-    private debugArrowOptions: any;
+    private static baseHueShiftMaterial: Nullable<B.NodeMaterial> = null;
 
     public billboard: boolean = false;
 
@@ -71,170 +927,420 @@ export class SpriteSheetCharacter {
         this.scene = scene;
         this.assetService = assetService;
 
+        if (!SpriteSheetCharacter.baseHueShiftMaterial) {
+            const parsedMaterial = B.NodeMaterial.Parse(HueShiftSpriteMaterialSnippet, this.scene)
+            parsedMaterial.backFaceCulling = false;
+            parsedMaterial.alphaMode = B.Engine.ALPHA_COMBINE;
+            // Store the parsed material
+            SpriteSheetCharacter.baseHueShiftMaterial = parsedMaterial;
+            console.log("[SpriteSheetCharacter] Base hue shift NodeMaterial loaded.");
+        }
+
+        this.initialize(name, scene, assetService, initialPosition);
+    }
+
+    private initialize(
+        name: string,
+        scene: B.Scene,
+        assetService?: AssetService,
+        initialPosition: B.Vector3 = Vector3.Zero()
+    ) {
+        // 1. Create the Plane Mesh
         this.plane = B.MeshBuilder.CreatePlane(`${name}_plane`, { size: 2 }, this.scene);
         this.plane.position = initialPosition.clone();
         this.plane.billboardMode = B.Mesh.BILLBOARDMODE_NONE; // Manual rotation
         this.plane.isPickable = false;
         this.plane.rotationQuaternion = Quaternion.Identity(); // Use Quaternion
-        this.plane.visibility = 0;
+        this.plane.visibility = 0; // Initially invisible until customized
+        // Ensure back faces aren't culled if needed (sprites often visible from both sides slightly)
+        // this.plane.material.backFaceCulling = false; // Apply this later to submaterials
 
-        this.material = new B.StandardMaterial(`${name}_mat`, this.scene);
-        this.material.backFaceCulling = true;
-        this.material.disableLighting = false;
-        this.material.emissiveColor = new Color3(0.2, 0.2, 0.2);
-        this.material.useAlphaFromDiffuseTexture = true;
-        this.plane.material = this.material;
+        // 2. Create Individual Materials for Each Layer
+        this.material_base = this.createLayerMaterial(`${name}_mat_base`, false);
+        this.material_eyes = this.createLayerMaterial(`${name}_mat_eyes`, true);
+        this.material_hair = this.createLayerMaterial(`${name}_mat_hair`, true);
 
-        // const forward = new Vector3(0, 0, 1); // local +Z direction
-        // const worldForward = Vector3.TransformNormal(forward, this.plane.getWorldMatrix());
-        // this.forwardArrowOptions = {
-        //     points: [
-        //         this.plane.position,
-        //         this.plane.position.add(worldForward.scale(0.5))
-        //     ],
-        //     updatable: true
-        // }
-        // this.forwardArrow = B.MeshBuilder.CreateLines("arrow", this.forwardArrowOptions, scene);
-        // this.forwardArrow.color = Color3.Red();
+        // 3. Create the MultiMaterial
+        this.multiMaterial = new B.MultiMaterial(`${name}_multimat`, this.scene);
+        this.multiMaterial.subMaterials.push(this.material_base); // Index 0
+        this.multiMaterial.subMaterials.push(this.material_eyes); // Index 1
+        this.multiMaterial.subMaterials.push(this.material_hair); // Index 2
+
+        // 4. *** Crucial Step: Define SubMeshes ***
+        // A standard plane has 4 vertices and 6 indices (0, 1, 2, 0, 2, 3)
+        const vertexCount = 4;
+        const indexCount = 6;
+        this.plane.subMeshes = []; // Clear default submesh
+
+        // Create a submesh for each material layer, all covering the entire geometry
+        // SubMesh(materialIndex, verticesStart, verticesCount, indexStart, indexCount, mesh)
+        new B.SubMesh(0, 0, vertexCount, 0, indexCount, this.plane); // For material_base
+        new B.SubMesh(1, 0, vertexCount, 0, indexCount, this.plane); // For material_eyes
+        new B.SubMesh(2, 0, vertexCount, 0, indexCount, this.plane); // For material_hair
+
+        // 5. Assign the MultiMaterial to the Plane
+        this.plane.material = this.multiMaterial;
 
         this.updateObserver = this.scene.onBeforeRenderObservable.add(this.update);
-        console.log(`[SpriteSheetCharacter:${this.name}] Initialized.`);
+        console.log(`[SpriteSheetCharacter:${this.name}] Initialized with MultiMaterial.`);
     }
 
-    public async updateCharacter(spriteSheetUrl: string | null, initialAnimation?: AnimationName): Promise<void> {
-        const oldTexture = this.texture;
-        if (!spriteSheetUrl) {
-            console.log(`[SpriteSheetCharacter:${this.name}] Clearing texture.`);
-            this.material.diffuseTexture = null; this.texture = null; this.stopAnimation(); this.plane.visibility = 0;
-        } else {
-            console.log(`[SpriteSheetCharacter:${this.name}] Updating texture: ${spriteSheetUrl}`);
-            try {
-                let newTexture: B.Texture | null = null; const scene = this.scene;
-                if (this.assetService) { newTexture = await this.assetService.loadTexture(spriteSheetUrl); } // TODO: Use AssetService with options
-                else { newTexture = new B.Texture(spriteSheetUrl, scene, false, true, B.Texture.NEAREST_SAMPLINGMODE); } // invertY=true
-                if (newTexture) {
-                    this.texture = newTexture;
-                    this.texture.hasAlpha = true;
-                    this.material.diffuseTexture = this.texture;
-                    console.log(`[SpriteSheetCharacter:${this.name}] Texture updated.`);
-                    if (!this.isAnimationPlaying && initialAnimation) this.setAnimationInternal(initialAnimation, true);
-                    this._updateUVs();
-                    this.plane.visibility = 1;
-                } else { console.error(`[SpriteSheetCharacter:${this.name}] Texture update failed: ${spriteSheetUrl}`); }
-            } catch (error) { console.error(`[SpriteSheetCharacter:${this.name}] Error updating texture ${spriteSheetUrl}:`, error); this.texture = null; this.material.diffuseTexture = null; }
+    // private createLayerMaterial(name: string, disableDepthWrite: boolean): B.StandardMaterial {
+    //     const material = new B.StandardMaterial(name, this.scene);
+
+    //     material.useAlphaFromDiffuseTexture = true;
+    //     material.diffuseTexture = null;
+
+    //     // --- Alpha Blending Settings ---
+    //     material.alphaMode = B.Engine.ALPHA_COMBINE;
+
+    //     // --- Depth Settings ---
+    //     material.disableDepthWrite = disableDepthWrite; 
+
+    //     // --- Other common sprite settings ---
+    //     material.backFaceCulling = false;            // Show back face if needed
+    //     material.disableLighting = false;             // Sprites often ignore scene lighting
+
+    //     return material;
+    // }
+
+    private createLayerMaterial(name: string, disableDepthWrite: boolean): B.NodeMaterial {
+        if (!SpriteSheetCharacter.baseHueShiftMaterial) {
+            // Handle case where material isn't loaded yet (important!)
+            console.error(`[${name}] Base NodeMaterial not ready!`);
+            // Return a temporary placeholder or throw error
+            // ... (Placeholder logic from previous answer) ...
+            const dummyMat = new B.StandardMaterial(name + "_dummy", this.scene);
+            dummyMat.emissiveColor = Color3.Magenta();
+            return dummyMat as any;
         }
-        if (oldTexture && oldTexture !== this.texture && !this.assetService) { oldTexture.dispose(); }
+
+        // <<< CLONE the base material >>>
+        const material = SpriteSheetCharacter.baseHueShiftMaterial.clone(name);
+
+        // Apply instance-specific settings
+        material.disableDepthWrite = disableDepthWrite;
+        material.alpha = 0.0; // Start invisible
+
+        // Initialize texture sampler to null
+        const samplerBlock = material.getBlockByName(HUE_SHIFT_TEXTURE_SAMPLER_NAME) as Nullable<B.TextureBlock>;
+        if (samplerBlock) {
+            samplerBlock.texture = null; // <<< Set the .texture property of the block
+        } else {
+            console.warn(`[${name}] Sampler block '${HUE_SHIFT_TEXTURE_SAMPLER_NAME}' not found during init.`);
+        }
+
+        // Initialize hue shift uniform to 0
+        const inputBlock = material.getBlockByName(HUE_SHIFT_UNIFORM_NAME) as Nullable<B.InputBlock>;
+        if (inputBlock) {
+            inputBlock.value = 0;
+        }
+
+        return material;
     }
 
-    public async updateCharacterTexture(spritesheetTexture: B.Texture, initialAnimation?: AnimationName): Promise<void> {
-        const oldTexture = this.texture;
-        console.log(`[SpriteSheetCharacter:${this.name}] Updating texture: ${spritesheetTexture.name}`);
-        try {
-            let newTexture: B.Texture | null = spritesheetTexture;
-            if (newTexture) {
-                this.texture = newTexture;
-                this.texture.hasAlpha = true;
-                this.material.diffuseTexture = this.texture;
-                console.log(`[SpriteSheetCharacter:${this.name}] Texture updated.`);
-                if (!this.isAnimationPlaying && initialAnimation) this.setAnimationInternal(initialAnimation, true);
-                this._updateUVs();
-                this.plane.visibility = 1;
-            } else { console.error(`[SpriteSheetCharacter:${this.name}] Texture update failed: ${spritesheetTexture.name}`); }
-        } catch (error) { console.error(`[SpriteSheetCharacter:${this.name}] Error updating texture ${spritesheetTexture.name}:`, error); this.texture = null; this.material.diffuseTexture = null; }
-        if (oldTexture && oldTexture !== this.texture && !this.assetService) { oldTexture.dispose(); }
+    // --- Helper function using NodeMaterial specifics ---
+    private async loadLayerTexture(
+        textureUrl: string | undefined | null,
+        material: B.NodeMaterial,
+        layerName: string
+    ): Promise<Texture | null> {
+
+        const samplerBlock = material.getBlockByName(HUE_SHIFT_TEXTURE_SAMPLER_NAME) as Nullable<B.TextureBlock>;
+        if (!samplerBlock) {
+            console.error(`[${this.name}] Cannot find sampler block '${HUE_SHIFT_TEXTURE_SAMPLER_NAME}' in material ${material.name}`);
+            material.alpha = 0.0;
+            return null;
+        }
+        // We don't necessarily need currentTexture ref here unless managing disposal carefully
+        // let currentTexture: Texture | null = samplerBlock.texture ?? null;
+
+        if (textureUrl && textureUrl.length > 0) {
+            // --- Texture URL Provided ---
+            try {
+                let newTexture: B.Texture | null = null;
+                let currentTextureInBlock = samplerBlock.texture; // Get texture currently in block
+                const needsLoading = !currentTextureInBlock || currentTextureInBlock.url !== textureUrl;
+
+                if (needsLoading) {
+                    if (this.assetService) {
+                        newTexture = await this.assetService.loadTexture(textureUrl);
+                    } else {
+                        // Dispose old manually ONLY if it exists and we loaded it (not from asset service)
+                        currentTextureInBlock?.dispose();
+                        newTexture = new B.Texture(textureUrl, this.scene, false, true, B.Texture.NEAREST_SAMPLINGMODE);
+                    }
+                } else {
+                    newTexture = currentTextureInBlock; // Reuse existing texture
+                }
+
+                if (newTexture) {
+                    newTexture.hasAlpha = true;
+                    // --- CORRECT WAY to assign the texture ---
+                    samplerBlock.texture = newTexture; // <<< Assign to the block's .texture property
+                    material.alpha = 1.0;
+                    console.log(`[SpriteSheetCharacter:${this.name}] ${layerName} Texture updated: ${textureUrl}`);
+                    // needsUVUpdate = true; // Flag this in setCharacter if needed
+                    return newTexture;
+                } else {
+                    // Loading failed
+                    console.error(`[SpriteSheetCharacter:${this.name}] ${layerName} Texture failed to load: ${textureUrl}`);
+                    if (needsLoading && !this.assetService) currentTextureInBlock?.dispose(); // Dispose if manually loaded
+                    // --- CORRECT WAY to set null texture ---
+                    samplerBlock.texture = null; // <<< Set block's texture to null
+                    material.alpha = 0.0;
+                    return null;
+                }
+            } catch (error) {
+                // Error during loading
+                console.error(`[SpriteSheetCharacter:${this.name}] Error loading ${layerName} texture: ${textureUrl}`, error);
+                // Consider if currentTextureInBlock needs disposal here based on needsLoading/assetService
+                // --- CORRECT WAY to set null texture ---
+                samplerBlock.texture = null; // <<< Set block's texture to null
+                material.alpha = 0.0;
+                return null;
+            }
+        } else {
+            // --- No Texture URL Provided ---
+            let currentTextureInBlock = samplerBlock.texture;
+            if (currentTextureInBlock && !this.assetService) {
+                currentTextureInBlock.dispose();
+            }
+            // --- CORRECT WAY to set null texture ---
+            samplerBlock.texture = null; // <<< Set block's texture to null
+            material.alpha = 0.0;
+            console.log(`[SpriteSheetCharacter:${this.name}] ${layerName} Texture set to null. Material alpha = 0.`);
+            return null;
+        }
     }
+
+    public async setCharacter(characterSummary: ICharacterSummary | null, initialAnimation?: AnimationName) {
+        console.log(`[SpriteSheetCharacter:${this.name}] Updating character customization.`, characterSummary);
+        const scene = this.scene;
+        let needsUVUpdate = false; // Track if UVs need update after texture changes
+
+        // --- Base Layer ---
+        if (characterSummary?.customization?.baseSpriteSheet) {
+            try {
+                const textureUrl = characterSummary.customization.baseSpriteSheet;
+                let newTexture: B.Texture | null = await this.loadLayerTexture(characterSummary?.customization?.baseSpriteSheet, this.material_base, "Base");
+                if (newTexture) {
+                    this.texture_base = newTexture;
+                    this.texture_base.hasAlpha = true;
+                    // this.material_base.diffuseTexture = this.texture_base;
+                    // this.material_base.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, this.texture_base);
+                    console.log(`[SpriteSheetCharacter:${this.name}] Base Texture updated.`);
+                    needsUVUpdate = true; // Texture loaded/changed, update UVs
+                } else {
+                    console.error(`[SpriteSheetCharacter:${this.name}] Base Texture failed to load: ${textureUrl}`);
+                    this.texture_base = null;
+                    // this.material_base.diffuseTexture = null;
+                    // this.material_base.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
+                }
+            } catch (error) {
+                console.error(`[SpriteSheetCharacter:${this.name}] Error loading base texture: ${characterSummary.customization.baseSpriteSheet}`, error);
+                this.texture_base = null;
+                // this.material_base.diffuseTexture = null;
+                // this.material_base.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
+            }
+        } else {
+            this.texture_base = null;
+            // this.material_base.diffuseTexture = null;
+            // this.material_base.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
+            this.texture_base = await this.loadLayerTexture(null, this.material_base, "Base");
+        }
+
+        // --- Hair Layer ---
+        if (characterSummary?.customization?.hairSpriteSheet && characterSummary?.customization?.hairSpriteSheet.length > 0) {
+            try {
+                const textureUrl = characterSummary.customization.hairSpriteSheet;
+                let newTexture: B.Texture | null = await this.loadLayerTexture(characterSummary?.customization?.hairSpriteSheet, this.material_hair, "Hair");
+                if (newTexture) {
+                    this.texture_hair = newTexture;
+                    this.texture_hair.hasAlpha = true;
+                    // this.material_hair.diffuseTexture = this.texture_hair;
+                    // this.material_hair.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, this.texture_hair);
+                    console.log(`[SpriteSheetCharacter:${this.name}] Hair Texture updated.`);
+                    needsUVUpdate = true; // Texture loaded/changed, update UVs (in case base wasn't loaded)
+                    this.material_hair.alpha = 1.0;
+                } else {
+                    console.error(`[SpriteSheetCharacter:${this.name}] Hair Texture failed to load: ${textureUrl}`);
+                    this.texture_hair = null;
+                    // this.material_hair.diffuseTexture = null;
+                    // this.material_hair.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
+                    this.material_hair.alpha = 0.0;
+                }
+            } catch (error) {
+                console.error(`[SpriteSheetCharacter:${this.name}] Error loading hair texture: ${characterSummary.customization.hairSpriteSheet}`, error);
+                this.texture_hair = null;
+                // this.material_hair.diffuseTexture = null;
+                // this.material_hair.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
+                this.material_hair.alpha = 0.0;
+            }
+        } else {
+            this.texture_hair = null;
+            // this.material_hair.diffuseTexture = null;
+            // this.material_hair.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
+            this.material_hair.alpha = 0.0;
+            this.texture_hair = await this.loadLayerTexture(null, this.material_hair, "Hair");
+        }
+
+        // --- Eyes Layer (Add similarly if needed) ---
+        if (characterSummary?.customization?.eyesSpriteSheet && characterSummary?.customization?.eyesSpriteSheet.length > 0) {
+            try {
+                const textureUrl = characterSummary.customization.eyesSpriteSheet;
+                let newTexture: B.Texture | null = await this.loadLayerTexture(characterSummary?.customization?.eyesSpriteSheet, this.material_base, "Eyes");
+                if (newTexture) {
+                    this.texture_eyes = newTexture;
+                    this.texture_eyes.hasAlpha = true;
+                    // this.material_eyes.diffuseTexture = this.texture_eyes;
+                    // this.material_eyes.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, this.texture_eyes);
+                    console.log(`[SpriteSheetCharacter:${this.name}] Eyes Texture updated.`);
+                    needsUVUpdate = true; // Texture loaded/changed, update UVs
+                    this.material_eyes.alpha = 1.0;
+                } else {
+                    console.error(`[SpriteSheetCharacter:${this.name}] Eyes Texture failed to load: ${textureUrl}`);
+                    this.texture_eyes = null;
+                    // this.material_eyes.diffuseTexture = null;
+                    // this.material_eyes.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
+                    this.material_eyes.alpha = 0.0;
+                }
+            } catch (error) {
+                console.error(`[SpriteSheetCharacter:${this.name}] Error loading eyes texture: ${characterSummary.customization.eyesSpriteSheet}`, error);
+                this.texture_eyes = null;
+                // this.material_eyes.diffuseTexture = null;
+                // this.material_eyes.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
+                this.material_eyes.alpha = 0.0;
+            }
+        } else {
+            this.texture_eyes = null;
+            // this.material_eyes.diffuseTexture = null;
+            // this.material_eyes.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
+            this.material_eyes.alpha = 0.0;
+            this.texture_eyes = await this.loadLayerTexture(null, this.material_eyes, "Eyes");
+        }
+
+
+        // --- Final Setup ---
+        if (characterSummary && this.texture_base) { // Require at least a base texture to be visible
+            // Set initial animation state if provided or default
+            this.setAnimationInternal(initialAnimation || this.currentFullAnimation || DEFAULT_ANIMATION, true); // Force UV update
+            this.plane.visibility = 1;
+            console.log(`[SpriteSheetCharacter:${this.name}] Character setup complete. Visible.`);
+        } else {
+            this.plane.visibility = 0;
+            this.stopAnimation();
+            console.log(`[SpriteSheetCharacter:${this.name}] No base texture or character summary. Hidden.`);
+        }
+
+        // Apply hue shift if needed (requires custom shader or node material)
+        if (characterSummary?.customization) {
+            this.applyHueShift(this.material_base, characterSummary?.customization?.baseHue);
+            this.applyHueShift(this.material_eyes, characterSummary?.customization?.eyesHue);
+            this.applyHueShift(this.material_hair, characterSummary?.customization?.hairHue);
+        }
+    }
+
+    // Placeholder for hue shift - requires more advanced material setup
+    private applyHueShift(material: StandardMaterial, hue: number): void {
+        // This needs a custom shader or Node Material to implement hue rotation.
+        // StandardMaterial doesn't support hue shift directly.
+        // console.warn("Hue shift not implemented. Requires Custom/Node Material.");
+        const inputBlock = material.getBlockByName(HUE_SHIFT_UNIFORM_NAME) as Nullable<B.InputBlock>;
+        if (inputBlock) {
+            inputBlock.value = hue;
+        }
+    }
+
 
     public stopAnimation(): void { this.isAnimationPlaying = false; }
     public resumeAnimation(): void { this.isAnimationPlaying = true; }
     public setPosition(position: B.Vector3): void { this.plane.position.copyFrom(position); }
     public getPosition(): B.Vector3 { return this.plane.position; }
-    public hasTexture(): Boolean { return this.texture !== null; }
+    public hasTexture(): boolean { return this.texture_base !== null; } // Check base texture
 
     private update = (): void => {
+        // Only update if visible and has a base texture
+        if (this.plane.visibility === 0 || !this.texture_base) {
+            return;
+        }
+
         this.updateCurrentDirection();
 
         // Sprite Animation
-        this.updateAnimationName();
-        this.advanceAnimationFrame();
+        this.updateAnimationName(); // Determine correct animation based on state and direction
+        this.advanceAnimationFrame(); // Advance frame if playing
     }
 
+    // --- Direction Logic (Keep as is, seems fine) ---
     private updateCurrentDirection(): void {
         const cam = this.scene.activeCamera;
         const charPos = this.plane.position;
 
         if (!cam || !cam.getViewMatrix() || !this.plane.rotationQuaternion) return;
 
-        const viewDirectionXZ = TmpVectors.Vector3[1];
-        cam.globalPosition.subtractToRef(charPos, viewDirectionXZ);
+        // Use temporary vectors from the pool
+        const viewDirectionXZ = TmpVectors.Vector3[0]; // Use index 0
+        cam.getForwardRay(999, undefined, charPos).direction.scaleToRef(-1, viewDirectionXZ); // More direct way to get view dir towards point
         viewDirectionXZ.y = 0; // Project onto XZ plane
 
+
         if (viewDirectionXZ.lengthSquared() < 0.001) {
-            // Camera is directly above or below, maintain last rotation or default
-            // Or use the character's lookDirection to decide a default facing
-            viewDirectionXZ.copyFrom(SpriteSheetCharacter.getDirectionVector(this.lookDirection));
-            viewDirectionXZ.negateInPlace(); // Point towards character
-            if (viewDirectionXZ.lengthSquared() < 0.001) { viewDirectionXZ.set(0, 0, -1); } // Ultimate fallback
+            // Camera is directly above or below, use lookDirection
+            SpriteSheetCharacter.getDirectionVector(this.lookDirection, viewDirectionXZ);
+            if (viewDirectionXZ.lengthSquared() < 0.001) { viewDirectionXZ.set(0, 0, -1); } // Ultimate fallback if lookDirection is zero?
         }
         viewDirectionXZ.normalize(); // Vector FROM character TOWARDS camera (on XZ plane)
 
         const cameraAngle = Math.atan2(viewDirectionXZ.x, viewDirectionXZ.z);
 
-        // Snap this angle to the nearest 90 degrees (PI/2 radians)
-        const snappedAngle = Math.round(cameraAngle / (Math.PI / 2)) * (Math.PI / 2);
+        // --- Rotation ---
+        if (this.billboard) {
+            // Simple billboard (face camera directly on Y axis)
+            const angleToCamera = cameraAngle + Math.PI
+            Quaternion.RotationYawPitchRollToRef(angleToCamera, 0, 0, this.plane.rotationQuaternion);
+        } else {
+            const targetAngle = Math.round(cameraAngle / (Math.PI / 2)) * (Math.PI / 2) + Math.PI;
+            Quaternion.RotationYawPitchRollToRef(targetAngle, 0, 0, this.plane.rotationQuaternion); // Directly set rotation based on lookDirection
+        }
 
-        const finalPlaneAngle = snappedAngle + Math.PI;
-        
-        if(this.billboard)
-            Quaternion.RotationYawPitchRollToRef(cameraAngle + Math.PI, 0.1, 0, this.plane.rotationQuaternion);
-        else
-            Quaternion.RotationYawPitchRollToRef(finalPlaneAngle, 0.1, 0, this.plane.rotationQuaternion);
-        
-        const characterLookVector = TmpVectors.Vector3[2]; // Use a different temp vector
-        SpriteSheetCharacter.getDirectionVector(this.lookDirection, characterLookVector); // Get the character's intended facing direction
+        const characterLookVector = TmpVectors.Vector3[1]; // Use index 1
+        SpriteSheetCharacter.getDirectionVector(this.lookDirection, characterLookVector);
 
+        // --- Sprite Direction Choice ---
+        // Calculate angle between where character is looking and the camera direction
         const dot = Vector3.Dot(characterLookVector, viewDirectionXZ);
-        const crossY = characterLookVector.z * viewDirectionXZ.x - characterLookVector.x * viewDirectionXZ.z;
+        const crossY = characterLookVector.z * viewDirectionXZ.x - characterLookVector.x * viewDirectionXZ.z; // Cross product Y component
         let relativeAngle = Math.atan2(crossY, dot); // Angle from characterLookVector to viewDirectionXZ (-PI to PI)
-        
 
         const PI_4 = Math.PI / 4;
         const PI_34 = 3 * Math.PI / 4;
         let newSpriteDirection = this.currentDirection;
 
-        if (relativeAngle >= -PI_4 && relativeAngle < PI_4) {             // Camera is relatively in FRONT of where the character is looking
-            newSpriteDirection = CharacterDirection.Down;
-        } else if (relativeAngle >= PI_4 && relativeAngle < PI_34) {      // Camera is relatively to the RIGHT
-            newSpriteDirection = CharacterDirection.Right;
-        } else if (relativeAngle >= PI_34 || relativeAngle < -PI_34) {   // Camera is relatively BEHIND
-            newSpriteDirection = CharacterDirection.Up;
-        } else { // angle >= -PI_34 && angle < -PI_4                     // Camera is relatively to the LEFT
-            newSpriteDirection = CharacterDirection.Left;
+        // Determine sprite based on camera relative angle
+        if (relativeAngle >= -PI_4 && relativeAngle < PI_4) {
+            newSpriteDirection = CharacterDirection.Down; // Camera is in front
+        } else if (relativeAngle >= PI_4 && relativeAngle < PI_34) {
+            newSpriteDirection = CharacterDirection.Right; // Camera is to the right
+        } else if (relativeAngle >= PI_34 || relativeAngle < -PI_34) {
+            newSpriteDirection = CharacterDirection.Up;   // Camera is behind
+        } else { // angle >= -PI_34 && angle < -PI_4
+            newSpriteDirection = CharacterDirection.Left;  // Camera is to the left
         }
 
-        this.currentDirection = newSpriteDirection;
 
-        // // Make the debug arrow represent the characters lookDirection in world space
-        // if(this.forwardArrow) {
-        //     const logicalForwardWorld = TmpVectors.Vector3[3]; // Use another temp vector
-        //     SpriteSheetCharacter.getDirectionVector(this.lookDirection, logicalForwardWorld); // Get the pure world direction vector
-
-        //     // If you want the arrow to rotate with the character's body *rotation* (which we don't set directly anymore based on lookDirection)
-        //     // you might need to transform the local forward (0,0,-1 maybe?) by the plane's *current* world matrix.
-        //     // However, showing the intended logical direction might be more useful for debugging.
-        //      const arrowEnd = this.plane.position.add(logicalForwardWorld.scale(0.5)); // Show logical direction from center
-
-        //      // Check if MeshBuilder.CreateLines needs points array directly or an options object
-        //      // Assuming it modifies the instance if 'instance' is provided correctly:
-        //      this.forwardArrowOptions.points[0] = this.plane.position; // Update start point in case character moved
-        //      this.forwardArrowOptions.points[1] = arrowEnd;
-        //      this.forwardArrow = B.MeshBuilder.CreateLines("arrow", {points: this.forwardArrowOptions.points, instance: this.forwardArrow }); // Update existing instance
-        // }
+        // Only trigger animation change if the sprite direction changes
+        if (newSpriteDirection !== this.currentDirection) {
+            this.currentDirection = newSpriteDirection;
+            // Don't call _updateUVs directly here, let updateAnimationName handle it
+            this.updateAnimationName(true); // Force update if direction changes animation
+        }
     }
 
     public applyAssetService(assetService: AssetService) {
         this.assetService = assetService;
+        // Potentially reload textures if needed, or just use it for future loads
     }
-
     public turnAtCamera(): void {
         const cam = this.scene.activeCamera;
         const charPos = this.plane.position;
@@ -322,59 +1428,173 @@ export class SpriteSheetCharacter {
     }
 
     private updateAnimationName(forceUpdateUV: boolean = false): void {
+        // Determine the correct animation name based on the current state (e.g., 'walk') and sprite direction (e.g., 'left')
         const prefix = this.animationState || 'idle';
         const newAnimationName = `${prefix}_${this.currentDirection}` as AnimationName;
+
+        // Update the animation only if the name actually changes, or if forced
         this.setAnimationInternal(newAnimationName, forceUpdateUV);
     }
 
     private setAnimationInternal(name: AnimationName, forceUpdateUV: boolean = false): void {
-        if (!this.texture) return;
+        // Find the animation definition
         let animDef = ANIMATION_DEFINITIONS[name];
-        if (!animDef) { name = DEFAULT_ANIMATION; animDef = ANIMATION_DEFINITIONS[name]; }
-        if (!animDef) { console.error(`Default animation ${DEFAULT_ANIMATION} missing!`); return; }
+        if (!animDef) {
+            console.warn(`[SpriteSheetCharacter:${this.name}] Animation definition not found for "${name}". Falling back to default.`);
+            name = DEFAULT_ANIMATION;
+            animDef = ANIMATION_DEFINITIONS[name];
+            if (!animDef) {
+                console.error(`[SpriteSheetCharacter:${this.name}] Default animation ${DEFAULT_ANIMATION} definition missing! Cannot set animation.`);
+                this.stopAnimation();
+                return;
+            }
+        }
+
         const nameChanged = this.currentFullAnimation !== name;
-        if (!nameChanged && !forceUpdateUV) { this.isAnimationPlaying = true; return; }
+
+        // If the animation name hasn't changed and we're not forcing an update,
+        // just ensure it's playing (if it wasn't already).
+        if (!nameChanged && !forceUpdateUV) {
+            if (!this.isAnimationPlaying) {
+                this.resumeAnimation();
+            }
+            return;
+        }
+
         // console.log(`[DEBUG Anim] SetAnimInternal: UPDATING Animation from ${this.currentFullAnimation} to ${name}`);
         this.currentFullAnimation = name;
         this.currentFrameDuration = (animDef.durationMultiplier || 1.0) * BASE_FRAME_DURATION;
-        if (this.animationState != name.split('_')[0]) { this.currentFrameIndex = 0; this.animationTimer = 0; }
-        this.isAnimationPlaying = true;
-        this._updateUVs();
+
+        // Reset frame index and timer only if the base animation type changes (e.g., 'walk' to 'idle')
+        const currentPrefix = this.currentFullAnimation.split('_')[0];
+        if (this.animationState !== currentPrefix) {
+            this.currentFrameIndex = 0;
+            this.animationTimer = 0;
+            // No need to set this.animationState here, it's set externally
+        } else {
+            // If only direction changed (e.g., 'walk_left' to 'walk_right'),
+            // keep the current frame index if it's valid for the new direction's animation
+            // This prevents animation "jumps" when turning while walking.
+            if (this.currentFrameIndex >= animDef.frames) {
+                this.currentFrameIndex = 0; // Reset if index is out of bounds for the new direction
+                this.animationTimer = 0;
+            }
+        }
+
+
+        this.resumeAnimation(); // Ensure animation plays
+        this._updateUVs(); // Update UVs immediately for the new animation/frame
     }
 
+
     private advanceAnimationFrame(): void {
-        if (!this.isAnimationPlaying || !this.texture || !this.scene || !this.currentFullAnimation) return;
+        if (!this.isAnimationPlaying || !this.currentFullAnimation || !this.scene) return;
+
+        // Check if we have textures to animate
+        if (!this.texture_base && !this.texture_eyes && !this.texture_hair) {
+            return;
+        }
+
+        const animDef = ANIMATION_DEFINITIONS[this.currentFullAnimation];
+        if (!animDef || animDef.frames <= 1) { // No animation if definition missing or only 1 frame
+            // If it's a single frame animation, ensure the UVs are set correctly once
+            if (this.currentFrameIndex !== 0) {
+                this.currentFrameIndex = 0;
+                this._updateUVs();
+            }
+            this.stopAnimation(); // Stop timer for single-frame "animations"
+            return;
+        }
+
+
         const deltaTime = this.scene.getEngine().getDeltaTime() / 1000.0;
         this.animationTimer += deltaTime;
+
         if (this.animationTimer >= this.currentFrameDuration) {
-            this.animationTimer %= this.currentFrameDuration;
-            const animDef = ANIMATION_DEFINITIONS[this.currentFullAnimation];
-            if (!animDef) return;
-            this.currentFrameIndex = (this.currentFrameIndex + 1) % animDef.frames;
-            this._updateUVs();
+            // Use while loop in case delta time is very large / frame rate very low
+            while (this.animationTimer >= this.currentFrameDuration) {
+                this.animationTimer -= this.currentFrameDuration;
+                this.currentFrameIndex = (this.currentFrameIndex + 1) % animDef.frames;
+            }
+            this._updateUVs(); // Update UVs only when the frame actually changes
         }
     }
 
+
+    // Corrected UV Update
     private _updateUVs(): void {
-        if (!this.texture || !this.currentFullAnimation) return;
         const animDef = ANIMATION_DEFINITIONS[this.currentFullAnimation];
-        if (!animDef) return;
-        const frameIndexInSequence = this.currentFrameIndex;
+        // Ensure we have an animation definition and at least one texture exists
+        if (!animDef || (!this.texture_base && !this.texture_eyes && !this.texture_hair)) {
+            // console.warn(`[SpriteSheetCharacter:${this.name}] Cannot update UVs. AnimDef: ${!!animDef}, BaseTex: ${!!this.texture_base}`);
+            return;
+        }
+
+        // Ensure frame index is valid
+        const frameIndexInSequence = this.currentFrameIndex % animDef.frames;
+
         const column = animDef.columnOffset + frameIndexInSequence;
-        const row = animDef.startRow;
+        const row = animDef.startRow; // Assuming row is constant for the animation sequence
+
+        // Calculate UV coordinates (bottom-left corner of the frame)
         const uOffset = column * this.uvScaleX;
+        // V coordinate needs care: Texture origin (0,0) is often bottom-left, but UV origin is top-left for meshes.
+        // If your sprite sheet rows count from top (0) to bottom (SHEET_ROWS - 1):
+        // const vOffset = (SHEET_ROWS - 1 - row) * this.uvScaleY;
+        // If your sprite sheet rows count from bottom (0) to top (SHEET_ROWS - 1) **OR**
+        // if you are using Texture InvertY=true (default for many loaders), then:
         const vOffset = row * this.uvScaleY;
-        this.texture.uOffset = uOffset; this.texture.vOffset = vOffset;
-        this.texture.uScale = this.uvScaleX; this.texture.vScale = this.uvScaleY;
+
+
+        // Apply the same UV offset and scale to all *existing* layer textures
+        if (this.texture_base) {
+            this.texture_base.uOffset = uOffset;
+            this.texture_base.vOffset = vOffset;
+            this.texture_base.uScale = this.uvScaleX;
+            this.texture_base.vScale = this.uvScaleY;
+        }
+        if (this.texture_eyes) {
+            this.texture_eyes.uOffset = uOffset;
+            this.texture_eyes.vOffset = vOffset;
+            this.texture_eyes.uScale = this.uvScaleX;
+            this.texture_eyes.vScale = this.uvScaleY;
+        }
+        if (this.texture_hair) {
+            this.texture_hair.uOffset = uOffset;
+            this.texture_hair.vOffset = vOffset;
+            this.texture_hair.uScale = this.uvScaleX;
+            this.texture_hair.vScale = this.uvScaleY;
+        }
+        // console.log(`[UV Update ${this.name}] Anim: ${this.currentFullAnimation}, Frame: ${this.currentFrameIndex}, UVs: (${uOffset.toFixed(2)}, ${vOffset.toFixed(2)}), Scale: (${this.uvScaleX.toFixed(2)}, ${this.uvScaleY.toFixed(2)})`);
     }
+
 
     public dispose(): void {
         console.log(`[SpriteSheetCharacter:${this.name}] Disposing...`);
-        if (this.updateObserver) { this.scene.onBeforeRenderObservable.remove(this.updateObserver); this.updateObserver = null; }
-        this.plane.dispose(false, true); this.material.dispose();
-        if (this.debugArrow) this.debugArrow.dispose();
-        if (!this.assetService && this.texture) { this.texture.dispose(); }
-        this.texture = null;
+        if (this.updateObserver) {
+            this.scene.onBeforeRenderObservable.remove(this.updateObserver);
+            this.updateObserver = null;
+        }
+        // Dispose mesh and materials
+        this.plane.dispose(false, true); // Dispose geometry and children, but not materials yet
+        this.multiMaterial.dispose(true); // Dispose multimaterial and its submaterials
+        // this.material_base.dispose(); // Already disposed by multiMaterial.dispose(true)
+        // this.material_eyes.dispose();
+        // this.material_hair.dispose();
+
+        // Dispose textures if not managed by AssetService
+        if (!this.assetService) {
+            this.texture_base?.dispose();
+            this.texture_eyes?.dispose();
+            this.texture_hair?.dispose();
+        }
+        this.texture_base = null;
+        this.texture_eyes = null;
+        this.texture_hair = null;
+
+
+        // if (this.debugArrow) this.debugArrow.dispose(); // Dispose debug arrow if used
+
         console.log(`[SpriteSheetCharacter:${this.name}] Disposed.`);
     }
 }

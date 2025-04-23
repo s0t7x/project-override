@@ -51,21 +51,10 @@ export function CharacterCreationUI() {
         if (!spriteSheetFactory) return;
         (async () => {
             if (!characterCustomization) return;
-            const spriteComposition = [
-                { url: characterCustomization.baseSpriteSheet || '', hueShift: characterCustomization.baseHue || 0 },
-                { url: characterCustomization.eyesSpriteSheet || '', hueShift: characterCustomization.eyesHue || 0 },
-                { url: characterCustomization.hairSpriteSheet || '', hueShift: characterCustomization.hairHue || 0 },
-            ];
-
-            const cacheKey = spriteSheetFactory.generateCacheKey(spriteComposition);
-            let texture: any = assetService.loadTextureFromCache(cacheKey);
-            if (!texture) {
-                const comp = await spriteSheetFactory.createComposite(spriteComposition);
-                texture = await assetService.loadTextureFromComposition(comp);
-            }
-
+    
             const characterPreview = sceneDirector.getActiveScene()?.metadata?.characterPreview;
-            characterPreview.updateCharacterTexture(texture);
+            // characterPreview.updateCharacterTexture(texture);
+            characterPreview.setCharacter({ customization: characterCustomization })
             characterPreview.lookAtCamera();
         })();
     }, [characterCustomization])
@@ -160,7 +149,7 @@ export function CharacterCreationUI() {
         (async () => {
             networkService.onMessageOnce('INFO_MESSAGE', (payload: any) => {
                 if(payload.message?.endsWith('created!')) {
-                    sceneDirector.getActiveScene()?.metadata?.characterPreview?.updateCharacter(null);
+                    sceneDirector.getActiveScene()?.metadata?.characterPreview?.setCharacter(null);
                     if(payload.characterId) setSelectedCharacter(payload.characterId)
                     setTimeout(() => setCurrentScreen("charSelect"), 200)
                 }
@@ -174,7 +163,7 @@ export function CharacterCreationUI() {
     }
 
     const handleBack = () => {
-        sceneDirector.getActiveScene()?.metadata?.characterPreview?.updateCharacter(null);
+        sceneDirector.getActiveScene()?.metadata?.characterPreview?.setCharacter(null);
         setCurrentScreen("charSelect");
     }
 

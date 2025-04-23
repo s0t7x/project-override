@@ -274,7 +274,7 @@ export class NetworkService {
                console.log("[NetworkService] Received character list update.");
                // Update a specific part of the gameStore or a dedicated charSelectStore
                // e.g., useGameStore.setState({ characterList: Object.values(state.characters) });
-               useGameStore.setState({ characterList: Object.values(state.characters) });
+               useGameStore.setState({ characterList: Array.from(state.characters.$items.values()) });
           }
            if (state.publicRooms && this.currentRoom?.name === 'world_lobby') {
                console.log("[NetworkService] Received room list update.");

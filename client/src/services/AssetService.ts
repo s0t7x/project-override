@@ -95,7 +95,7 @@ export class AssetService {
     * @param filePath - Path to the texture file (e.g., "/assets/textures/grass.png").
     * @returns Promise resolving with the loaded texture or null on failure.
     */
-    public async loadTexture(filePath: string): Promise<B.Texture | null> {
+    public async loadTexture(filePath: string, load = true): Promise<B.Texture | null> {
         if (!this.assetsManager || !this.scene) {
             console.error("[AssetService] Cannot load texture, scene context not set.");
             return null;
@@ -117,7 +117,7 @@ export class AssetService {
                 console.error(`[AssetService] Failed to load texture ${filePath}: ${message}`, exception);
                 reject(null);
             };
-            // this.assetsManager?.load(); // Consider calling load() separately after queuing tasks
+            if(load) this.assetsManager?.loadAsync(); // Consider calling load() separately after queuing tasks
         });
     }
 

@@ -41,8 +41,8 @@ export function createEntryScene(engine: B.Engine, assetService?: AssetService):
 
 
         assetServiceInstance?.setScene(scene);
-        assetServiceInstance?.loadTexture('/assets/sprites/char_test.png');
-        assetServiceInstance?.loadTexture('/assets/sprites/char_test_2.png');
+        assetServiceInstance?.loadTexture('/assets/sprites/char_test.png', false);
+        assetServiceInstance?.loadTexture('/assets/sprites/char_test_2.png', false);
         assetServiceInstance?.startLoadingSync();
 
         // --- Create Map Renderer ---
@@ -221,7 +221,7 @@ export function createEntryScene(engine: B.Engine, assetService?: AssetService):
         } else {
             nextCameraTarget = cameraDefaultTarget
             nextCameraRadius = 10;
-            if (characterPreview.hasTexture()) characterPreview.updateCharacter(null);
+            if (characterPreview.hasTexture()) characterPreview.setCharacter(null);
         }
 
         if (camera.targetScreenOffset !== nextCameraTarget) {
