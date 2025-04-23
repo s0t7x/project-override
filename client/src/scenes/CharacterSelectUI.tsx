@@ -11,42 +11,56 @@ import { SpriteSheetFactory } from "../babylon/SpriteSheetFactory";
 
 export function CharacterSelectUI() {
     const { networkService, sceneDirector, assetService } = useGameContext(); // Get the network service from context
-    const { setCurrentScreen, resetAuth, roomState, selectedCharacterId, setSelectedCharacter } = useGameStore();
+    const { currentScreen, setCurrentScreen, resetAuth, roomState, selectedCharacterId, setSelectedCharacter } = useGameStore();
 
     const [characterList, setCharacterList] = useState<any>(null);
-    const [ spriteSheetFactory ] = useState(new SpriteSheetFactory);
+    const [spriteSheetFactory] = useState(new SpriteSheetFactory);
 
     useEffect(() => {
         if (roomState && roomState.characters) {
             const chars: any[] = [];
             roomState.characters.forEach((e: any) => {
-                console.log(e)
                 chars.push(e);
             })
             setCharacterList(chars);
         }
-    }, [roomState]);
+    }, [roomState, currentScreen]);
+
+    useEffect(() => {
+        console.log('i just ran')
+        if(selectedCharacterId && selectedCharacterId.length > 1)
+            handleSelectCharacter(selectedCharacterId || '');
+    }, [characterList])
 
     const handleSelectCharacter = async (charId: string) => {
         console.log('Handle select char', charId);
+
+        const char = characterList?.find((e: any) => e.id == charId);
+        if (!char) return;
+        
         setSelectedCharacter(charId);
+
+        const spriteComposition = [
+            { url: char.customization.baseSpriteSheet || '', hueShift: char.customization.baseHue || 0 },
+            { url: char.customization.eyesSpriteSheet || '', hueShift: char.customization.eyesHue || 0 },
+            { url: char.customization.hairSpriteSheet || '', hueShift: char.customization.hairHue || 0 },
+        ];
+
+        const cacheKey = spriteSheetFactory.generateCacheKey(spriteComposition);
+        let texture: any = assetService.loadTextureFromCache(cacheKey);
+        if (!texture) {
+            const comp = await spriteSheetFactory.createComposite(spriteComposition);
+            texture = await assetService.loadTextureFromComposition(comp);
+        }
+
         const characterPreview = sceneDirector.getActiveScene()?.metadata?.characterPreview;
-        let texture;
-        if(charId == 'cm9hdv5jx00020cl42kgm7tu1') {
-                const cacheKey = spriteSheetFactory.generateCacheKey([
-                    { url: '/assets/sprites/char_test.png', hueShift: 120 },
-                    { url: '/assets/sprites/char_test_cloth.png' }]);
-                texture = await assetService.loadTextureFromCache(cacheKey)
-                if(!texture) {
-                    const comp = await spriteSheetFactory.createComposite([
-                        { url: '/assets/sprites/char_test.png', hueShift: 120 },
-                        { url: '/assets/sprites/char_test_cloth.png' }]);
-                    texture = await assetService.loadTextureFromComposition(comp);
-                }
-        } else texture = await assetService.loadTexture('/assets/sprites/char_test.png');
         characterPreview.updateCharacterTexture(texture);
         characterPreview.lookAtCamera();
     };
+
+    const handleNewCharacter = () => {
+        setCurrentScreen('charCreation');
+    }
 
     const handleBack = () => {
         resetAuth();
@@ -79,13 +93,10 @@ export function CharacterSelectUI() {
                         })}
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '5px', paddingTop: '20px', width: '100%' }}>
-                        <Button type="submit" style={{ marginTop: '15px' }}>
+                        <Button type="button" onClick={handleNewCharacter} style={{ marginTop: '15px' }}>
                             <Text>New Character</Text>
                         </Button>
-                        {/* <Button type="submit" className="secondary" style={{ lineHeight: '0'}}>
-                            <Text>Register</Text>
-                            </Button> */}
-                        <Button type="Button" onClick={handleBack} className="danger" style={{ lineHeight: '0' }}>
+                        <Button type="button" onClick={handleBack} className="danger" style={{ lineHeight: '0' }}>
                             <Text>Log Out</Text>
                         </Button>
                     </div>

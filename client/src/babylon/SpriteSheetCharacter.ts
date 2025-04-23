@@ -59,6 +59,8 @@ export class SpriteSheetCharacter {
     private debugArrow: B.LinesMesh | null = null;
     private debugArrowOptions: any;
 
+    public billboard: boolean = false;
+
     constructor(
         name: string,
         scene: B.Scene,
@@ -181,15 +183,19 @@ export class SpriteSheetCharacter {
         const snappedAngle = Math.round(cameraAngle / (Math.PI / 2)) * (Math.PI / 2);
 
         const finalPlaneAngle = snappedAngle + Math.PI;
-        Quaternion.RotationYawPitchRollToRef(finalPlaneAngle, 0.1, 0, this.plane.rotationQuaternion);
-
-
+        
+        if(this.billboard)
+            Quaternion.RotationYawPitchRollToRef(cameraAngle + Math.PI, 0.1, 0, this.plane.rotationQuaternion);
+        else
+            Quaternion.RotationYawPitchRollToRef(finalPlaneAngle, 0.1, 0, this.plane.rotationQuaternion);
+        
         const characterLookVector = TmpVectors.Vector3[2]; // Use a different temp vector
         SpriteSheetCharacter.getDirectionVector(this.lookDirection, characterLookVector); // Get the character's intended facing direction
 
         const dot = Vector3.Dot(characterLookVector, viewDirectionXZ);
         const crossY = characterLookVector.z * viewDirectionXZ.x - characterLookVector.x * viewDirectionXZ.z;
         let relativeAngle = Math.atan2(crossY, dot); // Angle from characterLookVector to viewDirectionXZ (-PI to PI)
+        
 
         const PI_4 = Math.PI / 4;
         const PI_34 = 3 * Math.PI / 4;

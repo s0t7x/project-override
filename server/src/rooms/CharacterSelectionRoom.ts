@@ -99,7 +99,7 @@ export class CharacterSelectRoom extends Room<CharacterSelectState> {
                     });
                     this.state.characters.set(newCharacter.id, summary);
                     console.log(`[CharSelectRoom ${this.roomId}] Character "${newCharacter.name}" created for user ${userId}.`);
-                    client.send(ServerMessageType.INFO_MESSAGE, { message: `Character "${newCharacter.name}" created!` });
+                    client.send(ServerMessageType.INFO_MESSAGE, { message: `Character "${newCharacter.name}" created!`, characterId: newCharacter.id });
                 } else {
                     // Creation failed (likely caught by repo checks, but handle null just in case)
                     client.send(ServerMessageType.ERROR_MESSAGE, { message: "Failed to create character. Please try again." });
@@ -214,7 +214,7 @@ export class CharacterSelectRoom extends Room<CharacterSelectState> {
             characters.forEach(char => {
                 // Avoid adding duplicates if state already populated by another client's join? Usually not needed.
                 if (!this.state.characters.has(char.id)) {
-                    const customization = new CharacterCustomizationState().assign(char.equipmentJson as any || {})
+                    const customization = new CharacterCustomizationState().assign(JSON.parse(char.customizationJson as any || '') || {})
                     const summary = new CharacterSummaryState().assign({
                         id: char.id,
                         name: char.name,

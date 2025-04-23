@@ -9,6 +9,7 @@ import { useGameStore } from '@/state/gameStore';
 import { LoginUI } from '../scenes/LoginUI';
 import { EntryUI } from '../scenes/EntryUI';
 import { CharacterSelectUI } from '../scenes/CharacterSelectUI';
+import { CharacterCreationUI } from '../scenes/CharacterCreationUI';
 
 // Import UI Scene components (create these later)
 // import LoadingUI from '@/scenes/LoadingUI';
@@ -48,6 +49,9 @@ const UIManager: React.FC = () => {
             break;
         case 'charSelect':
             ActiveComponent = <CharacterSelectUI />;
+            break;
+        case 'charCreation':
+            ActiveComponent = <CharacterCreationUI />;
             break;
         case 'lobby':
             // ActiveComponent = <WorldLobbyUI />;

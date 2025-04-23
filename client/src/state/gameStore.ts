@@ -7,7 +7,7 @@ import { create } from 'zustand';
 // import { persist, createJSONStorage } from 'zustand/middleware';
 
 // Define the possible screens/views for the UI Manager
-export type ScreenState = 'loading' | 'entry' | 'login' | 'charSelect' | 'lobby' | 'game' | 'disconnected' | 'error';
+export type ScreenState = 'loading' | 'entry' | 'login' | 'charSelect' | 'charCreation' | 'lobby' | 'game' | 'disconnected' | 'error';
 export type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'error';
 export type AuthStatus = 'pending' | 'authenticated' | 'unauthenticated';
 
@@ -140,7 +140,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     },
 
     setRoomState: (state: any) => {
-        console.log(`[GameStore] Setting room state: ${state}`);
+        console.log(`[GameStore] Setting room state: ${JSON.stringify(state)}`);
         set({ roomState: state });
     },
 

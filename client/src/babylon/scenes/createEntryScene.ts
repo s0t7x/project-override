@@ -15,8 +15,8 @@ export function createEntryScene(engine: B.Engine, assetService?: AssetService):
     console.log("[SceneCreator] Creating Background Map Scene...");
     const scene = new B.Scene(engine);
     scene.metadata = {}; // Initialize metadata
-    
-    scene.clearColor = new B.Color4(0,0,0,0);
+
+    scene.clearColor = new B.Color4(0, 0, 0, 0);
 
     // Use onReadyObservable to ensure scene is fully initialized
     let assetServiceInstance: AssetService | undefined = undefined;
@@ -26,7 +26,7 @@ export function createEntryScene(engine: B.Engine, assetService?: AssetService):
 
         // --- Get AssetService from context ---
         // NOTE: This assumes createBackgroundMapScene is called where context is available.
-        if(assetService) {
+        if (assetService) {
             assetServiceInstance = assetService;
             characterPreview.applyAssetService(assetServiceInstance);
         } else {
@@ -141,6 +141,7 @@ export function createEntryScene(engine: B.Engine, assetService?: AssetService):
         previewPosition
     );
     characterPreview.lookDirection = CharacterDirection.Up;
+    characterPreview.billboard = true;
     // characterPreview.animationState = 'test'
 
     // Store reference in metadata
@@ -185,15 +186,38 @@ export function createEntryScene(engine: B.Engine, assetService?: AssetService):
     const cameraDefaultRadius = 10;
     let nextCameraRadius = cameraDefaultRadius;
 
+    let lastAlpha = camera.alpha;
+    let lastBeta = camera.beta;
+    let userMovedCamera = false;
+
     scene.registerBeforeRender(() => {
+        const threshold = 0.0001; // sensitivity to detect movement
+
+        // Did user interfere?
+        const alphaChanged = Math.abs(camera.alpha - lastAlpha) > threshold;
+        const betaChanged = Math.abs(camera.beta - lastBeta) > threshold;
+
+        userMovedCamera = (alphaChanged || betaChanged);
+        
         const deltaTime = engine.getDeltaTime() / 1000.0; // Delta time in seconds
         const angleChange = .2 * deltaTime;
         camera.alpha += angleChange;
         
-        if (useGameStore.getState().currentScreen == 'charSelect') {
+        // Store last camera angles
+        lastAlpha = camera.alpha;
+        lastBeta = camera.beta;
+
+        characterPreview.billboard = false;
+
+        const currentScreen = useGameStore.getState().currentScreen;
+        if (currentScreen == 'charSelect' || currentScreen == 'charCreation') {
             nextCameraTarget = cameraCharTarget
             nextCameraRadius = 8;
-            camera.alpha = 0;
+            if(currentScreen == 'charCreation') {
+                characterPreview.billboard = true;
+                if(!userMovedCamera)
+                    characterPreview.lookAtCamera();
+            }
         } else {
             nextCameraTarget = cameraDefaultTarget
             nextCameraRadius = 10;

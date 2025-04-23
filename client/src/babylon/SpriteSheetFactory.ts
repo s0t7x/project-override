@@ -26,16 +26,25 @@ export class SpriteSheetFactory {
         const canvas = SpriteSheetFactory.canvas;
 
         // Load all images
-        const imageEntries = await Promise.all(
+        let imageEntries = await Promise.all(
             layers.map(async (layer, index) => {
-                const img = await this.loadImage(layer.url);
-                return {
-                    image: img,
-                    hueShift: layer.hueShift ?? 0,
-                    layerIndex: layer.layer ?? index, // Default to array order
-                };
+                if(!layer.url || layer.url.length < 1) return undefined;
+                console.log(layer.url)
+                try{
+                    const img = await this.loadImage(layer.url);
+                    return {
+                        image: img,
+                        hueShift: layer.hueShift ?? 0,
+                        layerIndex: layer.layer ?? index, // Default to array order
+                    };
+                } catch (err: any) {
+                    return undefined;
+                }
             })
         );
+        
+        imageEntries = imageEntries.filter((layer) => layer != undefined)
+
 
         // Determine canvas size from the first image, or use defaults
         const baseImage = imageEntries[0]?.image;
@@ -46,10 +55,11 @@ export class SpriteSheetFactory {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         // Sort by layer index
-        imageEntries.sort((a, b) => a.layerIndex - b.layerIndex);
+        imageEntries.sort((a, b) => (a?.layerIndex || 0) - (b?.layerIndex || 0));
 
         // Draw each image with optional hue shift
         for (const entry of imageEntries) {
+            if(!entry) continue;
             if (entry.hueShift !== 0) {
                 this.drawWithHueShift(entry.image, entry.hueShift);
             } else {

@@ -12,12 +12,54 @@ export class NetworkService {
     private client: Colyseus.Client;
     public currentRoom: Colyseus.Room | null = null;
 
+    private messageListeners: Map<string | number, Set<Function>> = new Map();
+
     constructor() {
         console.log(`[NetworkService] Initializing network client for endpoint: ${config.colyseusEndpoint}`);
         this.client = new Colyseus.Client(config.colyseusEndpoint);
+    }
 
-        // Expose instance globally for debugging (optional)
-        // (window as any).networkService = this;
+    /** Register a message listener and track it for removal. */
+    public addMessageListener<T = any>(type: string | number, handler: (data: T) => void): void {
+        if (!this.currentRoom) {
+            console.warn(`[NetworkService] Cannot add listener. Not in a room.`);
+            return;
+        }
+
+        this.currentRoom.onMessage(type, handler);
+
+        if (!this.messageListeners.has(type)) {
+            this.messageListeners.set(type, new Set());
+        }
+        this.messageListeners.get(type)!.add(handler);
+    }
+
+    /**
+     * Remove a previously registered message listener.
+     * If no handler is passed, all listeners for that message type are removed.
+     */
+    public removeMessageListener(type: string | number, handler?: Function): void {
+        if (!this.currentRoom) return;
+
+        const handlers = this.messageListeners.get(type);
+        if (!handlers) return;
+
+        if (handler) {
+            handlers.delete(handler);
+        } else {
+            handlers.clear();
+        }
+
+        // Cleanup
+        if (handlers.size === 0) {
+            this.messageListeners.delete(type);
+        }
+    }
+
+    /** Clear all registered message listeners when leaving the room */
+    private clearAllMessageListeners(): void {
+        if (!this.currentRoom) return;
+        this.messageListeners.clear();
     }
 
     // --- Connection and Room Management ---
@@ -76,10 +118,19 @@ export class NetworkService {
         }
     }
 
+    onMessageOnce<T = any>(type: string | number, callback: (payload: T) => void): void {
+        const onceWrapper = (payload: T) => {
+            this.removeMessageListener(type, onceWrapper);
+            callback(payload);
+        };
+        this.addMessageListener(type, onceWrapper);
+    }
+
     /** Leaves the current room if connected. */
     async leaveRoom(): Promise<void> {
         if (this.currentRoom) {
             console.log(`[NetworkService] Leaving room: ${this.currentRoom.name} (${this.currentRoom.id})`);
+             this.clearAllMessageListeners(); // <<< clear tracked listeners
             try {
                 // Prevent race conditions by setting to null before await
                 const roomToLeave = this.currentRoom;
