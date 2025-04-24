@@ -7,8 +7,6 @@ import { CharacterSummaryState } from "./CharacterSummaryState";
 
 // The main state for the room, containing a map of characters
 export class CharacterSelectState extends Schema {
-    // Use MapSchema for efficient synchronization of collections
-    // Key: Character ID, Value: CharacterSummarySchema
     @type({ map: CharacterSummaryState })
     characters = new MapSchema<CharacterSummaryState>();
 

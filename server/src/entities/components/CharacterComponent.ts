@@ -8,7 +8,6 @@ import { CharacterCustomizationState } from "@/rooms/schemas/CharacterCustomizat
 
 export class CharacterComponent extends Component {
     public customization: CharacterCustomizationState;
-    public lookAtDirection: string = 'DOWN';
 
     update(deltaTime: number, room: GameRoom): void {
 

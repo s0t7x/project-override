@@ -1,1 +1,0 @@
-// Methods for loading Quest definitions and CRUD for CharacterQuest progress records.

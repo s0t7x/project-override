@@ -52,7 +52,7 @@ export interface IPlayerState extends IEntityState {
     characterId: string;
     characterName: string;
     level: number;
-    currencies: { [key in CurrencyType]?: number }; // e.g., { BYTES: 100, HACK_CHIPS: 5 }
+    // currencies: { [key in CurrencyType]?: number }; // e.g., { BYTES: 100, HACK_CHIPS: 5 }
     guildId?: string;
     guildName?: string;
     guildRank?: GuildRank;
@@ -74,7 +74,7 @@ export interface IMapChunkState {
 export interface IGameRoomState {
     entities: { [entityId: string]: IEntityState }; // Map entityId -> state
     players: { [sessionId: string]: IPlayerState };   // Map sessionId -> state
-    mapChunks: { [chunkId: string]: IMapChunkState }; // Map chunkId -> state
+    // mapChunks: { [chunkId: string]: IMapChunkState }; // Map chunkId -> state
     // Other global room state? e.g., time of day, weather
     worldTime?: number; // Example: cycle from 0 to 1
     currentWeather?: string; // Example: "sunny", "rainy"

@@ -2,10 +2,12 @@
 // Base class representing any object in the game world (players, NPCs, items, blocks).
 // Manages its components collection. Includes unique ID.
 
+import { generateId } from "colyseus"; // Utility for generating unique IDs
 import { Component } from "./Component";
 import { EntityState } from "@/rooms/schemas/EntityState"; // Import schema for serialization type
 import { GameRoom } from "@/rooms/GameRoom";
-import { generateId } from "colyseus"; // Utility for generating unique IDs
+import { ComponentFactory } from "../factories/ComponentFactory";
+import { ComponentState } from "@/rooms/schemas/ComponentState";
 
 export class Entity {
     public id: string;
@@ -111,16 +113,3 @@ export class Entity {
          this.components.clear();
     }
 }
-
-// --- Concrete Component Example (Requires TransformComponent file) ---
-// This is just to show how serializeState might use a component.
-// Put the actual TransformComponent class in its own file.
-import { IVector3 } from "@shared/types";
-import { ComponentState } from "@/rooms/schemas/ComponentState";
-import { ComponentFactory } from "../factories/ComponentFactory";
-class TransformComponent extends Component {
-    public position: IVector3 = { x: 0, y: 0, z: 0 };
-    public rotationY: number = 0;
-    update(deltaTime: number, room: GameRoom): void { /* Update logic */ }
-}
-// --- End Concrete Component Example ---

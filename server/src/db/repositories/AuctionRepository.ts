@@ -1,1 +1,0 @@
-// Methods for AuctionListing CRUD, finding active listings, processing bids/buyouts.
