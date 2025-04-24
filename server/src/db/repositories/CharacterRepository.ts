@@ -5,12 +5,14 @@
 import { CharacterCustomizationState } from '@/rooms/schemas/CharacterCustomizationState';
 import prisma from '../client'; // Use the singleton Prisma client instance
 import { Character, Prisma } from '@prisma/client'; // Import Character type and Prisma namespace for JsonValue type
+import { CharacterEquipmentState } from '@/rooms/schemas/CharacterEquipmentState';
 
 // Define a type for the data needed to create a character (minimum required fields)
 type CharacterCreationData = {
     userId: string;
     name: string;
     customization: CharacterCustomizationState;
+    equipment: CharacterEquipmentState;
     // Add optional fields that might be provided at creation (e.g., appearance details)
     // statsJson?: Prisma.JsonValue;
     // inventoryJson?: Prisma.JsonValue;
@@ -86,7 +88,8 @@ export class CharacterRepository {
                 data: {
                     userId: data.userId,
                     name: data.name,
-                    customizationJson: JSON.stringify(data.customization)
+                    customizationJson: JSON.stringify(data.customization),
+                    equipmentJson: JSON.stringify(data.equipment),
                     // Spread any other optional initial data provided
                     // statsJson: data.statsJson ?? Prisma.JsonNull, // Set defaults if needed
                     // inventoryJson: data.inventoryJson ?? Prisma.JsonNull,

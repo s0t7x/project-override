@@ -20,6 +20,7 @@ import {
 } from 'shared/types';
 import { CharacterCustomizationState } from './schemas/CharacterCustomizationState';
 import { Color3Schema } from './schemas/Color3Schema';
+import { CharacterEquipmentState } from './schemas/CharacterEquipmentState';
 
 export class CharacterSelectRoom extends Room<CharacterSelectState> {
     // Max characters per user (example)
@@ -86,12 +87,19 @@ export class CharacterSelectRoom extends Room<CharacterSelectState> {
                 });
             }
 
+            const characterEquipmentState = new CharacterEquipmentState();
+            characterEquipmentState.assign({ 
+                legsItemId: 'starter_legs',
+                bodyItemId: 'starter_body'
+            });
+
             // Attempt to create character in DB
             try {
                 const newCharacter = await this.characterRepo.create({
                     userId: userId,
                     name: payload.name,
-                    customization: characterCustomizationState
+                    customization: characterCustomizationState,
+                    equipment: characterEquipmentState
                 });
 
                 if (newCharacter) {
@@ -101,6 +109,7 @@ export class CharacterSelectRoom extends Room<CharacterSelectState> {
                         name: newCharacter.name,
                         level: newCharacter.level,
                         customization: characterCustomizationState,
+                        equipment: characterEquipmentState
                         // Assign appearance data to schema if applicable
                     });
                     this.state.characters.set(newCharacter.id, summary);
@@ -202,11 +211,13 @@ export class CharacterSelectRoom extends Room<CharacterSelectState> {
                     customRaw.eyesColor = new Color3Schema(customRaw.eyesColor.r, customRaw.eyesColor.g, customRaw.eyesColor.b)
                     customRaw.hairColor = new Color3Schema(customRaw.hairColor.r, customRaw.hairColor.g, customRaw.hairColor.b)
                     const customization = new CharacterCustomizationState().assign(customRaw)
+                    const equipment = new CharacterEquipmentState().assign( JSON.parse(char.equipmentJson as any || '') )
                     const summary = new CharacterSummaryState().assign({
                         id: char.id,
                         name: char.name,
                         level: char.level,
-                        customization
+                        customization,
+                        equipment
                     });
                     this.state.characters.set(char.id, summary);
                 }

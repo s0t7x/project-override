@@ -59,12 +59,17 @@ export interface IVector3 {
       // Add other stats relevant to ProjectOverride (e.g., hacking skill, edit efficiency)
   }
 
-    /** Basic structure for representing stats. */
     export interface ICharacterCustomization {
-      baseSpriteSheet: string;
-      baseColor: IColor3;
-      eyesSpriteSheet: string;
-      eyesColor: IColor3;
-      hairSpriteSheet: string;
-      hairColor: IColor3;
-  }
+        baseSpriteSheet: string;
+        baseColor: IColor3;
+        eyesSpriteSheet: string;
+        eyesColor: IColor3;
+        hairSpriteSheet: string;
+        hairColor: IColor3;
+    }
+
+    export interface ICharacterEquipment {
+        bodyItemId?: string;
+        legsItemId?: string;
+        hatItemId?: string;
+    }
