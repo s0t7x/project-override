@@ -1736,8 +1736,8 @@ export class SpriteSheetCharacter {
         // --- Final Setup ---
         if (characterSummary) { // Require at least a base texture to be visible
             // Set initial animation state if provided or default
-            if(characterSummary.customization) await this.applyCustomization(characterSummary.customization);
-            if(characterSummary.equipmentVisuals) await this.applyEquipmentVisuals(characterSummary.equipmentVisuals);
+            await this.applyCustomization(characterSummary.customization || null);
+            await this.applyEquipmentVisuals(characterSummary.equipmentVisuals || null);
             if(this.texture_base) {
                 this.setAnimationInternal(initialAnimation || this.currentFullAnimation || DEFAULT_ANIMATION, true); // Force UV update
                 this.plane.visibility = 1;

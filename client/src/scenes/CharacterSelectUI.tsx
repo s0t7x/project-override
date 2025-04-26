@@ -11,7 +11,7 @@ import { SpriteSheetFactory } from "../babylon/SpriteSheetFactory";
 
 export function CharacterSelectUI() {
     const { networkService, sceneDirector, assetService } = useGameContext(); // Get the network service from context
-    const { currentScreen, setCurrentScreen, resetAuth, roomState, selectedCharacterId, setSelectedCharacter, characterList } = useGameStore();
+    const { currentScreen, setCurrentScreen, resetAuth, roomState, selectedCharacterId, setSelectedCharacter, characterList, userId } = useGameStore();
 
     const [spriteSheetFactory] = useState(new SpriteSheetFactory);
 
@@ -121,6 +121,7 @@ export function CharacterSelectUI() {
                         })}
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '5px', paddingTop: '20px', width: '100%' }}>
+                        <pre>{userId}</pre>
                         <Button type="button" onClick={handleNewCharacter} style={{ marginTop: '15px' }}>
                             <Text>New Character</Text>
                         </Button>
@@ -129,7 +130,6 @@ export function CharacterSelectUI() {
                         </Button>
                     </div>
                 </div>
-                {selectedCharacterId}
             </Window>
             { selectedCharacterId && 
             <Window title={characterList.find((char: any) => char.id == selectedCharacterId).name} width={300} height={140} x={'calc(50vw - 150px)'} y={'70vh'}  className="login-window">
@@ -139,6 +139,7 @@ export function CharacterSelectUI() {
                 <Button type="button" onClick={handleDelete} className="danger" style={{ lineHeight: '0' }}>
                     <Text>Delete</Text>
                 </Button>
+                <pre>{selectedCharacterId}</pre>
             </Window>
             }
             

@@ -59,8 +59,6 @@ export class SceneDirector {
         return this.currentScene;
     }
 
-    // No showInitialScene needed here now, onEngineInitialized handles it
-
     private disposeScene(): void {
         if(this.currentScene?.metadata?.mapRenderers)
             this.currentScene.metadata.mapRenderers.forEach((mr: any) => mr.dispose()); // Example
@@ -71,17 +69,16 @@ export class SceneDirector {
     }
 
     private handleScreenChange(newScreen: ScreenState, force: boolean = false): void {
-        // Ensure engine is ready before proceeding
         if (!this.isEngineReady || !this.engine) {
             console.warn("[SceneDirector] handleScreenChange called before engine was ready.");
             return;
         }
-        // ... rest of handleScreenChange remains the same ...
         if (newScreen === this.currentScreenState && !force) return;
         console.log(`[SceneDirector] Handling screen change: ${this.currentScreenState} -> ${newScreen}`);
 
-        switch (newScreen) { /* ... (switch logic remains same) ... */
+        switch (newScreen) {
             case 'entry':
+                // Should not happen. If so: BLANK!
                 this.disposeScene(); break;
             case 'game':
                 this.disposeScene();
