@@ -2,7 +2,7 @@ import * as B from '@babylonjs/core';
 import * as BABYLON from '@babylonjs/core';
 import { AssetService } from '../services/AssetService';
 import { Vector3, TmpVectors, Observer, Nullable, Quaternion, Color3, SubMesh, StandardMaterial, MultiMaterial, Texture, MeshBuilder, Mesh } from '@babylonjs/core';
-import { ICharacterCustomization, ICharacterEquipmentVisuals, ICharacterSummary } from '../../../shared/types';
+import { ICharacterCustomization, ICharacterEquipmentVisuals, ICharacterSummary, IColor3 } from '../../../shared/types';
 
 // --- Constants (keep as they are) ---
 const SHEET_COLUMNS = 24;
@@ -1364,11 +1364,11 @@ export class SpriteSheetCharacter {
     private multiMaterial: B.MultiMaterial; // Renamed for clarity
 
     // Use StandardMaterial as created
-    private material_base: B.StandardMaterial;
-    private material_eyes: B.StandardMaterial;
-    private material_hair: B.StandardMaterial;
-    private material_equip_legs: B.StandardMaterial;
-    private material_equip_body: B.StandardMaterial;
+    private material_base:          B.NodeMaterial;
+    private material_eyes:          B.NodeMaterial;
+    private material_hair:          B.NodeMaterial;
+    private material_equip_legs:    B.NodeMaterial;
+    private material_equip_body:    B.NodeMaterial;
 
     // Keep separate texture references for each layer
     private texture_base: B.Texture | null = null;
@@ -1416,16 +1416,7 @@ export class SpriteSheetCharacter {
             console.log("[SpriteSheetCharacter] Base hue shift NodeMaterial loaded.");
         }
 
-        this.initialize(name, scene, assetService, initialPosition);
-    }
-
-    private initialize(
-        name: string,
-        scene: B.Scene,
-        assetService?: AssetService,
-        initialPosition: B.Vector3 = Vector3.Zero()
-    ) {
-        // 1. Create the Plane Mesh
+          // 1. Create the Plane Mesh
         this.plane = B.MeshBuilder.CreatePlane(`${name}_plane`, { size: 2 }, this.scene);
         this.plane.position = initialPosition.clone();
         this.plane.billboardMode = B.Mesh.BILLBOARDMODE_NONE; // Manual rotation
@@ -1599,7 +1590,6 @@ export class SpriteSheetCharacter {
 
     public async applyCustomization(customization: ICharacterCustomization | null) {
         console.log(`[SpriteSheetCharacter:${this.name}] Updating character customization.`);
-        let needsUVUpdate = false; // Track if UVs need update after texture changes
 
         // --- Base Layer ---
         if (customization?.baseSpriteSheet) {
@@ -1612,7 +1602,6 @@ export class SpriteSheetCharacter {
                     // this.material_base.diffuseTexture = this.texture_base;
                     // this.material_base.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, this.texture_base);
                     console.log(`[SpriteSheetCharacter:${this.name}] Base Texture updated.`);
-                    needsUVUpdate = true; // Texture loaded/changed, update UVs
                 } else {
                     console.error(`[SpriteSheetCharacter:${this.name}] Base Texture failed to load: ${textureUrl}`);
                     this.texture_base = null;
@@ -1643,7 +1632,6 @@ export class SpriteSheetCharacter {
                     // this.material_hair.diffuseTexture = this.texture_hair;
                     // this.material_hair.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, this.texture_hair);
                     console.log(`[SpriteSheetCharacter:${this.name}] Hair Texture updated.`);
-                    needsUVUpdate = true; // Texture loaded/changed, update UVs (in case base wasn't loaded)
                     this.material_hair.alpha = 1.0;
                 } else {
                     console.error(`[SpriteSheetCharacter:${this.name}] Hair Texture failed to load: ${textureUrl}`);
@@ -1678,7 +1666,6 @@ export class SpriteSheetCharacter {
                     // this.material_eyes.diffuseTexture = this.texture_eyes;
                     // this.material_eyes.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, this.texture_eyes);
                     console.log(`[SpriteSheetCharacter:${this.name}] Eyes Texture updated.`);
-                    needsUVUpdate = true; // Texture loaded/changed, update UVs
                     this.material_eyes.alpha = 1.0;
                 } else {
                     console.error(`[SpriteSheetCharacter:${this.name}] Eyes Texture failed to load: ${textureUrl}`);
@@ -1739,6 +1726,7 @@ export class SpriteSheetCharacter {
 
         if (equipmentVisuals) {
             this.colorize(this.material_equip_body, equipmentVisuals?.bodyColor)
+            this.applyHueShift(this.material_equip_body, equipmentVisuals?.bodyHueShift || 0)
             // this.colorizeHair(customization?.hairColor)
             // this.colorizeEyes(customization?.eyesColor)
         }
@@ -1762,14 +1750,14 @@ export class SpriteSheetCharacter {
         console.log(`[SpriteSheetCharacter:${this.name}] No base texture or character summary. Hidden.`);
     }
 
-    private applyHueShift(material: StandardMaterial, hue: number): void {
+    private applyHueShift(material: B.NodeMaterial, hue: number): void {
         const inputBlock = material.getBlockByName(HUE_SHIFT_UNIFORM_NAME) as Nullable<B.InputBlock>;
         if (inputBlock) {
             inputBlock.value = hue;
         }
     }
 
-    private colorize(material: StandardMaterial, color: B.Color3, strength: number = 255.0): void {
+    private colorize(material: B.NodeMaterial, color: IColor3, strength: number = 255.0): void {
         if(!material) return;
         if(color.r + color.g + color.b == 0) return; // it never gets truly black but who the fuck will see anyway :)
         const inputBlock = material.getBlockByName("targetColor") as Nullable<B.InputBlock>;
@@ -1778,17 +1766,17 @@ export class SpriteSheetCharacter {
         }
     }
 
-    public colorizeBase(color: B.Color3, strength: number = 255.0): void {
+    public colorizeBase(color: IColor3, strength: number = 255.0): void {
         if (!this.material_base) return;
         this.colorize(this.material_base, color, strength);
     }
 
-    public colorizeEyes(color: B.Color3, strength: number = 255.0): void {
+    public colorizeEyes(color: IColor3, strength: number = 255.0): void {
         if (!this.material_eyes) return;
         this.colorize(this.material_eyes, color, strength);
     }
 
-    public colorizeHair(color: B.Color3, strength: number = 255.0): void {
+    public colorizeHair(color: IColor3, strength: number = 255.0): void {
         if (!this.material_hair) return;
         this.colorize(this.material_hair, color, strength);
     }

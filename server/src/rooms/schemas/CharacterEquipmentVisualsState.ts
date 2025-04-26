@@ -5,9 +5,12 @@ import { Color3Schema } from "./Color3Schema";
 // Represents the limited data needed for one character in the selection list
 export class CharacterEquipmentVisualsState extends Schema implements ICharacterEquipmentVisuals {
     @type("string") bodySpriteSheet: string = "";
+    @type("int32") bodyHueShift: number = 0;
     @type(Color3Schema) bodyColor = new Color3Schema();
     @type("string") legsSpriteSheet: string = "";
+    @type("int32") legsHueShift: number = 0;
     @type(Color3Schema) legsColor = new Color3Schema();
     @type("string") hatSpriteSheet: string = "";
+    @type("int32") hatHueShift: number = 0;
     @type(Color3Schema) hatColor = new Color3Schema();
 }

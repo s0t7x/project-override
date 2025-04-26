@@ -70,10 +70,13 @@ export interface IVector3 {
 
     export interface ICharacterEquipmentVisuals {
         bodySpriteSheet: string;
+        bodyHueShift: number;
         bodyColor: IColor3;
         legsSpriteSheet: string;
+        legsHueShift: number;
         legsColor: IColor3;
         hatSpriteSheet: string;
+        hatHueShift: number;
         hatColor: IColor3;
     }
 
