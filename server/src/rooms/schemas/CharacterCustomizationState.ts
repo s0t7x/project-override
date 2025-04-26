@@ -4,7 +4,7 @@ import { Color3Schema } from "./Color3Schema";
 
 // Represents the limited data needed for one character in the selection list
 export class CharacterCustomizationState extends Schema implements ICharacterCustomization {
-    @type("string") baseSpriteSheet: string = "/assets/sprites/char_test.png";
+    @type("string") baseSpriteSheet: string = "/assets/sprites/char_base_a.png";
     @type(Color3Schema) baseColor = new Color3Schema();
     @type("string") eyesSpriteSheet: string = "";
     @type(Color3Schema) eyesColor = new Color3Schema();

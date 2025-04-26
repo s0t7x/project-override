@@ -17,7 +17,7 @@ const characterCustomization_Body: string[] = [
 ]
 
 const characterCustomization_Eyes: string[] = [
-
+    "/assets/sprites/char_eyes_a.png"
 ]
 
 const characterCustomization_Hair: string[] = [
@@ -38,17 +38,19 @@ export function CharacterCreationUI() {
 
     const defaultBodyColor = '#E4B8A0'
     const defaultHairColor = "#7D4513"
+    const defaultEyesColor = "#FAFDFF"
 
     const [currentBodyColor, setCurrentBodyColor] = useState(defaultBodyColor);
     const [currentHairColor, setCurrentHairColor] = useState(defaultHairColor);
+    const [currentEyesColor, setCurrentEyesColor] = useState(defaultEyesColor);
 
     useEffect(() => {
         setSpriteSheetFactory(new SpriteSheetFactory());
         setCharacterCustomization({
             baseSpriteSheet: characterCustomization_Body[0],
             baseColor: ({r: 228 /255, g: 189/255, b: 167/255} as IColor3),
-            eyesSpriteSheet: "",
-            eyesColor: ({r: 0, g: 0, b: 0} as IColor3),
+            eyesSpriteSheet: characterCustomization_Eyes[0],
+            eyesColor: ({r: 122 /255, g: 215/255, b: 1} as IColor3),
             hairSpriteSheet: "",
             hairColor: ({r: 1, g: 133/255, b: 26/255} as IColor3),
         })
@@ -146,6 +148,11 @@ export function CharacterCreationUI() {
         setCharacterCustomization({ ...characterCustomization, hairColor: Color3.FromHexString(event.target.value) })
     }
 
+    const handleColorizeEyes = (event: any) => {
+        setCurrentEyesColor(event.target.value)
+        setCharacterCustomization({ ...characterCustomization, eyesColor: Color3.FromHexString(event.target.value) })
+    }
+
     return (
         <>
             {/* <FloatingHeader title="Project Override" width={350} height={50} x={175} y={10}></FloatingHeader> */}
@@ -163,7 +170,8 @@ export function CharacterCreationUI() {
                             <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
                                 <Button onClick={previousEyes} style={{ maxWidth: 25, maxHeight: 25 }}>&lt;</Button><Text style={{ flexGrow: 1, textAlign: "center" }}>Eyes</Text><Button onClick={nextEyes} style={{ maxWidth: 25, maxHeight: 25 }}>&gt;</Button>
                             </div>
-
+                            <input type="color" style={{ height: 50, position: "relative", marginTop: -10 }} value={currentEyesColor} onChange={handleColorizeEyes} />
+                                                    
                         </div>
                         <div>
                             <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>

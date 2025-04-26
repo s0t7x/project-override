@@ -3,7 +3,7 @@
 // Ensures both ends agree on the data format for specific actions.
 
 import { CurrencyType, InputActions, InteractionType, ItemSlot } from './enums';
-import { IVector3, IQuaternion, IColor3 } from './data';
+import { IVector3, IQuaternion, IColor3, ICharacterCustomization, ICharacterEquipmentVisuals } from './data';
 
 // --- Client -> Server Messages ---
 
@@ -69,14 +69,7 @@ export interface ITeleportPayload {
 export interface ICreateCharacterPayload {
     name: string;
     // Include appearance customization data
-    customization: {
-        baseSpriteSheet: string;
-        baseColor: IColor3;
-        eyesSpriteSheet: string;
-        eyesColor: IColor3;
-        hairSpriteSheet: string;
-        hairColor: IColor3;
-    };
+    customization: ICharacterCustomization;
 }
 
 /** Payload for selecting a character to play. */

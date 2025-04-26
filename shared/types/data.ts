@@ -68,6 +68,15 @@ export interface IVector3 {
         hairColor: IColor3;
     }
 
+    export interface ICharacterEquipmentVisuals {
+        bodySpriteSheet: string;
+        bodyColor: IColor3;
+        legsSpriteSheet: string;
+        legsColor: IColor3;
+        hatSpriteSheet: string;
+        hatColor: IColor3;
+    }
+
     export interface ICharacterEquipment {
         bodyItemId?: string;
         legsItemId?: string;

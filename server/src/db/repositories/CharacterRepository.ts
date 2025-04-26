@@ -1,30 +1,20 @@
-// server/src/db/repositories/CharacterRepository.ts
-// Methods for Character model CRUD operations (create, findById, findByUserId, update state etc.).
-// Abstracts direct Prisma calls for the Character model.
-
-import { CharacterCustomizationState } from '@/rooms/schemas/CharacterCustomizationState';
+import { CharacterCustomizationState } from '../../rooms/schemas/CharacterCustomizationState';
 import prisma from '../client'; // Use the singleton Prisma client instance
 import { Character, Prisma } from '@prisma/client'; // Import Character type and Prisma namespace for JsonValue type
-import { CharacterEquipmentState } from '@/rooms/schemas/CharacterEquipmentState';
+import { CharacterEquipmentVisualsState } from '../../rooms/schemas/CharacterEquipmentVisualsState';
+import { ICharacterSummary, ICreateCharacterPayload } from 'shared/types';
+import { Color3Schema } from '../../rooms/schemas/Color3Schema';
+import { CharacterSummaryState } from '../../rooms/schemas/CharacterSummaryState';
 
-// Define a type for the data needed to create a character (minimum required fields)
-type CharacterCreationData = {
+class CharacterCreationData implements ICreateCharacterPayload {
     userId: string;
     name: string;
     customization: CharacterCustomizationState;
-    equipment: CharacterEquipmentState;
-    // Add optional fields that might be provided at creation (e.g., appearance details)
-    // statsJson?: Prisma.JsonValue;
-    // inventoryJson?: Prisma.JsonValue;
-    // equipmentJson?: Prisma.JsonValue;
-};
+} ;
 
-// Define a type for the data used to update a character's state
-// Use Partial and Omit to allow updating only some fields and exclude immutable ones
 type CharacterUpdateData = Partial<Omit<Character, 'id' | 'userId' | 'createdAt' | 'name'>>;
 
 export class CharacterRepository {
-
     /**
      * Finds a character by their unique ID.
      * @param id - The character ID to search for.
@@ -33,9 +23,7 @@ export class CharacterRepository {
     async findById(id: string): Promise<Character | null> {
         try {
             return await prisma.character.findUnique({
-                where: { id },
-                // Optionally include related data if needed frequently, e.g.:
-                // include: { user: { select: { username: true } } } // Get username too
+                where: { id }
             });
         } catch (error) {
             console.error(`[CharacterRepository] Error finding character by ID "${id}":`, error);
@@ -88,22 +76,14 @@ export class CharacterRepository {
                 data: {
                     userId: data.userId,
                     name: data.name,
-                    customizationJson: JSON.stringify(data.customization),
-                    equipmentJson: JSON.stringify(data.equipment),
-                    // Spread any other optional initial data provided
-                    // statsJson: data.statsJson ?? Prisma.JsonNull, // Set defaults if needed
-                    // inventoryJson: data.inventoryJson ?? Prisma.JsonNull,
-                    // equipmentJson: data.equipmentJson ?? Prisma.JsonNull,
-                    // Prisma handles default values defined in schema (level, experience etc.)
+                    customizationJson: JSON.stringify(data.customization)
                 },
             });
         } catch (error: any) {
-            // Check if the error is due to a unique constraint violation (P2002 on name)
             if (error.code === 'P2002' && error.meta?.target?.includes('name')) {
                  console.warn(`[CharacterRepository] Attempted to create character with existing name: "${data.name}"`);
                  return null; // Name already exists
             }
-            // Check if the error is due to foreign key constraint (User doesn't exist - P2003)
              if (error.code === 'P2003' && error.meta?.field_name?.includes('userId')) {
                  console.error(`[CharacterRepository] Attempted to create character for non-existent user ID: "${data.userId}"`);
                  return null; // User doesn't exist
@@ -121,10 +101,6 @@ export class CharacterRepository {
      */
     async update(characterId: string, data: CharacterUpdateData): Promise<Character | null> {
         try {
-             // Ensure JSON fields are correctly formatted if necessary before passing to Prisma
-             // For example, if data contains complex objects for JSON fields:
-             // if (data.inventoryJson) data.inventoryJson = JSON.stringify(data.inventoryJson); // Example if needed
-
             return await prisma.character.update({
                 where: { id: characterId },
                 data: (data as any), // Pass the partial data object directly
@@ -163,8 +139,6 @@ export class CharacterRepository {
          }
      }
 
-    // --- Add other specific query methods as needed ---
-    // Example: Check if a character name exists quickly
     async nameExists(name: string): Promise<boolean> {
         try {
              const count = await prisma.character.count({
@@ -177,6 +151,45 @@ export class CharacterRepository {
         }
     }
 
+    async getSummary(character: Character): Promise<CharacterSummaryState | null> {
+        const characterCustomizationState = new CharacterCustomizationState();
+        if(character.customizationJson) {
+            const customization = JSON.parse(character.customizationJson as any)
+            characterCustomizationState.assign({ 
+                ...customization,
+                baseColor: new Color3Schema(customization.baseColor.r, customization.baseColor.g, customization.baseColor.b),
+                eyesColor: new Color3Schema(customization.eyesColor.r, customization.eyesColor.g, customization.eyesColor.b),
+                hairColor: new Color3Schema(customization.hairColor.r, customization.hairColor.g, customization.hairColor.b),
+            });
+        }
+
+        // should get equipment and create VisualsState
+        const characterEquipmentVisualsState = new CharacterEquipmentVisualsState();
+        if(character.equipmentJson) {
+            const equipment = JSON.parse(character.equipmentJson as any)
+            // TODO: Equipment should be based on entity instances / inventory items
+            // Right now it holds only some visual static info in one db character for testing
+            characterEquipmentVisualsState.assign({ 
+                ...equipment
+            });
+        }
+
+        const summary = new CharacterSummaryState().assign({
+            id: character.id,
+            name: character.name,
+            level: character.level,
+            customization: characterCustomizationState,
+            equipmentVisuals: characterEquipmentVisualsState
+        });
+
+        return summary;
+    }
+
+    async getSummaryById(characterId: string): Promise<CharacterSummaryState | null> {
+        const char = await this.findById(characterId);
+        if(!char) return null
+        return this.getSummary(char);
+    }
 }
 
 // Export an instance if you prefer singleton repositories, or export the class

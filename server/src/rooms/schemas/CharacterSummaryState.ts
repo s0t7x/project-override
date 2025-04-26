@@ -1,7 +1,7 @@
 import { Schema, type } from "@colyseus/schema";
 import { ICharacterSummary } from "@shared/types";
 import { CharacterCustomizationState } from "./CharacterCustomizationState";
-import { CharacterEquipmentState } from "./CharacterEquipmentState";
+import { CharacterEquipmentVisualsState } from "./CharacterEquipmentVisualsState";
 
 // Represents the limited data needed for one character in the selection list
 export class CharacterSummaryState extends Schema implements ICharacterSummary {
@@ -10,5 +10,5 @@ export class CharacterSummaryState extends Schema implements ICharacterSummary {
     @type("int32") level: number = 1;
 
     @type(CharacterCustomizationState) customization: CharacterCustomizationState;
-    @type(CharacterEquipmentState) equipment: CharacterEquipmentState;
+    @type(CharacterEquipmentVisualsState) equipmentVisuals: CharacterEquipmentVisualsState;
 }

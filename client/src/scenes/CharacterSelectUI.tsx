@@ -129,9 +129,10 @@ export function CharacterSelectUI() {
                         </Button>
                     </div>
                 </div>
+                {selectedCharacterId}
             </Window>
             { selectedCharacterId && 
-            <Window title={characterList.find((char: any) => char.id == selectedCharacterId).name} width={300} height={140} x={'calc(50vw - 150px)'} y={'70vw'}  className="login-window">
+            <Window title={characterList.find((char: any) => char.id == selectedCharacterId).name} width={300} height={140} x={'calc(50vw - 150px)'} y={'70vh'}  className="login-window">
                 <Button type="button" onClick={handleJoin} style={{ marginTop: '15px' }}>
                     <Text>Join Server</Text>
                 </Button>

@@ -2,7 +2,7 @@ import * as B from '@babylonjs/core';
 import * as BABYLON from '@babylonjs/core';
 import { AssetService } from '../services/AssetService';
 import { Vector3, TmpVectors, Observer, Nullable, Quaternion, Color3, SubMesh, StandardMaterial, MultiMaterial, Texture, MeshBuilder, Mesh } from '@babylonjs/core';
-import { ICharacterCustomization, ICharacterSummary } from '../../../shared/types';
+import { ICharacterCustomization, ICharacterEquipmentVisuals, ICharacterSummary } from '../../../shared/types';
 
 // --- Constants (keep as they are) ---
 const SHEET_COLUMNS = 24;
@@ -1367,11 +1367,15 @@ export class SpriteSheetCharacter {
     private material_base: B.StandardMaterial;
     private material_eyes: B.StandardMaterial;
     private material_hair: B.StandardMaterial;
+    private material_equip_legs: B.StandardMaterial;
+    private material_equip_body: B.StandardMaterial;
 
     // Keep separate texture references for each layer
     private texture_base: B.Texture | null = null;
     private texture_eyes: B.Texture | null = null;
     private texture_hair: B.Texture | null = null;
+    private texture_equip_legs: B.Texture | null = null;
+    private texture_equip_body: B.Texture | null = null;
 
     // Logical view direction
     public lookDirection: CharacterDirection = DEFAULT_DIRECTION;
@@ -1427,32 +1431,35 @@ export class SpriteSheetCharacter {
         this.plane.billboardMode = B.Mesh.BILLBOARDMODE_NONE; // Manual rotation
         this.plane.isPickable = false;
         this.plane.rotationQuaternion = Quaternion.Identity(); // Use Quaternion
-        this.plane.visibility = 0; // Initially invisible until customized
-        // Ensure back faces aren't culled if needed (sprites often visible from both sides slightly)
-        // this.plane.material.backFaceCulling = false; // Apply this later to submaterials
+        this.plane.visibility = 0;
 
         // 2. Create Individual Materials for Each Layer
         this.material_base = this.createLayerMaterial(`${name}_mat_base`, false);
         this.material_eyes = this.createLayerMaterial(`${name}_mat_eyes`, true);
         this.material_hair = this.createLayerMaterial(`${name}_mat_hair`, true);
+        this.material_equip_legs = this.createLayerMaterial(`${name}_mat_equip_legs`, true);
+        this.material_equip_body = this.createLayerMaterial(`${name}_mat_equip_body`, true);
 
         // 3. Create the MultiMaterial
         this.multiMaterial = new B.MultiMaterial(`${name}_multimat`, this.scene);
         this.multiMaterial.subMaterials.push(this.material_base); // Index 0
         this.multiMaterial.subMaterials.push(this.material_eyes); // Index 1
         this.multiMaterial.subMaterials.push(this.material_hair); // Index 2
+        this.multiMaterial.subMaterials.push(this.material_equip_legs);
+        this.multiMaterial.subMaterials.push(this.material_equip_body);
 
-        // 4. *** Crucial Step: Define SubMeshes ***
+        // 4. Define SubMeshes
         // A standard plane has 4 vertices and 6 indices (0, 1, 2, 0, 2, 3)
         const vertexCount = 4;
         const indexCount = 6;
         this.plane.subMeshes = []; // Clear default submesh
 
         // Create a submesh for each material layer, all covering the entire geometry
-        // SubMesh(materialIndex, verticesStart, verticesCount, indexStart, indexCount, mesh)
         new B.SubMesh(0, 0, vertexCount, 0, indexCount, this.plane); // For material_base
         new B.SubMesh(1, 0, vertexCount, 0, indexCount, this.plane); // For material_eyes
         new B.SubMesh(2, 0, vertexCount, 0, indexCount, this.plane); // For material_hair
+        new B.SubMesh(3, 0, vertexCount, 0, indexCount, this.plane);
+        new B.SubMesh(4, 0, vertexCount, 0, indexCount, this.plane);
 
         // 5. Assign the MultiMaterial to the Plane
         this.plane.material = this.multiMaterial;
@@ -1566,7 +1573,7 @@ export class SpriteSheetCharacter {
                     samplerBlock.texture = null; // <<< Set block's texture to null
                     material.alpha = 0.0;
                     return null;
-                }
+                } 
             } catch (error) {
                 // Error during loading
                 console.error(`[SpriteSheetCharacter:${this.name}] Error loading ${layerName} texture: ${textureUrl}`, error);
@@ -1590,16 +1597,15 @@ export class SpriteSheetCharacter {
         }
     }
 
-    public async setCharacter(characterSummary: ICharacterSummary | null, initialAnimation?: AnimationName) {
-        console.log(`[SpriteSheetCharacter:${this.name}] Updating character customization.`, characterSummary);
-        const scene = this.scene;
+    public async applyCustomization(customization: ICharacterCustomization | null) {
+        console.log(`[SpriteSheetCharacter:${this.name}] Updating character customization.`);
         let needsUVUpdate = false; // Track if UVs need update after texture changes
 
         // --- Base Layer ---
-        if (characterSummary?.customization?.baseSpriteSheet) {
+        if (customization?.baseSpriteSheet) {
             try {
-                const textureUrl = characterSummary.customization.baseSpriteSheet;
-                let newTexture: B.Texture | null = await this.loadLayerTexture(characterSummary?.customization?.baseSpriteSheet, this.material_base, "Base");
+                const textureUrl = customization.baseSpriteSheet;
+                let newTexture: B.Texture | null = await this.loadLayerTexture(customization?.baseSpriteSheet, this.material_base, "Base");
                 if (newTexture) {
                     this.texture_base = newTexture;
                     this.texture_base.hasAlpha = true;
@@ -1614,7 +1620,7 @@ export class SpriteSheetCharacter {
                     // this.material_base.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
                 }
             } catch (error) {
-                console.error(`[SpriteSheetCharacter:${this.name}] Error loading base texture: ${characterSummary.customization.baseSpriteSheet}`, error);
+                console.error(`[SpriteSheetCharacter:${this.name}] Error loading base texture: ${customization.baseSpriteSheet}`, error);
                 this.texture_base = null;
                 // this.material_base.diffuseTexture = null;
                 // this.material_base.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
@@ -1627,10 +1633,10 @@ export class SpriteSheetCharacter {
         }
 
         // --- Hair Layer ---
-        if (characterSummary?.customization?.hairSpriteSheet && characterSummary?.customization?.hairSpriteSheet.length > 0) {
+        if (customization?.hairSpriteSheet && customization?.hairSpriteSheet.length > 0) {
             try {
-                const textureUrl = characterSummary.customization.hairSpriteSheet;
-                let newTexture: B.Texture | null = await this.loadLayerTexture(characterSummary?.customization?.hairSpriteSheet, this.material_hair, "Hair");
+                const textureUrl = customization.hairSpriteSheet;
+                let newTexture: B.Texture | null = await this.loadLayerTexture(customization?.hairSpriteSheet, this.material_hair, "Hair");
                 if (newTexture) {
                     this.texture_hair = newTexture;
                     this.texture_hair.hasAlpha = true;
@@ -1647,7 +1653,7 @@ export class SpriteSheetCharacter {
                     this.material_hair.alpha = 0.0;
                 }
             } catch (error) {
-                console.error(`[SpriteSheetCharacter:${this.name}] Error loading hair texture: ${characterSummary.customization.hairSpriteSheet}`, error);
+                console.error(`[SpriteSheetCharacter:${this.name}] Error loading hair texture: ${customization.hairSpriteSheet}`, error);
                 this.texture_hair = null;
                 // this.material_hair.diffuseTexture = null;
                 // this.material_hair.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
@@ -1662,10 +1668,10 @@ export class SpriteSheetCharacter {
         }
 
         // --- Eyes Layer (Add similarly if needed) ---
-        if (characterSummary?.customization?.eyesSpriteSheet && characterSummary?.customization?.eyesSpriteSheet.length > 0) {
+        if (customization?.eyesSpriteSheet && customization?.eyesSpriteSheet.length > 0) {
             try {
-                const textureUrl = characterSummary.customization.eyesSpriteSheet;
-                let newTexture: B.Texture | null = await this.loadLayerTexture(characterSummary?.customization?.eyesSpriteSheet, this.material_base, "Eyes");
+                const textureUrl = customization.eyesSpriteSheet;
+                let newTexture: B.Texture | null = await this.loadLayerTexture(customization?.eyesSpriteSheet, this.material_eyes, "Eyes");
                 if (newTexture) {
                     this.texture_eyes = newTexture;
                     this.texture_eyes.hasAlpha = true;
@@ -1682,7 +1688,7 @@ export class SpriteSheetCharacter {
                     this.material_eyes.alpha = 0.0;
                 }
             } catch (error) {
-                console.error(`[SpriteSheetCharacter:${this.name}] Error loading eyes texture: ${characterSummary.customization.eyesSpriteSheet}`, error);
+                console.error(`[SpriteSheetCharacter:${this.name}] Error loading eyes texture: ${customization.eyesSpriteSheet}`, error);
                 this.texture_eyes = null;
                 // this.material_eyes.diffuseTexture = null;
                 // this.material_eyes.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
@@ -1696,27 +1702,64 @@ export class SpriteSheetCharacter {
             this.texture_eyes = await this.loadLayerTexture(null, this.material_eyes, "Eyes");
         }
 
-
-        // --- Final Setup ---
-        if (characterSummary && this.texture_base) { // Require at least a base texture to be visible
-            // Set initial animation state if provided or default
-            this.setAnimationInternal(initialAnimation || this.currentFullAnimation || DEFAULT_ANIMATION, true); // Force UV update
-            this.plane.visibility = 1;
-            console.log(`[SpriteSheetCharacter:${this.name}] Character setup complete. Visible.`);
-        } else {
-            this.plane.visibility = 0;
-            this.stopAnimation();
-            console.log(`[SpriteSheetCharacter:${this.name}] No base texture or character summary. Hidden.`);
-        }
-
         // Apply hue shift if needed (requires custom shader or node material)
-        if (characterSummary?.customization) {
-            // this.applyHueShift(this.material_base, characterSummary?.customization?.baseHue);
-            // this.applyHueShift(this.material_eyes, characterSummary?.customization?.eyesHue);
-            // this.applyHueShift(this.material_hair, characterSummary?.customization?.hairHue);
-            this.colorizeBase(characterSummary?.customization?.baseColor)
-            this.colorizeHair(characterSummary?.customization?.hairColor)
+        if (customization) {
+            // this.applyHueShift(this.material_base, customization?.baseHue);
+            // this.applyHueShift(this.material_eyes, customization?.eyesHue);
+            // this.applyHueShift(this.material_hair, customization?.hairHue);
+            this.colorizeBase(customization?.baseColor)
+            this.colorizeHair(customization?.hairColor)
+            this.colorizeEyes(customization?.eyesColor)
         }
+    }
+
+    public async applyEquipmentVisuals(equipmentVisuals: ICharacterEquipmentVisuals | null) {
+     console.log(`[SpriteSheetCharacter:${this.name}] Updating character equipment visuals.`);
+        // -- Body
+        if (equipmentVisuals?.bodySpriteSheet) {
+            try {
+                const textureUrl = equipmentVisuals.bodySpriteSheet;
+                let newTexture: B.Texture | null = await this.loadLayerTexture(textureUrl, this.material_equip_body, "Body");
+                if (newTexture) {
+                    this.texture_equip_body = newTexture;
+                    this.texture_equip_body.hasAlpha = true;
+                    console.log(`[SpriteSheetCharacter:${this.name}] Equipment Body Texture updated.`);
+                } else {
+                    console.error(`[SpriteSheetCharacter:${this.name}] Equipment Body Texture failed to load: ${textureUrl}`);
+                    this.texture_equip_body = null;
+                }
+            } catch (error) {
+                console.error(`[SpriteSheetCharacter:${this.name}] Error loading Equipment Body texture: ${equipmentVisuals.bodySpriteSheet}`, error);
+                this.texture_equip_body = null;
+            }
+        } else {
+            this.texture_equip_body = null;
+            this.texture_equip_body = await this.loadLayerTexture(null, this.material_equip_body, "Body");
+        }
+
+        if (equipmentVisuals) {
+            this.colorize(this.material_equip_body, equipmentVisuals?.bodyColor)
+            // this.colorizeHair(customization?.hairColor)
+            // this.colorizeEyes(customization?.eyesColor)
+        }
+    }
+
+    public async setCharacter(characterSummary: ICharacterSummary | null, initialAnimation?: AnimationName) {
+        // --- Final Setup ---
+        if (characterSummary) { // Require at least a base texture to be visible
+            // Set initial animation state if provided or default
+            if(characterSummary.customization) await this.applyCustomization(characterSummary.customization);
+            if(characterSummary.equipmentVisuals) await this.applyEquipmentVisuals(characterSummary.equipmentVisuals);
+            if(this.texture_base) {
+                this.setAnimationInternal(initialAnimation || this.currentFullAnimation || DEFAULT_ANIMATION, true); // Force UV update
+                this.plane.visibility = 1;
+                console.log(`[SpriteSheetCharacter:${this.name}] Character setup complete. Visible.`);
+                return;
+            }
+        }
+        this.plane.visibility = 0;
+        this.stopAnimation();
+        console.log(`[SpriteSheetCharacter:${this.name}] No base texture or character summary. Hidden.`);
     }
 
     private applyHueShift(material: StandardMaterial, hue: number): void {
@@ -1727,16 +1770,22 @@ export class SpriteSheetCharacter {
     }
 
     private colorize(material: StandardMaterial, color: B.Color3, strength: number = 255.0): void {
+        if(!material) return;
+        if(color.r + color.g + color.b == 0) return; // it never gets truly black but who the fuck will see anyway :)
         const inputBlock = material.getBlockByName("targetColor") as Nullable<B.InputBlock>;
         if (inputBlock) {
             inputBlock.value = new B.Color4(color.r, color.g, color.b, strength);
         }
     }
 
-
     public colorizeBase(color: B.Color3, strength: number = 255.0): void {
         if (!this.material_base) return;
         this.colorize(this.material_base, color, strength);
+    }
+
+    public colorizeEyes(color: B.Color3, strength: number = 255.0): void {
+        if (!this.material_eyes) return;
+        this.colorize(this.material_eyes, color, strength);
     }
 
     public colorizeHair(color: B.Color3, strength: number = 255.0): void {
@@ -1798,7 +1847,6 @@ export class SpriteSheetCharacter {
         const characterLookVector = TmpVectors.Vector3[1]; // Use index 1
         SpriteSheetCharacter.getDirectionVector(this.lookDirection, characterLookVector);
 
-        // --- Sprite Direction Choice ---
         // Calculate angle between where character is looking and the camera direction
         const dot = Vector3.Dot(characterLookVector, viewDirectionXZ);
         const crossY = characterLookVector.z * viewDirectionXZ.x - characterLookVector.x * viewDirectionXZ.z; // Cross product Y component
@@ -2055,6 +2103,12 @@ export class SpriteSheetCharacter {
             this.texture_hair.vOffset = vOffset;
             this.texture_hair.uScale = this.uvScaleX;
             this.texture_hair.vScale = this.uvScaleY;
+        }
+        if (this.texture_equip_body) {
+            this.texture_equip_body.uOffset = uOffset;
+            this.texture_equip_body.vOffset = vOffset;
+            this.texture_equip_body.uScale = this.uvScaleX;
+            this.texture_equip_body.vScale = this.uvScaleY;
         }
         // console.log(`[UV Update ${this.name}] Anim: ${this.currentFullAnimation}, Frame: ${this.currentFrameIndex}, UVs: (${uOffset.toFixed(2)}, ${vOffset.toFixed(2)}), Scale: (${this.uvScaleX.toFixed(2)}, ${this.uvScaleY.toFixed(2)})`);
     }

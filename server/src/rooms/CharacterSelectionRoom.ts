@@ -20,7 +20,7 @@ import {
 } from 'shared/types';
 import { CharacterCustomizationState } from './schemas/CharacterCustomizationState';
 import { Color3Schema } from './schemas/Color3Schema';
-import { CharacterEquipmentState } from './schemas/CharacterEquipmentState';
+import { CharacterEquipmentVisualsState } from './schemas/CharacterEquipmentVisualsState';
 
 export class CharacterSelectRoom extends Room<CharacterSelectState> {
     // Max characters per user (example)
@@ -87,19 +87,14 @@ export class CharacterSelectRoom extends Room<CharacterSelectState> {
                 });
             }
 
-            const characterEquipmentState = new CharacterEquipmentState();
-            characterEquipmentState.assign({ 
-                legsItemId: 'starter_legs',
-                bodyItemId: 'starter_body'
-            });
+            const characterEquipmentVisualsState = new CharacterEquipmentVisualsState();
 
             // Attempt to create character in DB
             try {
                 const newCharacter = await this.characterRepo.create({
                     userId: userId,
                     name: payload.name,
-                    customization: characterCustomizationState,
-                    equipment: characterEquipmentState
+                    customization: characterCustomizationState
                 });
 
                 if (newCharacter) {
@@ -109,7 +104,7 @@ export class CharacterSelectRoom extends Room<CharacterSelectState> {
                         name: newCharacter.name,
                         level: newCharacter.level,
                         customization: characterCustomizationState,
-                        equipment: characterEquipmentState
+                        equipmentVisuals: characterEquipmentVisualsState
                         // Assign appearance data to schema if applicable
                     });
                     this.state.characters.set(newCharacter.id, summary);
@@ -206,20 +201,10 @@ export class CharacterSelectRoom extends Room<CharacterSelectState> {
             characters.forEach(char => {
                 // Avoid adding duplicates if state already populated by another client's join? Usually not needed.
                 if (!this.state.characters.has(char.id)) {
-                    const customRaw = JSON.parse(char.customizationJson as any || '');
-                    customRaw.baseColor = new Color3Schema(customRaw.baseColor.r, customRaw.baseColor.g, customRaw.baseColor.b)
-                    customRaw.eyesColor = new Color3Schema(customRaw.eyesColor.r, customRaw.eyesColor.g, customRaw.eyesColor.b)
-                    customRaw.hairColor = new Color3Schema(customRaw.hairColor.r, customRaw.hairColor.g, customRaw.hairColor.b)
-                    const customization = new CharacterCustomizationState().assign(customRaw)
-                    const equipment = new CharacterEquipmentState().assign( JSON.parse(char.equipmentJson as any || '') )
-                    const summary = new CharacterSummaryState().assign({
-                        id: char.id,
-                        name: char.name,
-                        level: char.level,
-                        customization,
-                        equipment
-                    });
-                    this.state.characters.set(char.id, summary);
+                    this.characterRepo.getSummary(char).then((summary) => {
+                        if(summary)
+                            this.state.characters.set(char.id, summary);
+                    })
                 }
             });
         } catch (error) {
