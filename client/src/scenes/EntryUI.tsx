@@ -35,14 +35,12 @@ export function EntryUI() {
     const { connectionStatus, setCurrentScreen } = useGameStore();
 
     useEffect(() => {
-        console.log("hehe", roomState)
-            if(roomState && roomState.mapDataJson && connectionStatus == "connected") {
-                console.log("haha")
-                const mapData = JSON.parse(roomState.mapDataJson)
-                if(mapData.blockData) 
-                    useWorldStore.setState({ mapChunks: mapData.blockData})
-            }
-        }, [roomState]);
+        if(roomState && roomState.mapDataJson && connectionStatus == "connected") {
+            const mapData = JSON.parse(roomState.mapDataJson)
+            if(mapData.blockData) 
+                useWorldStore.setState({ mapChunks: mapData.blockData})
+        }
+    }, [roomState]);
 
     return (
         <>
