@@ -1,13 +1,18 @@
 import { Component } from "@/entities/core/Component";
 import { Entity } from "@/entities/core/Entity";
 import { GameRoom } from "@/rooms/GameRoom"; // Room reference might be needed for interpolation triggers etc.
-import { IVector2, IVector3, IQuaternion } from "@shared/types"; // Use shared types
+import { IVector2, IVector3, IQuaternion, ICharacterEquipment, ICharacterCustomization } from "@shared/types"; // Use shared types
 import { SpriteComponent } from "./SpriteComponent";
 import { CharacterCustomizationState } from "@/rooms/schemas/CharacterCustomizationState";
 
 
-export class CharacterComponent extends Component {
-    public customization: CharacterCustomizationState;
+export class EquipableComponent extends Component {
+    // Requirements
+    public requiredCharacterLevel?: number;
+    public requiredCharacterBase?: string;
+
+    // Stat changes, buffs etc.
+    // ...
 
     update(deltaTime: number, room: GameRoom): void {
 

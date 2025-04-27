@@ -1,3 +1,5 @@
+import { EquipableComponent } from "../components/EquipableComponent";
+import { SpriteComponent } from "../components/SpriteComponent";
 import { TransformComponent } from "../components/TransformComponent";
 import { Component } from "../core/Component";
 import { Entity } from "../core/Entity";
@@ -6,7 +8,9 @@ type ComponentConstructor = new (entity: Entity) => Component;
 
 export class ComponentFactory {
     private static ParsableComponents = new Map<string, ComponentConstructor>([
-        ['transform', TransformComponent as ComponentConstructor]
+        ['transform', TransformComponent as ComponentConstructor],
+        ['equipable', EquipableComponent as ComponentConstructor],
+        ['sprite', SpriteComponent as ComponentConstructor],
     ]);
 
     static createComponent(entity: Entity, key: string, config: any): Component | null {
