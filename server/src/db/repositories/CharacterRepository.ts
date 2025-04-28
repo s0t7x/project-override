@@ -5,6 +5,7 @@ import { CharacterEquipmentVisualsState } from '../../rooms/schemas/CharacterEqu
 import { ICharacterSummary, ICreateCharacterPayload } from 'shared/types';
 import { Color3Schema } from '../../rooms/schemas/Color3Schema';
 import { CharacterSummaryState } from '../../rooms/schemas/CharacterSummaryState';
+import { entityRepository } from './EntityRepository';
 
 class CharacterCreationData implements ICreateCharacterPayload {
     userId: string;
@@ -167,8 +168,10 @@ export class CharacterRepository {
         const characterEquipmentVisualsState = new CharacterEquipmentVisualsState();
         if(character.equipmentJson) {
             const equipment = JSON.parse(character.equipmentJson as any)
-            // TODO: Equipment should be based on entity instances / inventory items
-            // Right now it holds only some visual static info in one db character for testing
+            if(equipment.body) {
+                const itemEntityInstance = await entityRepository.findInstanceById(equipment.body, true)
+                // const spriteComponent = itemEntityInstance?.baseEntity
+            }
             characterEquipmentVisualsState.assign({ 
                 ...equipment
             });
