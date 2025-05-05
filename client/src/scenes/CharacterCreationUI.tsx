@@ -44,6 +44,9 @@ export function CharacterCreationUI() {
     const [currentHairColor, setCurrentHairColor] = useState(defaultHairColor);
     const [currentEyesColor, setCurrentEyesColor] = useState(defaultEyesColor);
 
+    const [currentShirtHue, setCurrentShirtHue] = useState(0)
+    const [currentLegsHue, setCurrentLegsHue] = useState(0)
+
     useEffect(() => {
         setSpriteSheetFactory(new SpriteSheetFactory());
         setCharacterCustomization({
@@ -63,10 +66,17 @@ export function CharacterCreationUI() {
     
             const characterPreview = sceneDirector.getActiveScene()?.metadata?.characterPreview;
             // characterPreview.updateCharacterTexture(texture);
-            characterPreview.setCharacter({ customization: characterCustomization })
+            characterPreview.setCharacter({ 
+                customization: characterCustomization, 
+                equipmentVisuals: {
+                     bodySpriteSheet: "/assets/sprites/cloth_simple_shirt.png", 
+                     bodyHueShift: currentShirtHue,
+                     legsSpriteSheet: "/assets/sprites/cloth_simple_pants.png",
+                     legsHueShift: currentLegsHue
+                    } })
             characterPreview.lookAtCamera();
         })();
-    }, [characterCustomization])
+    }, [characterCustomization, currentShirtHue, currentLegsHue])
 
     const nextBody = () => {
         let next = currentBodyIndex + 1;
@@ -128,7 +138,9 @@ export function CharacterCreationUI() {
 
             networkService.sendMessage('createCharacter', {
                 name: name,
-                customization: characterCustomization
+                customization: characterCustomization,
+                cloth_body_hue: currentShirtHue,
+                cloth_legs_hue: currentLegsHue
             })
         })();
     }
@@ -151,6 +163,30 @@ export function CharacterCreationUI() {
     const handleColorizeEyes = (event: any) => {
         setCurrentEyesColor(event.target.value)
         setCharacterCustomization({ ...characterCustomization, eyesColor: Color3.FromHexString(event.target.value) })
+    }
+
+    const handleIncreaseShirtHue = (event: any) => {
+        let newHue = currentShirtHue + 20;
+        if(newHue >= 360) newHue -= 360;
+        setCurrentShirtHue(newHue);
+    }
+
+    const handleDecreaseShirtHue = (event: any) => {
+        let newHue = currentShirtHue - 20;
+        if(newHue < 0) newHue += 360;
+        setCurrentShirtHue(newHue);
+    }
+
+    const handleIncreaseLegsHue = (event: any) => {
+        let newHue = currentLegsHue + 20;
+        if(newHue >= 360) newHue -= 360;
+        setCurrentLegsHue(newHue);
+    }
+
+    const handleDecreaseLegsHue = (event: any) => {
+        let newHue = currentLegsHue - 20;
+        if(newHue < 0) newHue += 360;
+        setCurrentLegsHue(newHue);
     }
 
     return (
@@ -178,6 +214,16 @@ export function CharacterCreationUI() {
                                 <Button onClick={previousHair} style={{ maxWidth: 25, maxHeight: 25 }}>&lt;</Button><Text style={{ flexGrow: 1, textAlign: "center" }}>Hair</Text><Button onClick={nextHair} style={{ maxWidth: 25, maxHeight: 25 }}>&gt;</Button>
                             </div>
                             <input type="color" style={{ height: 50, position: "relative", marginTop: -10 }} value={currentHairColor} onChange={handleColorizeHair} />
+                        </div>
+                        <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
+                                <Button onClick={handleDecreaseShirtHue} style={{ maxWidth: 25, maxHeight: 25 }}>&lt;</Button><Text style={{ flexGrow: 1, textAlign: "center" }}>Shirt</Text><Button onClick={handleIncreaseShirtHue} style={{ maxWidth: 25, maxHeight: 25 }}>&gt;</Button>
+                            </div>
+                        </div>
+                        <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
+                                <Button onClick={handleDecreaseLegsHue} style={{ maxWidth: 25, maxHeight: 25 }}>&lt;</Button><Text style={{ flexGrow: 1, textAlign: "center" }}>Pants</Text><Button onClick={handleIncreaseLegsHue} style={{ maxWidth: 25, maxHeight: 25 }}>&gt;</Button>
+                            </div>
                         </div>
                         <div style={{ marginTop: 'auto' }}>
                             <div className="input-group">

@@ -87,33 +87,29 @@ export class CharacterSelectRoom extends Room<CharacterSelectState> {
                 });
             }
 
-            const characterEquipmentVisualsState = new CharacterEquipmentVisualsState();
-
             // Attempt to create character in DB
             try {
                 const newCharacter = await this.characterRepo.create({
                     userId: userId,
                     name: payload.name,
-                    customization: characterCustomizationState
+                    customization: characterCustomizationState,
+                    cloth_body_hue: payload.cloth_body_hue,
+                    cloth_legs_hue: payload.cloth_legs_hue
                 });
 
                 if (newCharacter) {
                     // Add new character summary to room state
-                    const summary = new CharacterSummaryState().assign({
-                        id: newCharacter.id,
-                        name: newCharacter.name,
-                        level: newCharacter.level,
-                        customization: characterCustomizationState,
-                        equipmentVisuals: characterEquipmentVisualsState
-                        // Assign appearance data to schema if applicable
-                    });
-                    this.state.characters.set(newCharacter.id, summary);
-                    console.log(`[CharSelectRoom ${this.roomId}] Character "${newCharacter.name}" created for user ${userId}.`);
-                    client.send(ServerMessageType.INFO_MESSAGE, { message: `Character "${newCharacter.name}" created!`, characterId: newCharacter.id });
-                } else {
-                    // Creation failed (likely caught by repo checks, but handle null just in case)
-                    client.send(ServerMessageType.ERROR_MESSAGE, { message: "Failed to create character. Please try again." });
+                    const summary = await this.characterRepo.getSummary(newCharacter);
+                    if(summary) {
+                        this.state.characters.set(newCharacter.id, summary);
+                        console.log(`[CharSelectRoom ${this.roomId}] Character "${newCharacter.name}" created for user ${userId}.`);
+                        client.send(ServerMessageType.INFO_MESSAGE, { message: `Character "${newCharacter.name}" created!`, characterId: newCharacter.id });
+                        return;
+                    }
                 }
+                
+                client.send(ServerMessageType.ERROR_MESSAGE, { message: "Failed to create character. Please try again." });
+                return;
             } catch (error) {
                 console.error(`[CharSelectRoom ${this.roomId}] Error creating character for user ${userId}:`, error);
                 client.send(ServerMessageType.ERROR_MESSAGE, { message: "Server error creating character." });

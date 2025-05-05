@@ -11,6 +11,8 @@ class CharacterCreationData implements ICreateCharacterPayload {
     userId: string;
     name: string;
     customization: CharacterCustomizationState;
+    cloth_body_hue: number = 0;
+    cloth_legs_hue: number = 0;
 } ;
 
 type CharacterUpdateData = Partial<Omit<Character, 'id' | 'userId' | 'createdAt' | 'name'>>;
@@ -73,13 +75,20 @@ export class CharacterRepository {
     async create(data: CharacterCreationData): Promise<Character | null> {
         try {
             // Prisma's create throws if constraints (like unique name) fail
-            return await prisma.character.create({
+            const char: Character = await prisma.character.create({
                 data: {
                     userId: data.userId,
                     name: data.name,
                     customizationJson: JSON.stringify(data.customization)
                 },
             });
+            const starterBodyInst = await entityRepository.createInstance("starter_body", { instanceDataJson: JSON.stringify({sprite: { hueShift: data.cloth_body_hue || 0 }})});
+            const starterLegsInst = await entityRepository.createInstance("starter_legs", { instanceDataJson: JSON.stringify({sprite: { hueShift: data.cloth_legs_hue || 0 }})})
+            char.equipmentJson = JSON.stringify({
+                body: starterBodyInst?.id,
+                legs: starterLegsInst?.id
+            })
+            return await this.update(char.id, char)
         } catch (error: any) {
             if (error.code === 'P2002' && error.meta?.target?.includes('name')) {
                  console.warn(`[CharacterRepository] Attempted to create character with existing name: "${data.name}"`);
@@ -124,9 +133,21 @@ export class CharacterRepository {
       */
      async delete(characterId: string): Promise<boolean> {
          try {
-             await prisma.character.delete({
+             const deletedChar = await prisma.character.delete({
                  where: { id: characterId },
              });
+             const equipment = JSON.parse(deletedChar.equipmentJson as string || 'null')
+             if(equipment) {
+                for (const instId of Object.values(equipment)) {
+                    await entityRepository.deleteInstance(instId as string || '')
+                }
+             }
+             const inventory = JSON.parse(deletedChar.inventoryJson as string || 'null')
+            if(inventory) {
+                for (const instId of Object.values(inventory)) {
+                    await entityRepository.deleteInstance(instId as string || '')
+                }
+             }
              console.log(`[CharacterRepository] Deleted character ID: "${characterId}"`);
              return true;
          } catch (error: any) {
@@ -169,12 +190,47 @@ export class CharacterRepository {
         if(character.equipmentJson) {
             const equipment = JSON.parse(character.equipmentJson as any)
             if(equipment.body) {
-                const itemEntityInstance = await entityRepository.findInstanceById(equipment.body, true)
-                // const spriteComponent = itemEntityInstance?.baseEntity
+                const itemEntityInstance = await entityRepository.findInstanceById(equipment.body, true);
+                if(itemEntityInstance) {
+                    const baseData = JSON.parse(itemEntityInstance?.baseEntity?.defaultComponents as string || 'null') as any;
+                    const instancedData = JSON.parse(itemEntityInstance?.instanceDataJson as string || 'null') as any;
+                    if((baseData?.equipable || instancedData?.equipable) && (baseData?.sprite || instancedData?.sprite)) {
+                        if(instancedData?.sprite)
+                            baseData.sprite = baseData.sprite ? { ...baseData.sprite, ...instancedData.sprite } : instancedData.sprite;
+
+                        characterEquipmentVisualsState.bodySpriteSheet = baseData.sprite.textureURI;
+                        characterEquipmentVisualsState.bodyHueShift = baseData.sprite.hueShift;
+                    }
+                }
             }
-            characterEquipmentVisualsState.assign({ 
-                ...equipment
-            });
+            if(equipment.legs) {
+                const itemEntityInstance = await entityRepository.findInstanceById(equipment.legs, true);
+                if(itemEntityInstance) {
+                    const baseData = JSON.parse(itemEntityInstance?.baseEntity?.defaultComponents as string || 'null') as any;
+                    const instancedData = JSON.parse(itemEntityInstance?.instanceDataJson as string || 'null') as any;
+                    if((baseData?.equipable || instancedData?.equipable) && (baseData?.sprite || instancedData?.sprite)) {
+                        if(instancedData?.sprite)
+                            baseData.sprite = baseData.sprite ? { ...baseData.sprite, ...instancedData.sprite } : instancedData.sprite;
+
+                        characterEquipmentVisualsState.legsSpriteSheet = baseData.sprite.textureURI;
+                        characterEquipmentVisualsState.legsHueShift = baseData.sprite.hueShift;
+                    }
+                }
+            }
+            if(equipment.hat) {
+                const itemEntityInstance = await entityRepository.findInstanceById(equipment.hat, true);
+                if(itemEntityInstance) {
+                    const baseData = JSON.parse(itemEntityInstance?.baseEntity?.defaultComponents as string || 'null') as any;
+                    const instancedData = JSON.parse(itemEntityInstance?.instanceDataJson as string || 'null') as any;
+                    if((baseData?.equipable || instancedData?.equipable) && (baseData?.sprite || instancedData?.sprite)) {
+                        if(instancedData?.sprite)
+                            baseData.sprite = baseData.sprite ? { ...baseData.sprite, ...instancedData.sprite } : instancedData.sprite;
+
+                        characterEquipmentVisualsState.hatSpriteSheet = baseData.sprite.textureURI;
+                        characterEquipmentVisualsState.hatHueShift = baseData.sprite.hueShift;
+                    }
+                }
+            }
         }
 
         const summary = new CharacterSummaryState().assign({

@@ -70,6 +70,8 @@ export interface ICreateCharacterPayload {
     name: string;
     // Include appearance customization data
     customization: ICharacterCustomization;
+    cloth_body_hue: number;
+    cloth_legs_hue: number;
 }
 
 /** Payload for selecting a character to play. */

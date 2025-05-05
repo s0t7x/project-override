@@ -1724,11 +1724,33 @@ export class SpriteSheetCharacter {
             this.texture_equip_body = await this.loadLayerTexture(null, this.material_equip_body, "Body");
         }
 
+        // -- Legs
+        if (equipmentVisuals?.legsSpriteSheet) {
+            try {
+                const textureUrl = equipmentVisuals.legsSpriteSheet;
+                let newTexture: B.Texture | null = await this.loadLayerTexture(textureUrl, this.material_equip_legs, "Legs");
+                if (newTexture) {
+                    this.texture_equip_legs = newTexture;
+                    this.texture_equip_legs.hasAlpha = true;
+                    console.log(`[SpriteSheetCharacter:${this.name}] Equipment Legs Texture updated.`);
+                } else {
+                    console.error(`[SpriteSheetCharacter:${this.name}] Equipment Legs Texture failed to load: ${textureUrl}`);
+                    this.texture_equip_legs = null;
+                }
+            } catch (error) {
+                console.error(`[SpriteSheetCharacter:${this.name}] Error loading Equipment Legs texture: ${equipmentVisuals.legsSpriteSheet}`, error);
+                this.texture_equip_legs = null;
+            }
+        } else {
+            this.texture_equip_legs = null;
+            this.texture_equip_legs = await this.loadLayerTexture(null, this.material_equip_legs, "Legs");
+        }
+
         if (equipmentVisuals) {
             this.colorize(this.material_equip_body, equipmentVisuals?.bodyColor)
             this.applyHueShift(this.material_equip_body, equipmentVisuals?.bodyHueShift || 0)
-            // this.colorizeHair(customization?.hairColor)
-            // this.colorizeEyes(customization?.eyesColor)
+            this.colorize(this.material_equip_legs, equipmentVisuals?.legsColor)
+            this.applyHueShift(this.material_equip_legs, equipmentVisuals?.legsHueShift || 0)
         }
     }
 
@@ -1758,7 +1780,7 @@ export class SpriteSheetCharacter {
     }
 
     private colorize(material: B.NodeMaterial, color: IColor3, strength: number = 255.0): void {
-        if(!material) return;
+        if(!material || !color) return;
         if(color.r + color.g + color.b == 0) return; // it never gets truly black but who the fuck will see anyway :)
         const inputBlock = material.getBlockByName("targetColor") as Nullable<B.InputBlock>;
         if (inputBlock) {
@@ -2097,6 +2119,12 @@ export class SpriteSheetCharacter {
             this.texture_equip_body.vOffset = vOffset;
             this.texture_equip_body.uScale = this.uvScaleX;
             this.texture_equip_body.vScale = this.uvScaleY;
+        }
+        if (this.texture_equip_legs) {
+            this.texture_equip_legs.uOffset = uOffset;
+            this.texture_equip_legs.vOffset = vOffset;
+            this.texture_equip_legs.uScale = this.uvScaleX;
+            this.texture_equip_legs.vScale = this.uvScaleY;
         }
         // console.log(`[UV Update ${this.name}] Anim: ${this.currentFullAnimation}, Frame: ${this.currentFrameIndex}, UVs: (${uOffset.toFixed(2)}, ${vOffset.toFixed(2)}), Scale: (${this.uvScaleX.toFixed(2)}, ${this.uvScaleY.toFixed(2)})`);
     }

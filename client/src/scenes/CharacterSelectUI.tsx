@@ -13,27 +13,6 @@ export function CharacterSelectUI() {
     const { networkService, sceneDirector, assetService } = useGameContext(); // Get the network service from context
     const { currentScreen, setCurrentScreen, resetAuth, roomState, selectedCharacterId, setSelectedCharacter, characterList, userId } = useGameStore();
 
-    const [spriteSheetFactory] = useState(new SpriteSheetFactory);
-
-    function updateCharacterList(roomState: any) {
-        const chars: any[] = [];
-        roomState.characters.forEach((e: any) => {
-            chars.push(e);
-        })
-        // setCharacterList(chars);
-    }
-
-    useEffect(() => {
-        networkService.addMessageListener("", updateCharacterList)
-    }, [])
-
-    useEffect(() => {
-        if (characterList) {
-            console.log("characterList changed", characterList)
-            // updateCharacterList(roomState)
-        }
-    }, [characterList]);
-
     useEffect(() => {
         if(selectedCharacterId && selectedCharacterId.length > 1)
             handleSelectCharacter(selectedCharacterId || '');
@@ -47,18 +26,7 @@ export function CharacterSelectUI() {
         
         setSelectedCharacter(charId);
 
-        // const spriteComposition = [
-        //     { url: char.customization.baseSpriteSheet || '', hueShift: char.customization.baseHue || 0 },
-        //     { url: char.customization.eyesSpriteSheet || '', hueShift: char.customization.eyesHue || 0 },
-        //     { url: char.customization.hairSpriteSheet || '', hueShift: char.customization.hairHue || 0 },
-        // ];
-
-        // const cacheKey = spriteSheetFactory.generateCacheKey(spriteComposition);
-        // let texture: any = assetService.loadTextureFromCache(cacheKey);
-        // if (!texture) {
-        //     const comp = await spriteSheetFactory.createComposite(spriteComposition);
-        //     texture = await assetService.loadTextureFromComposition(comp);
-        // }
+        console.log(char)
 
         const characterPreview = sceneDirector.getActiveScene()?.metadata?.characterPreview;
         // characterPreview.updateCharacterTexture(texture);
