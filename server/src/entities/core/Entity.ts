@@ -8,6 +8,8 @@ import { EntityState } from "@/rooms/schemas/EntityState"; // Import schema for 
 import { GameRoom } from "@/rooms/GameRoom";
 import { ComponentFactory } from "../factories/ComponentFactory";
 import { ComponentState } from "@/rooms/schemas/ComponentState";
+import { BaseEntity, InstancedEntity } from "@prisma/client";
+import { entityRepository } from "@/db/repositories/EntityRepository";
 
 export class Entity {
     public id: string;
@@ -21,10 +23,18 @@ export class Entity {
     // Flag to mark for removal
     public markedForRemoval: boolean = false;
 
-    constructor(id: string = generateId(), ownerSessionId: string | null = null) { // Allow providing an ID or generate one
+    constructor(id: string = generateId(), ownerSessionId: string | null = null, entityInstance?: InstancedEntity & { baseEntity: BaseEntity }) { // Allow providing an ID or generate one
         this.id = id;
         this.ownerSessionId = ownerSessionId;
         this.components = new Map<string, Component>();
+        if (entityInstance) {
+            this.id = entityInstance.id;
+            // this.ownerSessionId = entityInstance.ownerSessionId || null;
+            const components = {...entityInstance.baseEntity.defaultComponents as {} || {}, ...(entityInstance.instanceDataJson as {} || {})};
+            if (components) {
+                ComponentFactory.createAndAddComponents(this, components);
+            }
+        }
     }
 
     isProxy(): boolean {
@@ -84,7 +94,8 @@ export class Entity {
     }
 
     /** Populates an EntityState schema object with data from this entity's components. */
-    serializeState(state: EntityState): void {
+    serializeState(state?: EntityState): EntityState {
+        if(!state) state = new EntityState();
         state.entityId = this.id;
         state.ownerSessionId = this.ownerSessionId || undefined;
         for(const [componentKey, component] of this.components) {
@@ -94,6 +105,7 @@ export class Entity {
                 state.componentStates.set(componentKey, compState);
             }
         }
+        return state;
     }
 
     deserializeState(state: EntityState): void {

@@ -4,6 +4,8 @@ import { Schema, MapSchema, type } from "@colyseus/schema";
 import { IGameRoomState } from "@shared/types";
 import { PlayerState } from "./PlayerState";
 import { EntityState } from "./EntityState";
+import { RoomListingState } from "./RoomListingState";
+import { MapState } from "./MapState";
 
 // and potentially MapSchema<MapChunkState> or similar for world block data.
 export class GameRoomState extends Schema { // Optionally implement shared interface
@@ -13,6 +15,9 @@ export class GameRoomState extends Schema { // Optionally implement shared inter
     // Collections of synchronized objects
     @type({ map: PlayerState }) players = new MapSchema<PlayerState>();
     @type({ map: EntityState }) entities = new MapSchema<EntityState>();
+
+    @type(RoomListingState) room = new RoomListingState();
+    @type(MapState) map: MapState = new MapState(); // JSON data for the map/scene
 
     // Add other global room state fields as needed
     // @type("string") weather: string = "sunny";

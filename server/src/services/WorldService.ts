@@ -6,7 +6,6 @@ import { MapData } from '@prisma/client';
 import { Prisma } from '@prisma/client'; // For JsonValue
 
 export class WorldService {
-
     // Cache for frequently accessed maps (like the background map)
     private mapCache = new Map<string, MapData>();
     public readonly PREDEFINED_MAP_IDS = {
