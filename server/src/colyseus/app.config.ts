@@ -10,6 +10,8 @@ import prisma from '../db/client';
 import { EntryRoom } from "../rooms/EntryRoom";
 import { AuthRoom } from "../rooms/AuthRoom";
 import { CharacterSelectRoom } from "../rooms/CharacterSelectionRoom";
+import { WorldLobbyRoom } from "../rooms/WorldLobbyRoom";
+import { GlobalChatRoom } from "../rooms/GlobalChatRoom";
 
 
 export default config({
@@ -21,6 +23,8 @@ export default config({
         gameServer.define('entry', EntryRoom)
         gameServer.define('auth', AuthRoom);
         gameServer.define('character_select', CharacterSelectRoom);
+        gameServer.define('worldLobby', WorldLobbyRoom);
+        gameServer.define('globalChat', GlobalChatRoom);
     },
 
     initializeExpress: (app) => {

@@ -6,7 +6,7 @@ import { PlayerState } from "./PlayerState";
 import { EntityState } from "./EntityState";
 
 // and potentially MapSchema<MapChunkState> or similar for world block data.
-export class GameRoomState extends Schema implements IGameRoomState { // Optionally implement shared interface
+export class GameRoomState extends Schema { // Optionally implement shared interface
     @type("string") mapId: string = "default_map"; // ID of the current map/scene
     @type("number") serverTime: number = 0; // Server clock time
 

@@ -10,6 +10,7 @@ import { LoginUI } from '../scenes/LoginUI';
 import { EntryUI } from '../scenes/EntryUI';
 import { CharacterSelectUI } from '../scenes/CharacterSelectUI';
 import { CharacterCreationUI } from '../scenes/CharacterCreationUI';
+import { WorldLobbyUI } from '../scenes/WorldLobbyUI';
 
 // Import UI Scene components (create these later)
 // import LoadingUI from '@/scenes/LoadingUI';
@@ -54,8 +55,7 @@ const UIManager: React.FC = () => {
             ActiveComponent = <CharacterCreationUI />;
             break;
         case 'lobby':
-            // ActiveComponent = <WorldLobbyUI />;
-            ActiveComponent = <PlaceholderUI screenName="World Lobby" />;
+            ActiveComponent = <WorldLobbyUI />
             break;
         case 'game':
             // ActiveComponent = <GameHUD />;

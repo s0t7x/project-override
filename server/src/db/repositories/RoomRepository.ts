@@ -2,7 +2,7 @@
 // Methods for Room and MapData models, including fetching and editing block data,
 // and handling persistent entity data stored in World.entities JSON.
 
-import { RoomListingState } from '@/rooms/schemas/RoomListingState';
+import { RoomListingState } from '../../rooms/schemas/RoomListingState';
 import prisma from '../client';
 import { Room, MapData, World, Prisma } from '@prisma/client';
 import { IRoomListing } from '@shared/types';

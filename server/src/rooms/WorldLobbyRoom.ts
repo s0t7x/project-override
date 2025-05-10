@@ -8,7 +8,7 @@ import { characterRepository, CharacterRepository } from '../db/repositories/Cha
 import {
     ServerMessageType,
 } from 'shared/types';
-import { roomRepository } from '@/db/repositories/RoomRepository';
+import { roomRepository } from '../db/repositories/RoomRepository';
 import { MapSchema } from '@colyseus/schema';
 import { RoomListingState } from './schemas/RoomListingState';
 

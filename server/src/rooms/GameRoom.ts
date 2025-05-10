@@ -14,21 +14,23 @@ import {
 } from '@shared/types';
 
 // Import Schemas defined on Server
-import { GameRoomState, PlayerState, EntityState, MapChunkState } from "./schemas/GameRoomState"; // Assuming these are combined or imported correctly
+import { GameRoomState } from "./schemas/GameRoomState"; // Assuming these are combined or imported correctly
 
 // Import Core Entity/Component classes
-import { Entity } from '@/entities/core/Entity';
-import { EntityManager } from '@/entities/core/EntityManager';
-import { TransformComponent } from '@/entities/components/TransformComponent';
-import { PlayerInputComponent } from '@/entities/components/PlayerInputComponent'; // Needs implementation
+import { Entity } from '../entities/core/Entity';
+import { EntityManager } from '../entities/core/EntityManager';
+import { TransformComponent } from '../entities/components/TransformComponent';
+// import { PlayerInputComponent } from '../entities/components/PlayerInputComponent'; // Needs implementation
 // Import other components as needed...
 
 // Import Services
-import { authService, AuthService } from '@/services/AuthService';
-import { userRepository, UserRepository } from '@/db/repositories/UserRepository'; // Example repository
-import { characterRepository, CharacterRepository } from '@/db/repositories/CharacterRepository'; // Needs implementation
-import { roomRepository, RoomRepository } from '@/db/repositories/RoomRepository'; // Needs implementation
-import { PersistenceService } from '@/services/PersistenceService'; // Needs implementation
+import { authService, AuthService } from '../services/AuthService';
+import { userRepository, UserRepository } from '../db/repositories/UserRepository';
+import { characterRepository, CharacterRepository } from '../db/repositories/CharacterRepository'; 
+import { roomRepository, RoomRepository } from '../db/repositories/RoomRepository'; 
+import { PlayerState } from './schemas/PlayerState';
+import { EntityState } from './schemas/EntityState';
+// import { PersistenceService } from '../services/PersistenceService'; // Needs implementation
 
 // Import Physics Engine (requires setup)
 // import { AmmoPhysicsEngine } from '@/physics/AmmoPhysicsEngine';
@@ -43,12 +45,12 @@ export class GameRoom extends Room<GameRoomState> {
     // Room properties
     public entityManager: EntityManager;
     // public physicsEngine: AmmoPhysicsEngine; // Enable when AmmoJS is ready
-    private persistenceService: PersistenceService;
+    // private persistenceService: PersistenceService;
     private persistenceInterval?: Delayed; // For periodic saving
 
     // Injected services (using singletons for simplicity here)
     private authService: AuthService = authService;
-    private charRepo: CharacterRepository = characterRepository; // Use imported instance
+    private charRepo: CharacterRepository = characterRepository;
     private roomRepo: RoomRepository = roomRepository;
 
     // --- Room Lifecycle Methods ---
@@ -57,7 +59,7 @@ export class GameRoom extends Room<GameRoomState> {
         console.log(`[GameRoom ${this.roomId}] Creating room with options:`, options);
         this.setState(new GameRoomState());
         this.entityManager = new EntityManager(this); // Pass room reference
-        this.persistenceService = new PersistenceService(this.charRepo, this.roomRepo); // Pass necessary repos
+        // this.persistenceService = new PersistenceService(this.charRepo, this.roomRepo); // Pass necessary repos
 
         // TODO: Initialize Physics Engine (requires Ammo to be loaded first)
         // if (ammoInstance) {
@@ -92,26 +94,29 @@ export class GameRoom extends Room<GameRoomState> {
         console.log(`[GameRoom ${this.roomId}] Room created successfully.`);
     }
 
-    // Verify JWT token passed from WorldLobbyRoom when client tries to join
+       // Authenticate client using JWT passed in options
     async onAuth(client: Client, options: any, request?: any): Promise<any> {
         console.log(`[GameRoom ${this.roomId}] onAuth attempt from ${client.sessionId}`);
         if (!options || !options.token) {
-            throw new Error("Authentication token required.");
+            throw new Error("Auth token missing.");
         }
 
         const userData = this.authService.verifyJwt(options.token);
         if (!userData || !userData.userId) {
-            throw new Error("Invalid or expired authentication token.");
+            throw new Error("Invalid auth token.");
         }
 
-        // Check character selection consistency
-        if (!options.characterId) {
-            throw new Error("Character ID required to join game room.");
+        if (!options || !options.characterId || !options.mapId) {
+            throw new Error("Data missing.");
+        }
+        const charData = await characterRepository.findById(options.characterId)
+        if (!charData || !charData.id || userData.userId !== charData.userId ) {
+            throw new Error("Invalid characterId.");
         }
 
-        console.log(`[GameRoom ${this.roomId}] Client ${client.sessionId} authenticated as user ${userData.userId}`);
-        // Return user data to be available in onJoin
-        return { userId: userData.userId, characterId: options.characterId };
+        console.log(`[WorldLobbyRoom ${this.roomId}] Client ${client.sessionId} authenticated as user ${userData.userId} with char ${charData.id}`);
+
+        return { userId: userData.userId, token: options.token, character: charData };
     }
 
     async onJoin(client: Client, options: any, authData: any) {
@@ -142,16 +147,15 @@ export class GameRoom extends Room<GameRoomState> {
             const startRotationY = character.rotationY ?? 0;
 
             const playerEntity = new Entity(character.id); // Use character ID as entity ID for players
-            playerEntity.type = EntityType.PLAYER;
             playerEntity.addComponent(new TransformComponent(playerEntity, startPosition, startRotationY));
-            playerEntity.addComponent(new PlayerInputComponent(playerEntity)); // Add input component
+            // playerEntity.addComponent(new PlayerInputComponent(playerEntity)); // Add input component
             // Add other components: Vitals, Renderable, Combat, Inventory, Equipment etc. based on character data
 
             // Serialize initial entity state for the player
             const entityState = new EntityState();
             playerEntity.serializeState(entityState); // Populate schema from entity data
             entityState.ownerSessionId = client.sessionId; // Link to client session
-            playerState.syncWithEntity(entityState); // Copy relevant fields from EntityState to PlayerState if needed
+            // playerState.syncWithEntity(entityState); // Copy relevant fields from EntityState to PlayerState if needed
 
             // Add player entity to EntityManager FIRST
             this.entityManager.addEntity(playerEntity);
@@ -173,14 +177,14 @@ export class GameRoom extends Room<GameRoomState> {
 
         const playerState = this.state.players.get(client.sessionId);
         if (playerState) {
-            const playerEntity = this.entityManager.getEntity(playerState.characterId);
+            const playerEntity = this.entityManager.getEntityById(playerState.characterId);
 
             // --- Save Player Data ---
             if (playerEntity) {
                 console.log(`[GameRoom ${this.roomId}] Saving data for character ${playerState.characterId}...`);
-                await this.persistenceService.savePlayerState(playerEntity); // Implement this service method
+                // await this.persistenceService.savePlayerState(playerEntity); // Implement this service method
                 // Mark entity for removal AFTER saving data
-                this.entityManager.removeEntity(playerEntity.id);
+                this.entityManager.markEntityForRemoval(playerEntity.id);
             } else {
                  console.warn(`[GameRoom ${this.roomId}] Could not find entity for leaving player ${playerState.characterId}`);
             }
@@ -219,7 +223,7 @@ export class GameRoom extends Room<GameRoomState> {
 
         try {
             // 1. Process Inputs (apply inputs stored in PlayerInputComponents)
-            this.entityManager.processInputs(); // Add this method to EntityManager
+            // this.entityManager.processInputs(); // Add this method to EntityManager
 
             // 2. Update Entities (AI, component logic)
             this.entityManager.update(deltaTime);
@@ -231,10 +235,7 @@ export class GameRoom extends Room<GameRoomState> {
             // ...
 
             // 5. Serialize State (Update Colyseus state from entity components)
-            this.entityManager.syncState(); // Add this method to EntityManager to update this.state.entities
-
-            // 6. Check for removals
-            this.entityManager.cleanupRemovedEntities();
+            this.entityManager.syncState(this.state); // Add this method to EntityManager to update this.state.entities
 
         } catch (error) {
              console.error(`[GameRoom ${this.roomId}] Error in update loop:`, error);
@@ -249,44 +250,26 @@ export class GameRoom extends Room<GameRoomState> {
             const playerState = this.state.players.get(client.sessionId);
             if (!playerState) return; // Ignore input if player state not found
 
-            const playerEntity = this.entityManager.getEntity(playerState.characterId);
-            const inputComp = playerEntity?.getComponent(PlayerInputComponent);
+            const playerEntity = this.entityManager.getEntityById(playerState.characterId);
+            // const inputComp = playerEntity?.getComponent(PlayerInputComponent);
 
-            if (inputComp) {
-                // Store the input payload in the component for processing in the update loop
-                inputComp.queueInput(payload);
-            }
+            // if (inputComp) {
+            //     // Store the input payload in the component for processing in the update loop
+            //     inputComp.queueInput(payload);
+            // }
         });
 
         // --- Add handlers for other messages ---
         // "editBlock", "editEntity", "combatAction", "interact", "teleport", "chatMessage", etc.
 
-        // Example: Chat Message
-        this.onMessage<{ message: string }>("chat", (client, payload) => {
+        // Catch-all for unhandled message types
+        this.onMessage("*", (client, type, message) => {
             const playerState = this.state.players.get(client.sessionId);
-            if (!playerState || !payload.message) return;
-
-            const message = payload.message.substring(0, 100); // Limit message length
-            console.log(`[GameRoom ${this.roomId}] Chat from ${playerState.characterName}: ${message}`);
-
-            // Broadcast the chat message to all clients in the room
-            this.broadcast("chat", {
-                senderName: playerState.characterName,
-                message: message,
-            }, { except: client }); // Don't send back to sender immediately (client can predict)
-
-             // Also send to sender if they don't predict
-             // client.send("chat", { senderName: "You", message: message });
+            const playerName = playerState?.characterName || client.sessionId;
+            console.warn(`[GameRoom ${this.roomId}] Received unhandled message type "${type}" from ${playerName}`);
+            // Optionally send an error back to the client
+            // client.send(ServerMessageType.ERROR_MESSAGE, { message: `Unhandled message type: ${type}` });
         });
-
-         // Catch-all for unhandled message types
-         this.onMessage("*", (client, type, message) => {
-             const playerState = this.state.players.get(client.sessionId);
-             const playerName = playerState?.characterName || client.sessionId;
-             console.warn(`[GameRoom ${this.roomId}] Received unhandled message type "${type}" from ${playerName}`);
-             // Optionally send an error back to the client
-             // client.send(ServerMessageType.ERROR_MESSAGE, { message: `Unhandled message type: ${type}` });
-         });
     }
 
     // --- Helper Methods ---

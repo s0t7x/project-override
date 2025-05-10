@@ -11,7 +11,7 @@ import { SpriteSheetFactory } from "../babylon/SpriteSheetFactory";
 
 export function CharacterSelectUI() {
     const { networkService, sceneDirector, assetService } = useGameContext(); // Get the network service from context
-    const { currentScreen, setCurrentScreen, resetAuth, roomState, selectedCharacterId, setSelectedCharacter, characterList, userId } = useGameStore();
+    const { currentScreen, setCurrentScreen, resetAuth, roomState, selectedCharacterId, setSelectedCharacter, characterList, userId, setGlobalChatRoom } = useGameStore();
 
     useEffect(() => {
         if(selectedCharacterId && selectedCharacterId.length > 1)
@@ -44,8 +44,13 @@ export function CharacterSelectUI() {
         networkService.joinRoom("auth");
     }
 
-    const handleJoin = () => {
-
+    const handleJoin = async () => {
+        console.log('Handle join with char', selectedCharacterId);
+        const globalChatRoom = await networkService.joinRoom("globalChat", { characterId: selectedCharacterId }, false, true)
+        setGlobalChatRoom(globalChatRoom)
+        console.log('Global chat room', globalChatRoom)
+        await networkService.joinRoom("worldLobby", { characterId: selectedCharacterId })
+        setCurrentScreen('lobby')
     }
 
     const handleDelete = () => {

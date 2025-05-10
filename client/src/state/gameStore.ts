@@ -22,6 +22,8 @@ interface GameState {
     selectedCharacterId: string | null; // Character chosen to play
     roomState: any;
 
+    globalChatRoom: any;
+
     // Actions: Define methods to update the state
     setConnectionStatus: (status: ConnectionStatus) => void;
     setAuthStatus: (status: AuthStatus, token?: string | null, userId?: string | null) => void;
@@ -30,6 +32,8 @@ interface GameState {
     setSelectedCharacter: (characterId: string | null) => void;
     setRoomState: (state: any) => void;
     resetAuth: () => void;
+    setGlobalChatRoom: (room: any) => void;
+
 }
 
 // Create the Zustand store
@@ -95,6 +99,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     userId: null,
     selectedCharacterId: null,
     roomState: null,
+    globalChatRoom: null,
 
     // --- Actions ---
     setConnectionStatus: (status) => set({ connectionStatus: status }),
@@ -154,6 +159,10 @@ export const useGameStore = create<GameState>((set, get) => ({
             currentScreen: 'login', // Go back to login on logout
         });
     },
+
+    setGlobalChatRoom: (room: any) => {
+        set({ globalChatRoom: room })
+    }
 }));
 
 // Optional: Selector for convenience

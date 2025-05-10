@@ -34,6 +34,15 @@ export class NetworkService {
         this.messageListeners.get(type)!.add(handler);
     }
 
+    public addMessageListenerRx<T = any>(room: Colyseus.Room, type: string | number, handler: (data: T) => void): void {
+        if (!room) {
+            console.warn(`[NetworkService] Cannot add listener. Not in a room.`);
+            return;
+        }
+
+        room.onMessage(type, handler);
+    }
+
     /**
      * Remove a previously registered message listener.
      * If no handler is passed, all listeners for that message type are removed.
@@ -65,52 +74,62 @@ export class NetworkService {
     // --- Connection and Room Management ---
 
     /** Attempts to join or create a specific room type with options. */
-    async joinRoom<T = any>(roomName: string, options: any = {}): Promise<Colyseus.Room<T> | null> {
-        if (this.currentRoom && this.currentRoom.name === roomName) {
-            console.warn(`[NetworkService] Already in room: ${roomName}`);
-            return this.currentRoom as Colyseus.Room<T>;
+    async joinRoom<T = any>(roomName: string, options: any = {}, forceCreate: boolean = true, parallel: boolean = false): Promise<Colyseus.Room<T> | null> {
+        if(!parallel) {
+            if (this.currentRoom && this.currentRoom.name === roomName) {
+                console.warn(`[NetworkService] Already in room: ${roomName}`);
+                return this.currentRoom as Colyseus.Room<T>;
+            }
+            
+            // Leave existing room before joining a new one
+            await this.leaveRoom();
         }
 
-        // Leave existing room before joining a new one
-        await this.leaveRoom();
-
         console.log(`[NetworkService] Attempting to join room: ${roomName} with options:`, options);
-        useGameStore.getState().setConnectionStatus('connecting');
+        if(!parallel) useGameStore.getState().setConnectionStatus('connecting');
         // useGameStore.getState().setCurrentScreen('loading'); // Show loading screen
 
         try {
+            let newRoom: any;
             // Add auth token if available and not joining auth/entry room
             const token = useGameStore.getState().authToken;
-            if (token && roomName !== 'entry' && roomName !== 'auth') {
+            if (token) {
                 options.token = token;
-                // Try to join or create the room
-                this.currentRoom = await this.client.create<T>(roomName, options);
-            } else {
-                this.currentRoom = await this.client.joinOrCreate<T>(roomName, options);
+                if(!forceCreate)
+                    newRoom = await this.client.joinOrCreate<T>(roomName, options);
+                else
+                    newRoom = await this.client.create<T>(roomName, options);
+            } else if(roomName == 'entry' || roomName == 'auth') {
+                newRoom = await this.client.create<T>(roomName, options);
             }
 
 
-            if (this.currentRoom) {
-                console.log(`[NetworkService] Successfully joined room: ${this.currentRoom.name} (ID: ${this.currentRoom.roomId}, Session: ${this.currentRoom.sessionId})`);
+            if (newRoom) {
+                console.log(`[NetworkService] Successfully joined room: ${newRoom.name} (ID: ${newRoom.roomId}, Session: ${newRoom.sessionId})`);
                 useGameStore.getState().setConnectionStatus('connected');
                 // Setup generic listeners for the new room
-                this.setupRoomListeners(this.currentRoom);
+                this.setupRoomListeners(newRoom);
 
                 // Room-specific setup can happen here or based on room name
-                if (roomName === 'game_room') {
-                    useWorldStore.getState().setLocalPlayer(this.currentRoom.sessionId, options.characterId ?? null); // Store local player IDs
+                if (roomName === 'game') {
+                    useWorldStore.getState().setLocalPlayer(newRoom.sessionId, options.characterId ?? null); // Store local player IDs
                     // useGameStore.getState().setCurrentScreen('game'); // Switch UI to game
                 } else {
                     // For lobby, char select etc., screen might be set by gameStore reacting to auth status
                 }
+                if(parallel)
+                    return newRoom as Colyseus.Room<T>;
+                this.currentRoom = newRoom;
                 return this.currentRoom as Colyseus.Room<T>;
             } else {
-                throw new Error("joinOrCreate returned undefined room.");
+                throw new Error("create returned undefined room.");
             }
 
         } catch (error: any) {
             console.error(`[NetworkService] Failed to join room "${roomName}":`, error);
-            useGameStore.getState().setConnectionStatus('error');
+            if(!parallel) {
+                useGameStore.getState().setConnectionStatus('error');
+            }
             useGameStore.getState().setError(`Failed to join room "${roomName}": ${error?.message || 'Unknown error'}`);
             // useGameStore.getState().setCurrentScreen('error'); // Show error screen
             this.currentRoom = null;
@@ -157,6 +176,19 @@ export class NetworkService {
         try {
              // console.log(`[NetworkService] Sending message: ${type}`, message); // DEBUG
             this.currentRoom.send(type, message);
+        } catch (error) {
+             console.error(`[NetworkService] Error sending message type "${type}":`, error);
+        }
+    }
+
+    sendMessageTx(room: Colyseus.Room, type: string | number, message?: any): void {
+        if (!room) {
+            console.warn(`[NetworkService] Cannot send message type "${type}", not connected to a room.`);
+            return;
+        }
+        try {
+             // console.log(`[NetworkService] Sending message: ${type}`, message); // DEBUG
+            room.send(type, message);
         } catch (error) {
              console.error(`[NetworkService] Error sending message type "${type}":`, error);
         }
@@ -252,7 +284,7 @@ export class NetworkService {
         useGameStore.getState().setRoomState(state);
 
         // **Example using hypothetical direct state update (less efficient):**
-        if (state.entities && this.currentRoom?.name === 'game_room') {
+        if (state.entities && this.currentRoom?.name === 'game') {
             // Caution: This replaces the whole map, losing potential local interpolations.
             // useWorldStore.setState({ entities: { ...state.entities } });
 
@@ -260,11 +292,11 @@ export class NetworkService {
              // which would call addEntity, removeEntity, patchEntity actions.
              console.log("[NetworkService] Received entity state update (processing TBD). Count:", Object.keys(state.entities).length);
         }
-         if (state.players && this.currentRoom?.name === 'game_room') {
+         if (state.players && this.currentRoom?.name === 'game') {
             // useWorldStore.setState({ players: { ...state.players } });
              console.log("[NetworkService] Received player state update (processing TBD). Count:", Object.keys(state.players).length);
         }
-         if (state.mapChunks && this.currentRoom?.name === 'game_room') {
+         if (state.mapChunks && this.currentRoom?.name === 'game') {
             // useWorldStore.setState({ mapChunks: { ...state.mapChunks } });
              console.log("[NetworkService] Received map chunk state update (processing TBD). Count:", Object.keys(state.mapChunks).length);
         }
