@@ -12,6 +12,7 @@ import { AuthRoom } from "../rooms/AuthRoom";
 import { CharacterSelectRoom } from "../rooms/CharacterSelectionRoom";
 import { WorldLobbyRoom } from "../rooms/WorldLobbyRoom";
 import { GlobalChatRoom } from "../rooms/GlobalChatRoom";
+import { GameRoom } from "../rooms/GameRoom";
 
 
 export default config({
@@ -25,6 +26,8 @@ export default config({
         gameServer.define('character_select', CharacterSelectRoom);
         gameServer.define('worldLobby', WorldLobbyRoom);
         gameServer.define('globalChat', GlobalChatRoom);
+
+        gameServer.define('game', GameRoom)
     },
 
     initializeExpress: (app) => {

@@ -40,6 +40,10 @@ export class WorldService {
      * @returns The MapData object or null if not found.
      */
     async getMapDataById(mapId: string, bypassCache = true): Promise<MapData | null> {
+        if(!mapId) {
+            console.warn(`[WorldService] Invalid mapId provided: ${mapId}`);
+            return null;
+        }
         if (!bypassCache && this.mapCache.has(mapId)) {
             // console.log(`[WorldService] Returning cached map data for ID: ${mapId}`);
             return this.mapCache.get(mapId)!;

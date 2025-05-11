@@ -20,6 +20,7 @@ interface GameState {
     authToken: string | null;
     userId: string | null; // Logged in user's ID
     selectedCharacterId: string | null; // Character chosen to play
+    selectedCharacter: any;
     roomState: any;
 
     globalChatRoom: any;
@@ -29,7 +30,8 @@ interface GameState {
     setAuthStatus: (status: AuthStatus, token?: string | null, userId?: string | null) => void;
     setCurrentScreen: (screen: ScreenState) => void;
     setError: (message: string | null) => void;
-    setSelectedCharacter: (characterId: string | null) => void;
+    setSelectedCharacterId: (characterId: string | null) => void;
+    setSelectedCharacter: (character: any | null) => void;
     setRoomState: (state: any) => void;
     resetAuth: () => void;
     setGlobalChatRoom: (room: any) => void;
@@ -98,6 +100,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     authToken: null,
     userId: null,
     selectedCharacterId: null,
+    selectedCharacter: null,
     roomState: null,
     globalChatRoom: null,
 
@@ -132,7 +135,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         }
     },
 
-    setSelectedCharacter: (characterId) => {
+    setSelectedCharacterId: (characterId) => {
          console.log(`[GameStore] Setting selected character: ${characterId}`);
          set({ selectedCharacterId: characterId });
         //  // If authenticated and character selected, move to lobby (or game if skipping lobby)
@@ -142,6 +145,11 @@ export const useGameStore = create<GameState>((set, get) => ({
         //      // If character deselected, go back to char select
         //      set({ currentScreen: 'charSelect' });
         //  }
+    },
+
+    setSelectedCharacter: (character) => {
+        console.log(`[GameStore] Setting selected character: ${JSON.stringify(character)}`);
+        set({ selectedCharacter: character });
     },
 
     setRoomState: (state: any) => {

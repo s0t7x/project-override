@@ -4,12 +4,12 @@
 
 import { generateId } from "colyseus"; // Utility for generating unique IDs
 import { Component } from "./Component";
-import { EntityState } from "@/rooms/schemas/EntityState"; // Import schema for serialization type
-import { GameRoom } from "@/rooms/GameRoom";
+import { EntityState } from "../../rooms/schemas/EntityState"; // Import schema for serialization type
+import { GameRoom } from "../../rooms/GameRoom";
 import { ComponentFactory } from "../factories/ComponentFactory";
-import { ComponentState } from "@/rooms/schemas/ComponentState";
+import { ComponentState } from "../../rooms/schemas/ComponentState";
 import { BaseEntity, InstancedEntity } from "@prisma/client";
-import { entityRepository } from "@/db/repositories/EntityRepository";
+import { entityRepository } from "../../db/repositories/EntityRepository";
 
 export class Entity {
     public id: string;

@@ -1,10 +1,10 @@
 // server/src/managers/EntityManager.ts
 
-import { GameRoom } from "@/rooms/GameRoom";
+import { GameRoom } from "../../rooms/GameRoom";
 import { Entity } from "./Entity";
-import { GameRoomState } from "@/rooms/schemas/GameRoomState"; // Assuming your main room state schema is here
-import { EntityState } from "@/rooms/schemas/EntityState";
-import { Component } from "@/entities/core/Component";
+import { GameRoomState } from "../../rooms/schemas/GameRoomState"; // Assuming your main room state schema is here
+import { EntityState } from "../../rooms/schemas/EntityState";
+import { Component } from "./Component";
 import { MapSchema } from "@colyseus/schema"; // Import MapSchema
 
 export class EntityManager {

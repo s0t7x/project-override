@@ -60,26 +60,26 @@ export class MapRenderer {
      * Clears existing map visuals and renders a new map from the provided data.
      * @param mapData - The block data object (key: "x,y,z", value: { type: string }).
      */
-    public async renderMap(mapData: BlockDataMap | null): Promise<void> {
+    public async renderMap(mapData: any & { $items: BlockDataMap } | null): Promise<void> {
         console.log(`[MapRenderer:${this.rendererId}] Request to render map.`);
         this.clearMapVisuals(); // Clear previous visuals first
 
-        if (!mapData || Object.keys(mapData).length === 0) {
+        mapData = mapData?.$items || null; // Handle optional $items wrapper
+        if (!mapData || mapData.size === 0) {
             console.log(`[MapRenderer:${this.rendererId}] No map data provided or empty map.`);
             return;
         }
 
         console.log("Try render", mapData)
-        const blockCount = Object.keys(mapData).length;
-        console.log(`[MapRenderer:${this.rendererId}] Processing ${blockCount} blocks...`);
+        let blockCount = 0
+        console.log(`[MapRenderer:${this.rendererId}] Processing ${mapData.size} blocks...`);
 
         // --- Aggregate instance matrices per block type ---
         const matricesByType: Map<string, B.Matrix[]> = new Map();
         const baseMeshesToLoad: Set<string> = new Set();
 
         // First pass: Identify needed meshes and group matrices
-        for (const coordsString in mapData) {
-            const blockInfo = mapData[coordsString];
+        for (const [coordsString, blockInfo] of mapData.entries()) {
             if (!blockInfo || !blockInfo.type) continue;
 
             const [x, y, z] = coordsString.split(',').map(Number);
@@ -109,6 +109,7 @@ export class MapRenderer {
             // matrix = scaleMatrix.multiply(rotationMatrix).multiply(matrix);
             // --- End TODO ---
             matricesByType.get(blockType)!.push(matrix);
+            blockCount++;
         }
 
         // Load all required base meshes concurrently

@@ -13,9 +13,9 @@ import { roomRepository, RoomRepository } from '../db/repositories/RoomRepositor
 import { PlayerState } from './schemas/PlayerState';
 import { EntityState } from './schemas/EntityState';
 import { RoomListingState } from './schemas/RoomListingState';
-import prisma from '@/db/client';
+import prisma from '../db/client';
 import { MapSchema } from '@colyseus/schema';
-import { worldService } from '@/services/WorldService';
+import { worldService } from '../services/WorldService';
 import { MapState } from './schemas/MapState';
 import { MapBlockState } from './schemas/MapBlockState';
 
@@ -61,7 +61,7 @@ export class GameRoom extends Room<GameRoomState> {
             console.warn(`[GameRoom ${this.roomId}] No world data found for ID: ${roomData.worldId}`);
         }
 
-        const mapData = await worldService.getMapDataById(roomData.mapId, true);
+        const mapData = await worldService.getMapDataById(roomData.mapDataId, true);
         if (mapData) {
             console.log(`[GameRoom ${this.roomId}] Map data loaded successfully.`);
             this.state.map = new MapState();
@@ -80,7 +80,7 @@ export class GameRoom extends Room<GameRoomState> {
         console.log(`[GameRoom ${this.roomId}] Simulation interval set to ${SIMULATION_INTERVAL_MS}ms.`);
 
         this.registerMessageHandlers();
-        this.metadata.roomId = roomIdFromOptions;
+        this.setMetadata({ roomId: this.roomId, worldId: roomData.worldId });
         console.log(`[GameRoom ${this.roomId}] Room created successfully.`);
     }
 
@@ -90,7 +90,7 @@ export class GameRoom extends Room<GameRoomState> {
         if (!options?.token) throw new Error("Auth token missing.");
         const userData = this.authService.verifyJwt(options.token);
         if (!userData?.userId) throw new Error("Invalid auth token.");
-        if (!options.characterId || !options.mapId) throw new Error("Data missing.");
+        if (!options.characterId) throw new Error("Data missing.");
 
         const charData = await characterRepository.findById(options.characterId);
         if (!charData || userData.userId !== charData.userId) {
@@ -105,7 +105,7 @@ export class GameRoom extends Room<GameRoomState> {
         console.log(`[GameRoom ${this.roomId}] Client ${client.sessionId} (User: ${authData.userId}, Char: ${authData.characterId}) joined.`);
 
         try {
-            const character = await this.charRepo.findById(authData.characterId);
+            const character = await this.charRepo.findById(authData.character.id);
             if (!character || character.userId !== authData.userId) {
                 throw new Error(`Character ${authData.characterId} not found or unauthorized.`);
             }

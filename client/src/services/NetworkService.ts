@@ -108,7 +108,7 @@ export class NetworkService {
                 console.log(`[NetworkService] Successfully joined room: ${newRoom.name} (ID: ${newRoom.roomId}, Session: ${newRoom.sessionId})`);
                 useGameStore.getState().setConnectionStatus('connected');
                 // Setup generic listeners for the new room
-                this.setupRoomListeners(newRoom);
+                if(!parallel) this.setupRoomListeners(newRoom);
 
                 // Room-specific setup can happen here or based on room name
                 if (roomName === 'game') {

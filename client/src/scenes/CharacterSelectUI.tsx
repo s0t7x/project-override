@@ -11,7 +11,7 @@ import { SpriteSheetFactory } from "../babylon/SpriteSheetFactory";
 
 export function CharacterSelectUI() {
     const { networkService, sceneDirector, assetService } = useGameContext(); // Get the network service from context
-    const { currentScreen, setCurrentScreen, resetAuth, roomState, selectedCharacterId, setSelectedCharacter, characterList, userId, setGlobalChatRoom } = useGameStore();
+    const { currentScreen, setCurrentScreen, resetAuth, roomState, selectedCharacterId, setSelectedCharacterId, setSelectedCharacter, characterList, userId, setGlobalChatRoom } = useGameStore();
 
     useEffect(() => {
         if(selectedCharacterId && selectedCharacterId.length > 1)
@@ -24,7 +24,7 @@ export function CharacterSelectUI() {
         const char = characterList.find((char: any) => char.id == charId);
         if (!char) return;
         
-        setSelectedCharacter(charId);
+        setSelectedCharacterId(charId);
 
         console.log(char)
 
@@ -46,6 +46,9 @@ export function CharacterSelectUI() {
 
     const handleJoin = async () => {
         console.log('Handle join with char', selectedCharacterId);
+        const char = characterList.find((char: any) => char.id == selectedCharacterId);
+        if (!char) return;
+        setSelectedCharacter(char);
         const globalChatRoom = await networkService.joinRoom("globalChat", { characterId: selectedCharacterId }, false, true)
         setGlobalChatRoom(globalChatRoom)
         console.log('Global chat room', globalChatRoom)
@@ -58,7 +61,7 @@ export function CharacterSelectUI() {
             networkService.onMessageOnce('INFO_MESSAGE', (payload: any) => {
                 if(payload.message?.endsWith('deleted!')) {
                     sceneDirector.getActiveScene()?.metadata?.characterPreview?.setCharacter(null);
-                    setSelectedCharacter(null);
+                    setSelectedCharacterId(null);
                 }
             })
 

@@ -2,9 +2,9 @@
 // Manages entity's position, rotation, and potentially scale in the game world.
 // Can be updated by physics, player input, or AI.
 
-import { Component } from "@/entities/core/Component";
-import { Entity } from "@/entities/core/Entity";
-import { GameRoom } from "@/rooms/GameRoom"; // Room reference might be needed for interpolation triggers etc.
+import { Component } from "../core/Component";
+import { Entity } from "../core/Entity";
+import { GameRoom } from "../../rooms/GameRoom"; // Room reference might be needed for interpolation triggers etc.
 import { IVector3, IQuaternion } from "@shared/types"; // Use shared types
 
 export class TransformComponent extends Component {

@@ -60,8 +60,9 @@ export class SceneDirector {
     }
 
     private disposeScene(): void {
-        if(this.currentScene?.metadata?.mapRenderers)
-            this.currentScene.metadata.mapRenderers.forEach((mr: any) => mr.dispose()); // Example
+        if(this.currentScene?.metadata?.mapRenderers) {
+            Array.from(Object.values(this.currentScene.metadata.mapRenderers)).forEach((mr: any) => mr.dispose());
+        }
         this.currentScene?.metadata?.characterPreview?.dispose(); // Dispose character preview
 
         if (this.currentScene && this.currentScreenState === 'game') this.disposeGameScene();
@@ -128,7 +129,7 @@ export class SceneDirector {
         if (!this.engine) return;
         console.log("[SceneDirector] Setting up Game Scene...");
         // ... (check network connection etc.) ...
-        this.currentScene = createGameScene(this.engine);
+        this.currentScene = createGameScene(this.engine, this.assetService);
 
         // --- Wait for scene to be ready ---
         this.currentScene.onReadyObservable.addOnce(() => {

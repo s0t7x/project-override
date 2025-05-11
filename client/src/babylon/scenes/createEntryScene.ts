@@ -221,6 +221,10 @@ export function createEntryScene(engine: B.Engine, assetService?: AssetService):
             } else {
                 crystal.visibility = 1;
             }
+        } else if (currentScreen == 'lobby') {
+            crystal.visibility = 1;
+            nextCameraTarget = cameraDefaultTarget
+            nextCameraRadius = 10;
         } else {
             crystal.visibility = 1;
             nextCameraTarget = cameraDefaultTarget

@@ -27,7 +27,7 @@ const characterCustomization_Hair: string[] = [
 
 export function CharacterCreationUI() {
     const { networkService, sceneDirector, assetService } = useGameContext(); // Get the network service from context
-    const { setCurrentScreen, resetAuth, roomState, selectedCharacterId, setSelectedCharacter } = useGameStore();
+    const { setCurrentScreen, resetAuth, roomState, selectedCharacterId, setSelectedCharacterId } = useGameStore();
 
     const [characterCustomization, setCharacterCustomization] = useState<any>(null);
     const [currentBodyIndex, setCurrentBodyIndex] = useState<number>(0);
@@ -131,7 +131,7 @@ export function CharacterCreationUI() {
             networkService.onMessageOnce('INFO_MESSAGE', (payload: any) => {
                 if(payload.message?.endsWith('created!')) {
                     sceneDirector.getActiveScene()?.metadata?.characterPreview?.setCharacter(null);
-                    if(payload.characterId) setSelectedCharacter(payload.characterId)
+                    if(payload.characterId) setSelectedCharacterId(payload.characterId)
                     setTimeout(() => setCurrentScreen("charSelect"), 200)
                 }
             })
