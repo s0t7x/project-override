@@ -5,7 +5,11 @@ import { User } from '@prisma/client';
 import { userRepository } from '../db/repos/UserRepository';
 import { userService } from './UserService'; // For user login recording
 import { config } from '../config';
-import { BusinessRuleError, ForbiddenError, NotFoundError } from '@project-override/shared/errors/server';
+import {
+  BusinessRuleError,
+  ForbiddenError,
+  NotFoundError,
+} from '@project-override/shared/errors/server';
 
 interface AuthTokens {
   accessToken: string;
@@ -22,9 +26,9 @@ export interface JwtPayload {
 // For storing refresh tokens. In a real app, this MUST be a persistent store (e.g., Redis, DB table).
 // Using a simple in-memory store for this example is NOT production-ready.
 interface RefreshTokenStoreEntry {
-    token: string;
-    userId: string;
-    expiresAt: Date;
+  token: string;
+  userId: string;
+  expiresAt: Date;
 }
 const inMemoryRefreshTokenStore: Map<string, RefreshTokenStoreEntry> = new Map(); // NOT FOR PRODUCTION
 
@@ -38,14 +42,20 @@ class AuthServiceInternal {
    * @throws NotFoundError if user not found.
    * @throws BusinessRuleError if password doesn't match.
    */
-  async login(username: string, plainPasswordPlainText: string, ipAddress?: string): Promise<AuthTokens> {
+  async login(
+    username: string,
+    plainPasswordPlainText: string,
+    ipAddress?: string,
+  ): Promise<AuthTokens> {
     const user = await userRepository.findByUsername(username);
     if (!user) {
       throw new NotFoundError(`User "${username}" not found.`);
     }
 
     if (user.bannedUntil && user.bannedUntil > new Date()) {
-        throw new ForbiddenError(`User "${username}" is banned until ${user.bannedUntil.toISOString()}. Reason: ${user.banReason || 'N/A'}`);
+      throw new ForbiddenError(
+        `User "${username}" is banned until ${user.bannedUntil.toISOString()}. Reason: ${user.banReason || 'N/A'}`,
+      );
     }
 
     const isPasswordValid = await bcrypt.compare(plainPasswordPlainText, user.passwordHash);
@@ -54,7 +64,9 @@ class AuthServiceInternal {
     }
 
     // Record login attempt (can be done asynchronously, fire-and-forget)
-    userService.recordUserLogin(user.id, ipAddress).catch(err => console.warn("Failed to record login:", err));
+    userService
+      .recordUserLogin(user.id, ipAddress)
+      .catch((err) => console.warn('Failed to record login:', err));
 
     return this.generateAndStoreTokens(user);
   }
@@ -86,20 +98,25 @@ class AuthServiceInternal {
     const durationParts = config.jwt.refreshTokenExpiration.match(/(\d+)([smhdwy])/);
     let durationMs = 7 * 24 * 60 * 60 * 1000; // Default 7 days
     if (durationParts) {
-        const value = parseInt(durationParts[1]);
-        const unit = durationParts[2];
-        if (unit === 's') durationMs = value * 1000;
-        else if (unit === 'm') durationMs = value * 60 * 1000;
-        else if (unit === 'h') durationMs = value * 60 * 60 * 1000;
-        else if (unit === 'd') durationMs = value * 24 * 60 * 60 * 1000;
+      const value = parseInt(durationParts[1]);
+      const unit = durationParts[2];
+      if (unit === 's') durationMs = value * 1000;
+      else if (unit === 'm') durationMs = value * 60 * 1000;
+      else if (unit === 'h') durationMs = value * 60 * 60 * 1000;
+      else if (unit === 'd') durationMs = value * 24 * 60 * 60 * 1000;
     }
     expiresAt.setTime(expiresAt.getTime() + durationMs);
 
     // In a real app, save refreshToken to a database table associated with the user.
     // Key: Hashed refresh token or a unique ID. Value: userId, expiry, isValid flag.
-    inMemoryRefreshTokenStore.set(refreshToken, { token: refreshToken, userId: user.id, expiresAt });
-    console.log(`Refresh token stored for user ${user.id}. Store size: ${inMemoryRefreshTokenStore.size}`);
-
+    inMemoryRefreshTokenStore.set(refreshToken, {
+      token: refreshToken,
+      userId: user.id,
+      expiresAt,
+    });
+    console.log(
+      `Refresh token stored for user ${user.id}. Store size: ${inMemoryRefreshTokenStore.size}`,
+    );
 
     return { accessToken, refreshToken };
   }
@@ -113,7 +130,7 @@ class AuthServiceInternal {
    */
   async refreshToken(oldRefreshToken: string): Promise<AuthTokens> {
     // 1. Validate refresh token structure/signature
-    let decodedRefreshPayload: { userId: string; version?: number, iat: number, exp: number };
+    let decodedRefreshPayload: { userId: string; version?: number; iat: number; exp: number };
     try {
       decodedRefreshPayload = jwt.verify(oldRefreshToken, config.jwt.refreshSecret) as any;
     } catch (error: any) {
@@ -131,24 +148,34 @@ class AuthServiceInternal {
       throw new BusinessRuleError('Refresh token not found or expired.', 401);
     }
     if (storedTokenEntry.userId !== decodedRefreshPayload.userId) {
-        // Should not happen if JWT verification passed, but good sanity check
-        this.invalidateRefreshToken(oldRefreshToken);
-        throw new BusinessRuleError('Refresh token mismatch.', 401);
+      // Should not happen if JWT verification passed, but good sanity check
+      this.invalidateRefreshToken(oldRefreshToken);
+      throw new BusinessRuleError('Refresh token mismatch.', 401);
     }
 
     // 3. Fetch the user
     const user = await userRepository.findById(decodedRefreshPayload.userId);
     if (!user) {
       this.invalidateRefreshToken(oldRefreshToken);
-      throw new NotFoundError(`User ${decodedRefreshPayload.userId} associated with refresh token not found.`);
+      throw new NotFoundError(
+        `User ${decodedRefreshPayload.userId} associated with refresh token not found.`,
+      );
     }
 
     // 4. (Optional but recommended) Check if refresh token has been revoked
     // e.g., if user.loginCount (our version) changed since token was issued
-    if (decodedRefreshPayload.version !== undefined && decodedRefreshPayload.version < user.loginCount) {
-        console.warn(`Attempt to use an old refresh token for user ${user.id}. Invalidating all user's tokens.`);
-        await this.invalidateAllUserRefreshTokens(user.id); // Invalidate all if one compromised/old one is used
-        throw new BusinessRuleError('Refresh token has been revoked (user session changed). Please log in again.', 401);
+    if (
+      decodedRefreshPayload.version !== undefined &&
+      decodedRefreshPayload.version < user.loginCount
+    ) {
+      console.warn(
+        `Attempt to use an old refresh token for user ${user.id}. Invalidating all user's tokens.`,
+      );
+      await this.invalidateAllUserRefreshTokens(user.id); // Invalidate all if one compromised/old one is used
+      throw new BusinessRuleError(
+        'Refresh token has been revoked (user session changed). Please log in again.',
+        401,
+      );
     }
 
     // 5. Invalidate the used refresh token (refresh tokens should typically be single-use or employ rotation)
@@ -173,7 +200,7 @@ class AuthServiceInternal {
       if (error instanceof jwt.TokenExpiredError) {
         throw new BusinessRuleError('Access token expired.', 401);
       }
-      console.error("Access token verification error:", error.message);
+      console.error('Access token verification error:', error.message);
       throw new BusinessRuleError('Invalid access token.', 401);
     }
   }
@@ -186,7 +213,6 @@ class AuthServiceInternal {
     // Remove from persistent store in a real app
     inMemoryRefreshTokenStore.delete(refreshToken);
     console.log(`Refresh token invalidated. Store size: ${inMemoryRefreshTokenStore.size}`);
-
   }
 
   /**
@@ -203,7 +229,9 @@ class AuthServiceInternal {
         invalidatedCount++;
       }
     }
-    console.log(`Invalidated ${invalidatedCount} refresh tokens for user ${userId}. Store size: ${inMemoryRefreshTokenStore.size}`);
+    console.log(
+      `Invalidated ${invalidatedCount} refresh tokens for user ${userId}. Store size: ${inMemoryRefreshTokenStore.size}`,
+    );
   }
 
   // Periodically clean up expired tokens from the in-memory store (not needed for DB with TTL/cron)
@@ -217,7 +245,9 @@ class AuthServiceInternal {
       }
     }
     if (cleanedCount > 0) {
-        console.log(`Cleaned up ${cleanedCount} expired refresh tokens. Store size: ${inMemoryRefreshTokenStore.size}`);
+      console.log(
+        `Cleaned up ${cleanedCount} expired refresh tokens. Store size: ${inMemoryRefreshTokenStore.size}`,
+      );
     }
   }
 

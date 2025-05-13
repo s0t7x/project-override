@@ -7,10 +7,18 @@ import { IPaginationArgs } from '@project-override/shared/types/misc/PaginationA
 // Data for creating an entity.
 // ownerCharacterId, worldId, templateId are optional based on your schema.
 // Components is JSON.
-export type EntityCreateData = Omit<Prisma.EntityCreateInput, 'id' | 'createdAt' | 'lastUsedAt' | 'ownerCharacter' | 'inventorySlot' | 'equipmentSlot'>;
+export type EntityCreateData = Omit<
+  Prisma.EntityCreateInput,
+  'id' | 'createdAt' | 'lastUsedAt' | 'ownerCharacter' | 'inventorySlot' | 'equipmentSlot'
+>;
 
 // Data for updating an entity.
-export type EntityUpdateData = Partial<Omit<Prisma.EntityUpdateInput, 'id' | 'createdAt' | 'ownerCharacter' | 'inventorySlot' | 'equipmentSlot'>>;
+export type EntityUpdateData = Partial<
+  Omit<
+    Prisma.EntityUpdateInput,
+    'id' | 'createdAt' | 'ownerCharacter' | 'inventorySlot' | 'equipmentSlot'
+  >
+>;
 
 // Define common include options for entities
 const entityIncludeOwner = {
@@ -22,18 +30,19 @@ const entityIncludeOwner = {
 // More detailed include, perhaps for an entity inspection view
 const entityIncludeDetails = {
   ...entityIncludeOwner,
-  inventorySlot: { // If you want to see if/where it's inventoried
-    select: { characterId: true, slotIndex: true, bagId: true }
+  inventorySlot: {
+    // If you want to see if/where it's inventoried
+    select: { characterId: true, slotIndex: true, bagId: true },
   },
-  equipmentSlot: { // If you want to see if/where it's equipped
-    select: { characterId: true, slotType: true }
+  equipmentSlot: {
+    // If you want to see if/where it's equipped
+    select: { characterId: true, slotType: true },
   },
   // If templateId linked to an EntityTemplate table:
   // template: true,
   // If worldId linked to a World table:
   // world: { select: { id: true, name: true } },
 } satisfies Prisma.EntityInclude<DefaultArgs>;
-
 
 export type EntityWithOwner = Prisma.EntityGetPayload<{
   include: typeof entityIncludeOwner;
@@ -43,16 +52,17 @@ export type EntityWithDetails = Prisma.EntityGetPayload<{
   include: typeof entityIncludeDetails;
 }>;
 
-
 class EntityRepositoryInternal {
-
   async create(data: EntityCreateData): Promise<Entity> {
     return prisma.entity.create({
       data,
     });
   }
 
-  async findById(id: string, includeDetails: boolean = false): Promise<EntityWithDetails | Entity | null> {
+  async findById(
+    id: string,
+    includeDetails: boolean = false,
+  ): Promise<EntityWithDetails | Entity | null> {
     return prisma.entity.findUnique({
       where: { id },
       include: includeDetails ? entityIncludeDetails : undefined,
@@ -99,7 +109,7 @@ class EntityRepositoryInternal {
     { skip, take }: IPaginationArgs = {},
     filter?: Prisma.EntityWhereInput,
     orderBy?: Prisma.EntityOrderByWithRelationInput,
-    includeOwner: boolean = false
+    includeOwner: boolean = false,
   ): Promise<Array<EntityWithOwner | Entity>> {
     return prisma.entity.findMany({
       skip,
@@ -127,7 +137,10 @@ class EntityRepositoryInternal {
    * @param pagination - Pagination arguments.
    * @returns A list of entities owned by the character.
    */
-  async findByOwnerCharacterId(ownerCharacterId: string, { skip, take }: IPaginationArgs = {}): Promise<Entity[]> {
+  async findByOwnerCharacterId(
+    ownerCharacterId: string,
+    { skip, take }: IPaginationArgs = {},
+  ): Promise<Entity[]> {
     return prisma.entity.findMany({
       where: { ownerCharacterId },
       skip,
@@ -142,7 +155,10 @@ class EntityRepositoryInternal {
    * @param pagination - Pagination arguments.
    * @returns A list of entities.
    */
-  async findByTemplateId(templateId: string, { skip, take }: IPaginationArgs = {}): Promise<Entity[]> {
+  async findByTemplateId(
+    templateId: string,
+    { skip, take }: IPaginationArgs = {},
+  ): Promise<Entity[]> {
     return prisma.entity.findMany({
       where: { templateId },
       skip,
@@ -158,7 +174,11 @@ class EntityRepositoryInternal {
    * @param pagination - Pagination arguments.
    * @returns A list of entities.
    */
-  async findByTags(tags: string[], matchAll: boolean = false, { skip, take }: IPaginationArgs = {}): Promise<Entity[]> {
+  async findByTags(
+    tags: string[],
+    matchAll: boolean = false,
+    { skip, take }: IPaginationArgs = {},
+  ): Promise<Entity[]> {
     return prisma.entity.findMany({
       where: {
         tags: matchAll ? { hasEvery: tags } : { hasSome: tags },
@@ -175,17 +195,20 @@ class EntityRepositoryInternal {
    * @param pagination - Pagination arguments.
    * @returns A list of unlinked entities.
    */
-  async findUnlinkedEntities({ skip, take }: IPaginationArgs = {}, worldId?: string): Promise<Entity[]> {
+  async findUnlinkedEntities(
+    { skip, take }: IPaginationArgs = {},
+    worldId?: string,
+  ): Promise<Entity[]> {
     return prisma.entity.findMany({
-        where: {
-            inventorySlot: null, // Not in an inventory slot
-            equipmentSlot: null, // Not in an equipment slot
-            worldId: worldId,    // Optional: further filter by worldId
-            // ownerCharacterId: { not: null } // Optional: if you only want owned but unlinked items
-        },
-        skip,
-        take,
-        orderBy: { createdAt: 'desc' }
+      where: {
+        inventorySlot: null, // Not in an inventory slot
+        equipmentSlot: null, // Not in an equipment slot
+        worldId: worldId, // Optional: further filter by worldId
+        // ownerCharacterId: { not: null } // Optional: if you only want owned but unlinked items
+      },
+      skip,
+      take,
+      orderBy: { createdAt: 'desc' },
     });
   }
 
@@ -199,7 +222,10 @@ class EntityRepositoryInternal {
    * @param componentsToUpdate The components data to merge/update.
    * @returns The updated entity.
    */
-  async updateComponents(entityId: string, componentsToUpdate: Prisma.InputJsonObject): Promise<Entity> {
+  async updateComponents(
+    entityId: string,
+    componentsToUpdate: Prisma.InputJsonObject,
+  ): Promise<Entity> {
     // Fetch the current entity to merge components manually, as Prisma's JSON update path is an overwrite.
     // For more complex JSON manipulation (like array ops within JSON), you might need raw SQL or more sophisticated logic.
     const entity = await prisma.entity.findUnique({ where: { id: entityId } });

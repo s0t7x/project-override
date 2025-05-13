@@ -6,11 +6,11 @@ import { IPaginationArgs } from '@project-override/shared/types/misc/PaginationA
 // Data for creating or updating a single world block.
 // The composite key fields are all required.
 export type WorldBlockInputData = Omit<Prisma.WorldBlockCreateInput, 'world'> & {
-    worldId: string; // Already part of WorldBlockCreateInput if not using connect
-    x: number;
-    y: number;
-    z: number;
-    // blockType, rotation, customData
+  worldId: string; // Already part of WorldBlockCreateInput if not using connect
+  x: number;
+  y: number;
+  z: number;
+  // blockType, rotation, customData
 };
 // Prisma.WorldBlockCreateInput is actually fine if you provide all PK fields.
 
@@ -23,7 +23,6 @@ export type WorldBlockCompositeId = {
 };
 
 class WorldBlockRepositoryInternal {
-
   /**
    * Creates or updates a single world block.
    * Uses `upsert` to handle both creation of new blocks and modification of existing ones.
@@ -96,9 +95,9 @@ class WorldBlockRepositoryInternal {
    * @returns A count of deleted blocks.
    */
   async deleteManyBlocks(filter: Prisma.WorldBlockWhereInput): Promise<Prisma.BatchPayload> {
-      return prisma.worldBlock.deleteMany({
-          where: filter,
-      });
+    return prisma.worldBlock.deleteMany({
+      where: filter,
+    });
   }
 
   /**
@@ -114,9 +113,12 @@ class WorldBlockRepositoryInternal {
    */
   async findBlocksInRegion(
     worldId: string,
-    minX: number, maxX: number,
-    minY: number, maxY: number,
-    minZ: number, maxZ: number
+    minX: number,
+    maxX: number,
+    minY: number,
+    maxY: number,
+    minZ: number,
+    maxZ: number,
   ): Promise<WorldBlock[]> {
     return prisma.worldBlock.findMany({
       where: {
@@ -136,7 +138,10 @@ class WorldBlockRepositoryInternal {
    * @param pagination - Optional pagination.
    * @returns A list of all blocks in the world.
    */
-  async findAllBlocksByWorldId(worldId: string, { skip, take }: IPaginationArgs = {}): Promise<WorldBlock[]> {
+  async findAllBlocksByWorldId(
+    worldId: string,
+    { skip, take }: IPaginationArgs = {},
+  ): Promise<WorldBlock[]> {
     return prisma.worldBlock.findMany({
       where: { worldId },
       skip,
@@ -155,7 +160,7 @@ class WorldBlockRepositoryInternal {
    */
   async updateManyBlocks(
     filter: Prisma.WorldBlockWhereInput,
-    data: Pick<WorldBlockInputData, 'blockType' | 'rotation' | 'customData'> // Only updatable fields
+    data: Pick<WorldBlockInputData, 'blockType' | 'rotation' | 'customData'>, // Only updatable fields
   ): Promise<Prisma.BatchPayload> {
     return prisma.worldBlock.updateMany({
       where: filter,

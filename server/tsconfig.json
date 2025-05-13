@@ -13,14 +13,15 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-        "@project-override/shared": ["../shared/src/index.ts"],
-        "@project-override/shared/*": ["../shared/src/*"]
+      "@project-override/shared": ["../shared/src/index.ts"],
+      "@project-override/shared/*": ["../shared/src/*"]
     },
     "sourceMap": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],
-  "references": [ // Crucial for "live" shared package
+  "references": [
+    // Crucial for "live" shared package
     { "path": "../shared" }
   ]
 }

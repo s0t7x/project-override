@@ -1,9 +1,18 @@
 // packages/po_server/src/services/UserService.ts
 import { User } from '@prisma/client';
-import { userRepository, UserCreateData, UserUpdateData, UserWithCharacterPreviews } from '../db/repos/UserRepository';
+import {
+  userRepository,
+  UserCreateData,
+  UserUpdateData,
+  UserWithCharacterPreviews,
+} from '../db/repos/UserRepository';
 // No direct need for characterRepository here usually, as user repo can include character previews.
 // If complex character interactions related to user actions are needed, CharacterService could be injected/used.
-import { NotFoundError, BusinessRuleError, ValidationError } from '@project-override/shared/errors/server'; 
+import {
+  NotFoundError,
+  BusinessRuleError,
+  ValidationError,
+} from '@project-override/shared/errors/server';
 import bcrypt from 'bcryptjs'; // For password hashing
 import { config } from 'src/config';
 
@@ -16,7 +25,12 @@ class UserServiceInternal {
    * @returns The created user (passwordHash will be set, plain password is not stored).
    * @throws BusinessRuleError for invalid username/password or if username exists.
    */
-  async registerUser(registrationData: Pick<UserCreateData, 'username' | 'passwordHash' /* but will be plain text */>): Promise<User> {
+  async registerUser(
+    registrationData: Pick<
+      UserCreateData,
+      'username' | 'passwordHash' /* but will be plain text */
+    >,
+  ): Promise<User> {
     const { username, passwordHash: plainPassword } = registrationData;
 
     if (!username || username.trim().length < 3) {
@@ -26,7 +40,9 @@ class UserServiceInternal {
       throw new BusinessRuleError(`Username "${username}" is already taken.`, 409); // 409 Conflict
     }
     if (!plainPassword || plainPassword.length < config.userPasswordMinLength) {
-      throw new ValidationError(`Password must be at least ${config.userPasswordMinLength} characters long.`);
+      throw new ValidationError(
+        `Password must be at least ${config.userPasswordMinLength} characters long.`,
+      );
     }
     // TODO: Add more password complexity rules if needed (uppercase, number, special char)
 
@@ -47,7 +63,10 @@ class UserServiceInternal {
    * @param includeCharacterPreviews Whether to include a preview of the user's characters.
    * @returns The user or null if not found.
    */
-  async getUserById(userId: string, includeCharacterPreviews: boolean = false): Promise<UserWithCharacterPreviews | User | null> {
+  async getUserById(
+    userId: string,
+    includeCharacterPreviews: boolean = false,
+  ): Promise<UserWithCharacterPreviews | User | null> {
     return userRepository.findById(userId, includeCharacterPreviews);
   }
 
@@ -57,7 +76,10 @@ class UserServiceInternal {
    * @param includeCharacterPreviews Whether to include a preview of the user's characters.
    * @returns The user or null if not found.
    */
-  async getUserByUsername(username: string, includeCharacterPreviews: boolean = false): Promise<UserWithCharacterPreviews | User | null> {
+  async getUserByUsername(
+    username: string,
+    includeCharacterPreviews: boolean = false,
+  ): Promise<UserWithCharacterPreviews | User | null> {
     return userRepository.findByUsername(username, includeCharacterPreviews);
   }
 
@@ -69,13 +91,16 @@ class UserServiceInternal {
    * @returns The updated user.
    * @throws NotFoundError if user not found.
    */
-  async updateUserProfile(userId: string, updateData: Omit<UserUpdateData, 'passwordHash' | 'username'>): Promise<User> {
+  async updateUserProfile(
+    userId: string,
+    updateData: Omit<UserUpdateData, 'passwordHash' | 'username'>,
+  ): Promise<User> {
     // Username changes might need special handling or be disallowed.
     // Password changes should have their own secure method.
     // Role changes should be admin-only.
     const user = await userRepository.findById(userId);
     if (!user) {
-        throw new NotFoundError(`User with ID ${userId} not found.`);
+      throw new NotFoundError(`User with ID ${userId} not found.`);
     }
     return userRepository.update(userId, updateData);
   }
@@ -89,7 +114,11 @@ class UserServiceInternal {
    * @throws NotFoundError if user not found.
    * @throws BusinessRuleError if old password doesn't match or new password is invalid.
    */
-  async changeUserPassword(userId: string, oldPasswordPlainText: string, newPasswordPlainText: string): Promise<User> {
+  async changeUserPassword(
+    userId: string,
+    oldPasswordPlainText: string,
+    newPasswordPlainText: string,
+  ): Promise<User> {
     const user = await userRepository.findById(userId);
     if (!user) {
       throw new NotFoundError(`User with ID ${userId} not found.`);
@@ -101,14 +130,19 @@ class UserServiceInternal {
     }
 
     if (!newPasswordPlainText || newPasswordPlainText.length < config.userPasswordMinLength) {
-      throw new ValidationError(`New password must be at least ${config.userPasswordMinLength} characters long.`);
+      throw new ValidationError(
+        `New password must be at least ${config.userPasswordMinLength} characters long.`,
+      );
     }
     if (oldPasswordPlainText === newPasswordPlainText) {
-        throw new BusinessRuleError('New password cannot be the same as the old password.');
+      throw new BusinessRuleError('New password cannot be the same as the old password.');
     }
     // TODO: Add more password complexity rules for newPassword
 
-    const newHashedPassword = await bcrypt.hash(newPasswordPlainText, config.userPasswordSaltRounds);
+    const newHashedPassword = await bcrypt.hash(
+      newPasswordPlainText,
+      config.userPasswordSaltRounds,
+    );
     return userRepository.update(userId, { passwordHash: newHashedPassword });
   }
 
@@ -138,7 +172,7 @@ class UserServiceInternal {
   async deleteUser(userId: string): Promise<User> {
     const user = await userRepository.findById(userId);
     if (!user) {
-        throw new NotFoundError(`User with ID ${userId} not found.`);
+      throw new NotFoundError(`User with ID ${userId} not found.`);
     }
     // Any pre-deletion logic for the user (e.g., logging, notifying other systems) would go here.
     return userRepository.delete(userId);
@@ -146,31 +180,40 @@ class UserServiceInternal {
 
   // --- Admin specific functions (would typically check caller's role) ---
 
-  async adminBanUser(adminUserId: string, targetUserId: string, bannedUntil: Date, banReason?: string): Promise<User> {
-      // TODO: Add role check for adminUserId
-      const targetUser = await userRepository.findById(targetUserId);
-      if (!targetUser) {
-          throw new NotFoundError(`Target user with ID ${targetUserId} not found.`);
-      }
-      return userRepository.banUser(targetUserId, bannedUntil, banReason);
+  async adminBanUser(
+    adminUserId: string,
+    targetUserId: string,
+    bannedUntil: Date,
+    banReason?: string,
+  ): Promise<User> {
+    // TODO: Add role check for adminUserId
+    const targetUser = await userRepository.findById(targetUserId);
+    if (!targetUser) {
+      throw new NotFoundError(`Target user with ID ${targetUserId} not found.`);
+    }
+    return userRepository.banUser(targetUserId, bannedUntil, banReason);
   }
 
   async adminUnbanUser(adminUserId: string, targetUserId: string): Promise<User> {
-      // TODO: Add role check for adminUserId
-      const targetUser = await userRepository.findById(targetUserId);
-      if (!targetUser) {
-          throw new NotFoundError(`Target user with ID ${targetUserId} not found.`);
-      }
-      return userRepository.unbanUser(targetUserId);
+    // TODO: Add role check for adminUserId
+    const targetUser = await userRepository.findById(targetUserId);
+    if (!targetUser) {
+      throw new NotFoundError(`Target user with ID ${targetUserId} not found.`);
+    }
+    return userRepository.unbanUser(targetUserId);
   }
 
-  async adminUpdateUserRole(adminUserId: string, targetUserId: string, newRole: User['role']): Promise<User> {
-      // TODO: Add role check for adminUserId
-      const targetUser = await userRepository.findById(targetUserId);
-      if (!targetUser) {
-          throw new NotFoundError(`Target user with ID ${targetUserId} not found.`);
-      }
-      return userRepository.update(targetUserId, { role: newRole });
+  async adminUpdateUserRole(
+    adminUserId: string,
+    targetUserId: string,
+    newRole: User['role'],
+  ): Promise<User> {
+    // TODO: Add role check for adminUserId
+    const targetUser = await userRepository.findById(targetUserId);
+    if (!targetUser) {
+      throw new NotFoundError(`Target user with ID ${targetUserId} not found.`);
+    }
+    return userRepository.update(targetUserId, { role: newRole });
   }
 }
 

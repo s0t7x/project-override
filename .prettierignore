@@ -1,0 +1,17 @@
+# project-override/.prettierignore
+
+# Output directories
+dist/
+build/
+coverage/
+
+# Node modules
+node_modules/
+
+# Lockfiles
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Optional: Generated files, specific large files, etc.
+# **/*.generated.ts

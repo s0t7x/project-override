@@ -6,8 +6,11 @@ import { IPaginationArgs } from '@project-override/shared/types/misc/PaginationA
 
 // Data for adding an entity to an inventory.
 // entityId and characterId are key.
-export type InventoryEntityCreateData = Omit<Prisma.InventoryEntityCreateInput, 'entity' | 'character'> & {
-  entityId: string;    // Explicitly require
+export type InventoryEntityCreateData = Omit<
+  Prisma.InventoryEntityCreateInput,
+  'entity' | 'character'
+> & {
+  entityId: string; // Explicitly require
   characterId: string; // Explicitly require
 };
 // Note: Prisma.InventoryEntityCreateInput already expects entityId and characterId
@@ -16,8 +19,9 @@ export type InventoryEntityCreateData = Omit<Prisma.InventoryEntityCreateInput, 
 
 // Data for updating an inventory slot (e.g., changing stack size, moving to different slot/bag).
 // PK (entityId) cannot be changed. characterId usually doesn't change for an existing inventory item.
-export type InventoryEntityUpdateData = Partial<Omit<Prisma.InventoryEntityUpdateInput, 'entityId' | 'entity' | 'character'>>;
-
+export type InventoryEntityUpdateData = Partial<
+  Omit<Prisma.InventoryEntityUpdateInput, 'entityId' | 'entity' | 'character'>
+>;
 
 // Define common include options
 const inventoryEntityIncludeDetails = {
@@ -32,7 +36,6 @@ export type InventoryEntityWithDetails = Prisma.InventoryEntityGetPayload<{
 }>;
 
 class InventoryEntityRepositoryInternal {
-
   /**
    * Adds an entity to a character's inventory.
    * Assumes the entity is not already in an inventory or equipped.
@@ -59,7 +62,10 @@ class InventoryEntityRepositoryInternal {
    * @param includeDetails - Whether to include related entity and character details.
    * @returns The inventory slot or null if not found.
    */
-  async findByEntityId(entityId: string, includeDetails: boolean = false): Promise<InventoryEntityWithDetails | InventoryEntity | null> {
+  async findByEntityId(
+    entityId: string,
+    includeDetails: boolean = false,
+  ): Promise<InventoryEntityWithDetails | InventoryEntity | null> {
     return prisma.inventoryEntity.findUnique({
       where: { entityId },
       include: includeDetails ? inventoryEntityIncludeDetails : undefined,
@@ -78,7 +84,7 @@ class InventoryEntityRepositoryInternal {
     characterId: string,
     { skip, take }: IPaginationArgs = {},
     bagId?: string | null, // null to find items not in any bag, undefined for all
-    includeDetails: boolean = false
+    includeDetails: boolean = false,
   ): Promise<Array<InventoryEntityWithDetails | InventoryEntity>> {
     const whereClause: Prisma.InventoryEntityWhereInput = { characterId };
     if (bagId !== undefined) {
@@ -130,7 +136,11 @@ class InventoryEntityRepositoryInternal {
    * @param newBagId - Optional: the new bag ID.
    * @returns The updated inventory entity record.
    */
-  async moveItem(entityId: string, newSlotIndex: number, newBagId?: string | null): Promise<InventoryEntity> {
+  async moveItem(
+    entityId: string,
+    newSlotIndex: number,
+    newBagId?: string | null,
+  ): Promise<InventoryEntity> {
     // A service layer should validate if the target slot is free or can be swapped.
     // Prisma's unique constraint on (characterId, slotIndex, bagId) will prevent direct overlap
     // if you try to move to an occupied slot without freeing it first.
@@ -188,14 +198,19 @@ class InventoryEntityRepositoryInternal {
    * @param bagId
    * @returns The InventoryEntity if occupied, otherwise null.
    */
-  async getSlotContents(characterId: string, slotIndex: number, bagId?: string | null): Promise<InventoryEntity | null> {
+  async getSlotContents(
+    characterId: string,
+    slotIndex: number,
+    bagId?: string | null,
+  ): Promise<InventoryEntity | null> {
     return prisma.inventoryEntity.findUnique({
       where: {
-        unique_inventory_slot: { // This relies on the default generated composite key name or your specified name
-            characterId,
-            slotIndex,
-            bagId: bagId === undefined ? '' : bagId || ''
-        }
+        unique_inventory_slot: {
+          // This relies on the default generated composite key name or your specified name
+          characterId,
+          slotIndex,
+          bagId: bagId === undefined ? '' : bagId || '',
+        },
       },
     });
   }

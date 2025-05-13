@@ -1,4 +1,4 @@
-import { prisma } from "./db/client";
+import { prisma } from './db/client';
 
 import { Server } from 'colyseus';
 import { WebSocketTransport } from '@colyseus/ws-transport';
@@ -7,7 +7,7 @@ import express from 'express';
 import cors from 'cors';
 
 import { config } from './config';
-import { constants } from "@project-override/shared";
+import { constants } from '@project-override/shared';
 
 let gameServer: Server;
 let httpServer: any;
@@ -23,26 +23,26 @@ async function bootstrap() {
       status: 'ok',
       timestamp: new Date().toISOString(),
     });
-});
+  });
 
-    httpServer = createServer(app);
+  httpServer = createServer(app);
 
   // --- Colyseus Game Server ---
   gameServer = new Server({
     transport: new WebSocketTransport({
-        pingInterval: 6000,
-        pingMaxRetries: 4,
-        server: httpServer,
-        maxPayload: 1024 * 1024 * 10, // 10 MB
-    })
- });
+      pingInterval: 6000,
+      pingMaxRetries: 4,
+      server: httpServer,
+      maxPayload: 1024 * 1024 * 10, // 10 MB
+    }),
+  });
 
   // Register rooms
 
   const originalConsoleLog = console.log;
   console.log = (...args: any[]) => {};
 
-  gameServer.listen(config.serverPort, config.serverHost).then(()=> {
+  gameServer.listen(config.serverPort, config.serverHost).then(() => {
     console.log = originalConsoleLog;
     console.log(`[GameServer] Version ${constants.PO_VERSION}`);
     console.log(`[GameServer] Listening on ${config.serverHost}:${config.serverPort}`);
@@ -53,7 +53,7 @@ async function bootstrap() {
     const userCount = await prisma.user.count();
     console.log(`[GameServer] DB connected. ${userCount} users.`);
   } catch (e: any) {
-    console.error("[GameServer] DB connection test failed:", e.message);
+    console.error('[GameServer] DB connection test failed:', e.message);
   }
 }
 

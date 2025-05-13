@@ -9,13 +9,15 @@ export type WorldCreateData = Omit<Prisma.WorldCreateInput, 'id' | 'blocks' | 'e
 // Assuming 'id' is auto-generated and relations are managed separately.
 
 // Data for updating an existing world.
-export type WorldUpdateData = Partial<Omit<Prisma.WorldUpdateInput, 'id' | 'blocks' | 'entitiesInWorld'>>;
+export type WorldUpdateData = Partial<
+  Omit<Prisma.WorldUpdateInput, 'id' | 'blocks' | 'entitiesInWorld'>
+>;
 
 // Define common include options (example)
 const worldIncludeCounts = {
   _count: {
     select: {
-      blocks: true,          // Count of blocks in this world
+      blocks: true, // Count of blocks in this world
       entitiesInWorld: true, // Count of entities placed in this world
     },
   },
@@ -26,21 +28,26 @@ export type WorldWithCounts = Prisma.WorldGetPayload<{
 }>;
 
 class WorldRepositoryInternal {
-
   async create(data: WorldCreateData): Promise<World> {
     return prisma.world.create({
       data,
     });
   }
 
-  async findById(id: string, includeCounts: boolean = false): Promise<WorldWithCounts | World | null> {
+  async findById(
+    id: string,
+    includeCounts: boolean = false,
+  ): Promise<WorldWithCounts | World | null> {
     return prisma.world.findUnique({
       where: { id },
       include: includeCounts ? worldIncludeCounts : undefined,
     });
   }
 
-  async findByName(name: string, includeCounts: boolean = false): Promise<WorldWithCounts | World | null> {
+  async findByName(
+    name: string,
+    includeCounts: boolean = false,
+  ): Promise<WorldWithCounts | World | null> {
     return prisma.world.findUnique({
       where: { name },
       include: includeCounts ? worldIncludeCounts : undefined,

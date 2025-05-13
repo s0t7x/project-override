@@ -4,7 +4,10 @@ import { DefaultArgs } from '@prisma/client/runtime/library';
 import { prisma } from '../client'; // Corrected import
 
 // Data for equipping an entity.
-export type EquipmentEntityCreateData = Omit<Prisma.EquipmentEntityCreateInput, 'entity' | 'character'> & {
+export type EquipmentEntityCreateData = Omit<
+  Prisma.EquipmentEntityCreateInput,
+  'entity' | 'character'
+> & {
   entityId: string;
   characterId: string;
   // slotType is already required by Prisma.EquipmentEntityCreateInput
@@ -12,7 +15,9 @@ export type EquipmentEntityCreateData = Omit<Prisma.EquipmentEntityCreateInput, 
 
 // Data for updating an equipment slot (e.g., toggling isActive, locking).
 // PK (entityId) cannot be changed. characterId and slotType usually don't change.
-export type EquipmentEntityUpdateData = Partial<Omit<Prisma.EquipmentEntityUpdateInput, 'entityId' | 'slotType' | 'entity' | 'character'>>;
+export type EquipmentEntityUpdateData = Partial<
+  Omit<Prisma.EquipmentEntityUpdateInput, 'entityId' | 'slotType' | 'entity' | 'character'>
+>;
 
 // Define common include options
 const equipmentEntityIncludeDetails = {
@@ -26,9 +31,7 @@ export type EquipmentEntityWithDetails = Prisma.EquipmentEntityGetPayload<{
   include: typeof equipmentEntityIncludeDetails;
 }>;
 
-
 class EquipmentEntityRepositoryInternal {
-
   /**
    * Equips an entity to a character's specified slot.
    * Assumes the entity is equippable and the slot is available or will be replaced.
@@ -58,7 +61,10 @@ class EquipmentEntityRepositoryInternal {
    * @param includeDetails - Whether to include related entity and character details.
    * @returns The equipment slot or null if not found.
    */
-  async findByEntityId(entityId: string, includeDetails: boolean = false): Promise<EquipmentEntityWithDetails | EquipmentEntity | null> {
+  async findByEntityId(
+    entityId: string,
+    includeDetails: boolean = false,
+  ): Promise<EquipmentEntityWithDetails | EquipmentEntity | null> {
     return prisma.equipmentEntity.findUnique({
       where: { entityId },
       include: includeDetails ? equipmentEntityIncludeDetails : undefined,
@@ -75,7 +81,7 @@ class EquipmentEntityRepositoryInternal {
   async findByCharacterId(
     characterId: string,
     isActive?: boolean,
-    includeDetails: boolean = false
+    includeDetails: boolean = false,
   ): Promise<Array<EquipmentEntityWithDetails | EquipmentEntity>> {
     const whereClause: Prisma.EquipmentEntityWhereInput = { characterId };
     if (isActive !== undefined) {
@@ -99,14 +105,14 @@ class EquipmentEntityRepositoryInternal {
   async findByCharacterAndSlot(
     characterId: string,
     slotType: string,
-    includeDetails: boolean = false
+    includeDetails: boolean = false,
   ): Promise<EquipmentEntityWithDetails | EquipmentEntity | null> {
     return prisma.equipmentEntity.findUnique({
       where: {
         unique_equipment_slot: {
-            characterId,
-            slotType,
-        }
+          characterId,
+          slotType,
+        },
       },
       include: includeDetails ? equipmentEntityIncludeDetails : undefined,
     });

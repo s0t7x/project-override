@@ -1,14 +1,23 @@
 // packages/po_server/src/services/CharacterService.ts
 import { Character, User, Entity, InventoryEntity, EquipmentEntity } from '@prisma/client';
 import { userRepository } from '../db/repos/UserRepository';
-import { characterRepository, CharacterCreateData, CharacterUpdateData } from '../db/repos/CharacterRepository';
+import {
+  characterRepository,
+  CharacterCreateData,
+  CharacterUpdateData,
+} from '../db/repos/CharacterRepository';
 import { entityRepository } from '../db/repos/EntityRepository';
 import { inventoryEntityRepository } from '../db/repos/InventoryEntityRepository';
 import { equipmentEntityRepository } from '../db/repos/EquipmentEntityRepository';
 // Import prisma client if we need to use transactions directly in the service
 import { prisma } from '../db/client';
 import { JsonObject } from '@prisma/client/runtime/library';
-import { ServerError, NotFoundError, ForbiddenError, BusinessRuleError } from '@project-override/shared/errors/server';
+import {
+  ServerError,
+  NotFoundError,
+  ForbiddenError,
+  BusinessRuleError,
+} from '@project-override/shared/errors/server';
 import { EquipmentSlot } from '@project-override/shared/src/types/game/EquipmentSlot';
 import { ICharacterAppearance } from '@project-override/shared/src/types/game/CharacterAppearance';
 
@@ -32,7 +41,7 @@ class CharacterServiceInternal {
    */
   async createCharacter(
     userId: string,
-    characterData: Omit<CharacterCreateData, 'userId'>
+    characterData: Omit<CharacterCreateData, 'userId'>,
   ): Promise<Character> {
     const user = await userRepository.findById(userId, true); // Include characters to count them
     if (!user) {
@@ -40,13 +49,17 @@ class CharacterServiceInternal {
     }
 
     // Type guard for UserWithCharacterPreviews
-    const charactersCount = 'characters' in user && Array.isArray(user.characters) ? user.characters.length : 0;
+    const charactersCount =
+      'characters' in user && Array.isArray(user.characters) ? user.characters.length : 0;
 
     if (charactersCount >= user.maxCharacters) {
-      throw new ForbiddenError(`User ${user.username} has reached the maximum character limit of ${user.maxCharacters}.`);
+      throw new ForbiddenError(
+        `User ${user.username} has reached the maximum character limit of ${user.maxCharacters}.`,
+      );
     }
 
-    if (!characterData.name || characterData.name.length < 3) { // Example validation
+    if (!characterData.name || characterData.name.length < 3) {
+      // Example validation
       throw new BusinessRuleError('Character name must be at least 3 characters long.');
     }
     if (await characterRepository.nameExists(characterData.name)) {
@@ -78,7 +91,6 @@ class CharacterServiceInternal {
       // Don't fail character creation if starting item fails, but log it.
     }
 
-
     return newCharacter;
   }
 
@@ -98,12 +110,21 @@ class CharacterServiceInternal {
       throw new ServerError('Character data is missing expected user relation.');
     }
 
-    const inventoryItems = await inventoryEntityRepository.findByCharacterId(characterId, {}, undefined, true) as Array<InventoryEntity & { entity: Entity }>;
-    const equippedItems = await equipmentEntityRepository.findByCharacterId(characterId, undefined, true) as Array<EquipmentEntity & { entity: Entity }>;
+    const inventoryItems = (await inventoryEntityRepository.findByCharacterId(
+      characterId,
+      {},
+      undefined,
+      true,
+    )) as Array<InventoryEntity & { entity: Entity }>;
+    const equippedItems = (await equipmentEntityRepository.findByCharacterId(
+      characterId,
+      undefined,
+      true,
+    )) as Array<EquipmentEntity & { entity: Entity }>;
 
     return {
       ...(character as Character), // Cast to base Character, relations will be added
-      user: character.user,        // user is already Pick<User, 'id' | 'username'>
+      user: character.user, // user is already Pick<User, 'id' | 'username'>
       inventory: inventoryItems,
       equipment: equippedItems,
     };
@@ -122,7 +143,9 @@ class CharacterServiceInternal {
       throw new NotFoundError(`Character with ID ${characterId} not found.`);
     }
     if (character.userId !== userId) {
-      throw new ForbiddenError(`User ${userId} is not authorized to delete character ${characterId}.`);
+      throw new ForbiddenError(
+        `User ${userId} is not authorized to delete character ${characterId}.`,
+      );
     }
 
     // Prisma's `onDelete: Cascade` on User->Character relation handles character deletion if user is deleted.
@@ -141,16 +164,21 @@ class CharacterServiceInternal {
    * @param updateData The data to update.
    * @returns The updated character.
    */
-  async updateCharacterDetails(characterId: string, updateData: CharacterUpdateData): Promise<Character> {
+  async updateCharacterDetails(
+    characterId: string,
+    updateData: CharacterUpdateData,
+  ): Promise<Character> {
     // Add any validation for updateData here (e.g., if name is being changed, check for uniqueness)
-    if (updateData.name && updateData.name !== (await characterRepository.findById(characterId))?.name) {
+    if (
+      updateData.name &&
+      updateData.name !== (await characterRepository.findById(characterId))?.name
+    ) {
       if (await characterRepository.nameExists(updateData.name as string)) {
         throw new BusinessRuleError(`Character name "${updateData.name}" is already taken.`);
       }
     }
     return characterRepository.update(characterId, updateData);
   }
-
 
   /**
    * Equips an item from a character's inventory.
@@ -159,16 +187,22 @@ class CharacterServiceInternal {
    * @param targetSlotType The equipment slot to equip the item to (e.g., "MAIN_HAND").
    * @returns The new equipment record.
    */
-  async equipItemFromInventory(characterId: string, inventoryEntityId: string, targetSlotType: EquipmentSlot): Promise<EquipmentEntity> {
+  async equipItemFromInventory(
+    characterId: string,
+    inventoryEntityId: string,
+    targetSlotType: EquipmentSlot,
+  ): Promise<EquipmentEntity> {
     // This operation needs to be atomic (all or nothing).
     return prisma.$transaction(async (tx) => {
       const inventoryItem = await tx.inventoryEntity.findUnique({
         where: { entityId: inventoryEntityId },
-        include: { entity: true }
+        include: { entity: true },
       });
 
       if (!inventoryItem || inventoryItem.characterId !== characterId) {
-        throw new NotFoundError(`Item ${inventoryEntityId} not found in character ${characterId}'s inventory.`);
+        throw new NotFoundError(
+          `Item ${inventoryEntityId} not found in character ${characterId}'s inventory.`,
+        );
       }
       if (!inventoryItem.entity) {
         throw new ServerError(`Entity data missing for inventory item ${inventoryEntityId}.`);
@@ -177,10 +211,15 @@ class CharacterServiceInternal {
       // TODO: Check if item is equippable, if character meets requirements (level, stats, class)
       // This logic would access inventoryItem.entity.components or similar
       const itemComponents = inventoryItem.entity.components as any; // Cast for example
-      if (!itemComponents?.itemType || !itemComponents?.slot || itemComponents.slot !== targetSlotType) {
-        throw new BusinessRuleError(`Item ${inventoryItem.entity.templateId || 'Unknown'} cannot be equipped in slot ${targetSlotType}.`);
+      if (
+        !itemComponents?.itemType ||
+        !itemComponents?.slot ||
+        itemComponents.slot !== targetSlotType
+      ) {
+        throw new BusinessRuleError(
+          `Item ${inventoryItem.entity.templateId || 'Unknown'} cannot be equipped in slot ${targetSlotType}.`,
+        );
       }
-
 
       // Check if there's an item already in the target slot and unequip it (move to inventory).
       const currentEquipped = await tx.equipmentEntity.findUnique({
@@ -228,15 +267,21 @@ class CharacterServiceInternal {
    * @param targetInventorySlotIndex Optional: specific inventory slot. If -1 or undefined, finds next available.
    * @returns The new inventory record.
    */
-  async unequipItemToInventory(characterId: string, equipmentEntityId: string, targetInventorySlotIndex?: number): Promise<InventoryEntity> {
+  async unequipItemToInventory(
+    characterId: string,
+    equipmentEntityId: string,
+    targetInventorySlotIndex?: number,
+  ): Promise<InventoryEntity> {
     return prisma.$transaction(async (tx) => {
       const equippedItem = await tx.equipmentEntity.findUnique({
         where: { entityId: equipmentEntityId },
-        include: { entity: true }
+        include: { entity: true },
       });
 
       if (!equippedItem || equippedItem.characterId !== characterId) {
-        throw new NotFoundError(`Equipped item ${equipmentEntityId} not found for character ${characterId}.`);
+        throw new NotFoundError(
+          `Equipped item ${equipmentEntityId} not found for character ${characterId}.`,
+        );
       }
 
       // Find an available inventory slot
@@ -246,9 +291,9 @@ class CharacterServiceInternal {
         const existingInventory = await tx.inventoryEntity.findMany({
           where: { characterId },
           select: { slotIndex: true },
-          orderBy: { slotIndex: 'asc' }
+          orderBy: { slotIndex: 'asc' },
         });
-        const occupiedSlots = new Set(existingInventory.map(i => i.slotIndex));
+        const occupiedSlots = new Set(existingInventory.map((i) => i.slotIndex));
         slotIndexToUse = 0;
         while (occupiedSlots.has(slotIndexToUse)) {
           slotIndexToUse++;
@@ -256,18 +301,19 @@ class CharacterServiceInternal {
         // TODO: Handle full inventory
         const MAX_INV_SLOTS = 30;
         if (slotIndexToUse >= MAX_INV_SLOTS) {
-          throw new BusinessRuleError("Inventory is full.");
+          throw new BusinessRuleError('Inventory is full.');
         }
       } else {
         // Check if specified slot is free
         const slotContent = await tx.inventoryEntity.findFirst({
-          where: { characterId, slotIndex: targetInventorySlotIndex }
+          where: { characterId, slotIndex: targetInventorySlotIndex },
         });
         if (slotContent) {
-          throw new BusinessRuleError(`Inventory slot ${targetInventorySlotIndex} is already occupied.`);
+          throw new BusinessRuleError(
+            `Inventory slot ${targetInventorySlotIndex} is already occupied.`,
+          );
         }
       }
-
 
       // Remove item from equipment
       await tx.equipmentEntity.delete({ where: { entityId: equipmentEntityId } });
@@ -286,15 +332,18 @@ class CharacterServiceInternal {
     });
   }
 
-  async updateCharacterAppearance(characterId: string, customizationData: Partial<ICharacterAppearance>): Promise<Character> {
+  async updateCharacterAppearance(
+    characterId: string,
+    customizationData: Partial<ICharacterAppearance>,
+  ): Promise<Character> {
     const character = await characterRepository.findById(characterId);
     if (!character) {
       throw new NotFoundError(`Character with ID ${characterId} not found.`);
     }
     if (character.appearance) {
       character.appearance = {
-        ...character.appearance as any,
-        ...customizationData
+        ...(character.appearance as any),
+        ...customizationData,
       };
     }
     return characterRepository.update(characterId, {
