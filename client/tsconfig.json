@@ -1,0 +1,68 @@
+{
+    "compilerOptions": {
+        // --- Project Environment ---
+        "target": "ES2020", // Modern browsers support ES2020. Vite/bundler handles older browser support if needed.
+        "lib": [
+            "dom", // Standard DOM APIs
+            "dom.iterable", // For iterating over DOM collections
+            "esnext" // Latest ES features (bundler will transpile)
+        ],
+        "jsx": "react-jsx", // Modern JSX transform (no `import React` needed in every file)
+        // --- Modules ---
+        "module": "esnext", // Output ES modules (bundler will handle this)
+        "moduleResolution": "bundler", // Recommended for modern bundlers like Vite/Webpack.
+        // Fallback: "node" or "nodenext"
+        "resolveJsonModule": true, // Allow importing .json files
+        "allowSyntheticDefaultImports": true, // For compatibility with modules that use `export default`
+        "esModuleInterop": true, // Enables `import * as React from 'react'` and default imports from CJS
+        // --- Paths & Structure ---
+        "baseUrl": ".", // Paths are relative to this tsconfig.json
+        "paths": {
+            "@/*": [
+                "./src/*"
+            ], // Example: For cleaner imports like `@/components/Button`
+            "@project-override/shared": [
+                "../shared/src/index.ts"
+            ], // Point to shared source for types
+            "@project-override/shared/*": [
+                "../shared/src/*"
+            ]
+        },
+        "rootDir": "./src", // Or wherever your client source code is
+        // --- Strictness & Quality ---
+        "strict": true,
+        "skipLibCheck": true, // Skip type checking of all declaration files (*.d.ts)
+        "forceConsistentCasingInFileNames": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUnusedLocals": true, // Report errors on unused local variables
+        "noUnusedParameters": true, // Report errors on unused parameters
+        "noImplicitReturns": true,
+        // --- Output (less relevant if bundler handles it, but good for tsc --noEmit) ---
+        "noEmit": true, // VERY IMPORTANT: TypeScript shouldn't emit JS files itself.
+        // The bundler (Vite, Webpack) does this.
+        // This tsconfig is for type checking.
+        // --- For Monorepo Setup with Shared Package ---
+        "composite": false,
+        "declaration": true, // If you want .d.ts files for the client (usually not needed if it's an app)
+        "declarationMap": true,
+        // "outDir": "./dist-types", // Where .d.ts files would go if declaration:true and noEmit:false
+        // --- For Babylon.js (usually not needed if types are bundled) ---
+        // "types": ["@babylonjs/core/typedoc"] // Sometimes needed for older Babylon or specific setups
+        // --- For React 18+ (usually covered by `jsx: "react-jsx"`) ---
+    },
+    "include": [
+        "src/**/*" // Adjust if your source is elsewhere, e.g., "src/**/*.ts", "src/**/*.tsx"
+        // Include Vite's env type if using Vite: "vite-env.d.ts" or similar
+    ],
+    "exclude": [
+        "node_modules",
+        "dist" // Or whatever your bundler's output directory is
+    ],
+    "references": [
+        // This ensures that when you type-check the client,
+        // TS also checks/builds the declarations for the shared package.
+        {
+            "path": "../shared"
+        }
+    ]
+}
