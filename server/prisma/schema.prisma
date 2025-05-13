@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PLAYER
+  MODERATOR
+  ADMIN
+}
+
+model User {
+  id            String    @id @default(uuid())
+  username      String    @unique
+  passwordHash  String
+  role          UserRole  @default(PLAYER) // Maps to the UserRole enum
+  maxCharacters Int       @default(4) @db.SmallInt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+  lastIP        String?   // Prisma maps INET to String. Validation in app.
+  loginCount    Int       @default(0)
+  bannedUntil   DateTime?
+  banReason     String?
+
+  characters Character[]
+}
+
+model Character {
+  id            String    @id @default(uuid())
+  userId        String
+  name          String    @unique
+  createdAt     DateTime  @default(now())
+  lastPlayedAt  DateTime?
+  playTime      String?   // Prisma has no native Interval. Store as ISO 8601 duration string (e.g., "PT2H30M") or total seconds as BigInt.
+  level         Int       @default(1) @db.SmallInt
+  experience    BigInt    @default(0)
+  appearance    Json?     // For JSONB
+  statsBase     Json?     // For JSONB
+  statsModified Json?     // For JSONB
+  metadata      Json?     // For JSONB
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  inventoryEntities InventoryEntity[]
+  equipmentEntities EquipmentEntity[]
+  ownedEntities     Entity[]          @relation("OwnedEntities") // Explicit relation name
+}
+
+model Entity {
+  id               String    @id @default(uuid())
+  templateId       String?   
+  ownerCharacterId String?
+  worldId          String?   
+  components       Json      // JSONB for ECS components
+  enhancementLevel Int?      @db.SmallInt
+  durability       Int?
+  tags             String[]  // TEXT[]
+  createdAt        DateTime  @default(now())
+  lastUsedAt       DateTime?
+
+  ownerCharacter Character? @relation("OwnedEntities", fields: [ownerCharacterId], references: [id], onDelete: SetNull)
+  world World? @relation(fields: [worldId], references: [id], onDelete: SetNull) // If you have a World model
+
+  // Relations to join tables (one-to-one as an entity is in one specific slot)
+  inventorySlot InventoryEntity?
+  equipmentSlot EquipmentEntity?
+}
+
+// Join table for Character's inventory
+model InventoryEntity {
+  entityId    String @id // This also acts as FK to Entity.id and is PK here.
+  characterId String
+  bagId       String?  // Optional: if inventory items can be in sub-containers (bags)
+  slotIndex   Int      @db.SmallInt
+  stackSize   Int      @default(1) @db.SmallInt
+
+  entity    Entity    @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@unique([characterId, slotIndex, bagId], name: "unique_inventory_slot")
+  // If bagId refers to another Entity (that is a bag):
+  // bag Entity? @relation("BagContents", fields: [bagId], references: [id])
+}
+
+// Join table for Character's equipment
+model EquipmentEntity {
+  entityId    String  @id // This also acts as FK to Entity.id and is PK here.
+  characterId String
+  slotType    String  // e.g., "HEAD", "CHEST". Consider an enum for this in your app / shared types.
+  isActive    Boolean @default(false)
+  locked      Boolean @default(false)
+
+  entity    Entity    @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@unique([characterId, slotType], name: "unique_equipment_slot")
+}
+
+model WorldBlock {
+  worldId    String // Assuming UUID, could link to a World table
+  x          Int
+  y          Int
+  z          Int
+  blockType  String
+  rotation   Int?   @db.SmallInt
+  customData Json?
+
+  world World? @relation(fields: [worldId], references: [id], onDelete: Cascade)
+  @@id([worldId, x, y, z])
+}
+
+model World {
+  id     String @id @default(uuid())
+  name   String @unique
+
+  blocks WorldBlock[]
+  entitiesInWorld Entity[]
+}

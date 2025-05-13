@@ -1,0 +1,36 @@
+{
+  "name": "@project-override/server",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "tsc -b && pnpm prisma generate",
+    "start": "node dist/index.js",
+    "dev": "nodemon --watch src --watch ../shared/src --ext ts,json --exec \"pnpm build && node dist/index.js\"",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:generate": "prisma generate",
+    "prisma:studio": "prisma studio"
+  },
+  "main": "./dist/index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.8.0",
+  "dependencies": {
+    "@colyseus/ws-transport": "^0.16.5",
+    "@prisma/client": "^6.7.0",
+    "@project-override/shared": "workspace:^",
+    "colyseus": "^0.16.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.15.17",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.7.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
