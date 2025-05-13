@@ -1,2 +1,0 @@
-// Contains complex combat calculations (damage formulas considering stats/gear, status effect logic/duration), 
-// and potentially server-side hit validation logic. Used by CombatComponent or GameRoom logic.

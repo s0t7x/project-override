@@ -1,1 +1,0 @@
-// Manages currency (Bytes, HackChips) transactions, ensuring players have sufficient funds for actions like editing, buying, auction bids. Provides methods like `debitBytes(characterId, amount)`.

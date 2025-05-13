@@ -1,1 +1,0 @@
-// Base schema types or shared Colyseus Schema structures (like a Vector3Schema) if needed across multiple room states.
