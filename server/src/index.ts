@@ -51,7 +51,7 @@ async function bootstrap() {
   console.log('[GameServer] Server bootstrap complete.');
   try {
     const userCount = await prisma.user.count();
-    console.log(`[GameServer] DB connected. Found ${userCount} users.`);
+    console.log(`[GameServer] DB connected. ${userCount} users.`);
   } catch (e: any) {
     console.error("[GameServer] DB connection test failed:", e.message);
   }
@@ -65,7 +65,6 @@ bootstrap().catch((error) => {
 async function gracefulShutdown(signal: string) {
   console.log(`[GameServer] Received ${signal}.`);
   console.log(`[GameServer] Closing server...`);
-  // Close the HTTP server
   const server = httpServer;
   if (server) {
     server.close(() => {
@@ -74,7 +73,6 @@ async function gracefulShutdown(signal: string) {
   } else {
     console.log('[GameServer] No server to close.');
   }
-  // Close the Prisma Client connection
   console.log(`[GameServer] Shutting down DB Client...`);
   await prisma.$disconnect();
 
