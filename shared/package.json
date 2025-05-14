@@ -1,13 +1,13 @@
 {
-  "name": "@project-override/shared",
-  "version": "1.0.0",
-  "license": "ISC",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "scripts": {},
-  "packageManager": "pnpm@10.8.0",
-  "devDependencies": {
-    "@types/node": "^22.15.17",
-    "typescript": "^5.8.3"
-  }
+	"name": "@project-override/shared",
+	"version": "1.0.0",
+	"license": "ISC",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"scripts": {},
+	"packageManager": "pnpm@10.8.0",
+	"devDependencies": {
+		"@types/node": "^22.15.17",
+		"typescript": "^5.8.3"
+	}
 }

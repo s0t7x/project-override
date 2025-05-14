@@ -1,4 +1,4 @@
 export interface IPaginationArgs {
-  skip?: number;
-  take?: number;
+	skip?: number;
+	take?: number;
 }

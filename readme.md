@@ -15,32 +15,32 @@ The project is currently in an active development phase, with core systems for r
 
 - **Runtime & Framework**: The server is built with Node.js and uses the Express.js framework to handle HTTP requests, primarily for authentication and serving initial client files.
 - **Real-time Multiplayer Engine**:
-  - **How it works**: Colyseus is the backbone for real-time communication. It manages game rooms, WebSocket connections, and state synchronization.
-  - `Room` classes on the server define the game's lifecycle and processes messages from clients.
+    - **How it works**: Colyseus is the backbone for real-time communication. It manages game rooms, WebSocket connections, and state synchronization.
+    - `Room` classes on the server define the game's lifecycle and processes messages from clients.
 - **Database (PostgreSQL & Prisma ORM)**:
-  - **How it works**: PostgreSQL is used as the relational database for persistent storage.
-  - Prisma acts as the Object-Relational Mapper (ORM). The database schema is defined in `prisma/schema.prisma`. Prisma Client is used by repositories in the server-side code (e.g., for authentication) to interact with the database in a safe way.
+    - **How it works**: PostgreSQL is used as the relational database for persistent storage.
+    - Prisma acts as the Object-Relational Mapper (ORM). The database schema is defined in `prisma/schema.prisma`. Prisma Client is used by repositories in the server-side code (e.g., for authentication) to interact with the database in a safe way.
 - **Authentication**:
-  - **How it works**: It implements a local strategy (username/password) for registration and login. Passwords are hashed using `bcryptjs`.
-    - Upon successful login, a JSON Web Token (JWT) is generated and sent to the client.
-    - This JWT is then used by the client to authenticate with Rooms, ensuring only logged-in users can join.
+    - **How it works**: It implements a local strategy (username/password) for registration and login. Passwords are hashed using `bcryptjs`.
+        - Upon successful login, a JSON Web Token (JWT) is generated and sent to the client.
+        - This JWT is then used by the client to authenticate with Rooms, ensuring only logged-in users can join.
 - **Server-Authoritative Game Logic**:
-  - **How it works**: The server has the final say on game state.
-    - Clients send data to the server.
-    - The server's Room processes these data, updating the player within the server-side `Player` schema.
-    - A server-side game loop (`update` method) periodically updates the game state
-    - These state changes (diff only) are then automatically broadcast to all clients. This model helps prevent cheating.
+    - **How it works**: The server has the final say on game state.
+        - Clients send data to the server.
+        - The server's Room processes these data, updating the player within the server-side `Player` schema.
+        - A server-side game loop (`update` method) periodically updates the game state
+        - These state changes (diff only) are then automatically broadcast to all clients. This model helps prevent cheating.
 
 ### 3. Frontend Systems (Client)
 
 - **Rendering Engine**:
 - **UI Framework (React & Zustand)**:
-  - **How it works**: React is used for building user interface elements that overlay or sit alongside the game canvas (e.g., chat, login forms, player lists).
-  - Zustand, a lightweight state management library, is used to manage the state of React UI components (e.g., auth status, chat messages).
+    - **How it works**: React is used for building user interface elements that overlay or sit alongside the game canvas (e.g., chat, login forms, player lists).
+    - Zustand, a lightweight state management library, is used to manage the state of React UI components (e.g., auth status, chat messages).
 - **Networking**:
-  - **How it works**: The Colyseus JavaScript client connects to the server, joins a room and handles sending/receiving real-time messages and state updates.
+    - **How it works**: The Colyseus JavaScript client connects to the server, joins a room and handles sending/receiving real-time messages and state updates.
 - **Build Tool (Vite)**:
-  - **How it works**: Vite is used as the build tool for the client, offering a fast development server and optimized production builds.
+    - **How it works**: Vite is used as the build tool for the client, offering a fast development server and optimized production builds.
 
 ### 4. Shared Code
 
