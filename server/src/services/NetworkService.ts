@@ -24,7 +24,7 @@ class NetworkServiceInternal { // Could also just be exported functions
     let payload: IServerErrorMessage;
 
     if (error instanceof ServerError) {
-      payload = error as IServerErrorMessage; // Cast to the shared error type
+      payload = {...error}; // Cast to the shared error type
     } else {
       // Generic error
       payload = {
@@ -34,7 +34,7 @@ class NetworkServiceInternal { // Could also just be exported functions
         timestamp: new Date().toISOString(),
       };
     }
-    console.warn(`[NetworkService] Sending error to client ${client.sessionId}:`, payload);
+    console.warn(`[NetworkService] Sending error to client ${client.sessionId}:`, payload.message);
     client.send(customMessageType || payload.type, payload);
   }
 
@@ -99,7 +99,7 @@ public broadcastRaw(
   ): void {
     let payload: IServerErrorMessage;
     if (error instanceof ServerError) {
-      payload = error; // Cast to the shared error type
+      payload = {...error}; // Cast to the shared error type
     } else {
       payload = { type: ServerErrorMessageTypeEnum.InternalServerError, message: error.message, statusCode: 500, timestamp: new Date().toISOString() };
     }

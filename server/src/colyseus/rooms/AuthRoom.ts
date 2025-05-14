@@ -46,7 +46,11 @@ export class AuthRoom extends Room<Unused> {
         });
 
         // Fallback
-        this.onMessage("*", (client, type, message) => {
+        this.onMessage("*", (client, type: any, message) => {
+            if(typeof(type) == 'object') {
+                message = type;
+                type = undefined;
+            }
             console.log(`[AuthRoom ${this.roomId}] Received message type "${type}" from ${client.sessionId}:`, message);
             networkService.sendError(client, new ServerError(`Message type "${type}" not recognized`));
         });
