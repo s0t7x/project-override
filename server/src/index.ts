@@ -2,7 +2,7 @@ import { prisma } from './db/client';
 
 import { Server } from 'colyseus';
 import { WebSocketTransport } from '@colyseus/ws-transport';
-import { playground } from "@colyseus/playground";
+import { playground } from '@colyseus/playground';
 import { createServer } from 'http';
 import express from 'express';
 import cors from 'cors';
@@ -10,6 +10,7 @@ import cors from 'cors';
 import { config } from './config';
 import { constants } from '@project-override/shared';
 import { AuthRoom } from './colyseus/rooms/AuthRoom';
+import { CharactersRoom } from './colyseus/rooms/CharactersRoom';
 
 let gameServer: Server;
 let httpServer: any;
@@ -19,7 +20,7 @@ async function bootstrap() {
   app.use(cors()); // Basic CORS setup
   app.use(express.json());
 
-  app.use("/playground", playground());
+  app.use('/playground', playground());
 
   // Simple health check / info endpoint
   app.get('/', (req, res) => {
@@ -43,6 +44,7 @@ async function bootstrap() {
 
   // Register rooms
   gameServer.define('auth', AuthRoom);
+  gameServer.define('characters', CharactersRoom);
 
   const originalConsoleLog = console.log;
   console.log = (...args: any[]) => {};

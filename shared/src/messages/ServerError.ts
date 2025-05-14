@@ -1,12 +1,12 @@
-import { time } from "console";
-import { IMessage } from "game/Messages";
+import { time } from 'console';
+import { IMessage } from 'messages/Messages';
 
 export interface IServerErrorMessage extends IMessage {
-    statusCode: number;
-    message: string;
-    timestamp: string;
-    stack?: string;
-    errors?: Record<string, string[]>;
+  statusCode: number;
+  message: string;
+  timestamp: string;
+  stack?: string;
+  errors?: Record<string, string[]>;
 }
 
 export const ServerErrorMessageTypeEnum = {
@@ -18,7 +18,8 @@ export const ServerErrorMessageTypeEnum = {
   InternalServerError: 'Error.InternalServerError',
 } as const;
 
-export type ServerErrorMessageType = typeof ServerErrorMessageTypeEnum[keyof typeof ServerErrorMessageTypeEnum];
+export type ServerErrorMessageType =
+  (typeof ServerErrorMessageTypeEnum)[keyof typeof ServerErrorMessageTypeEnum];
 
 export class ServerError extends Error implements IServerErrorMessage {
   public readonly type: ServerErrorMessageType;

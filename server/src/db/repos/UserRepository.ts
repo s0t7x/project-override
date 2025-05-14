@@ -17,7 +17,7 @@ export type UserUpdateData = Partial<
   Omit<Prisma.UserUpdateInput, 'id' | 'createdAt' | 'updatedAt' | 'characters'>
 >;
 const userIncludeRelations = {
-  characters: { select: { id: true, name: true, level: true, lastPlayedAt: true } },
+  characters: {},
 } satisfies Prisma.UserInclude<DefaultArgs>;
 export type UserWithCharacterPreviews = Prisma.UserGetPayload<{
   include: typeof userIncludeRelations;

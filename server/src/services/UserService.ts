@@ -12,7 +12,7 @@ import {
   NotFoundError,
   BusinessRuleError,
   ValidationError,
-} from '@project-override/shared/dist/misc/ServerError';
+} from '@project-override/shared/dist/messages/ServerError';
 import bcrypt from 'bcryptjs'; // For password hashing
 import { config } from '../config';
 
@@ -31,7 +31,7 @@ class UserServiceInternal {
   ): Promise<User> {
     const { username, passwordHash: plainPassword } = registrationData;
 
-    if(!config.userRegistrationAllowed) {
+    if (!config.userRegistrationAllowed) {
       throw new BusinessRuleError('User registration is currently disabled.', 403); // 403 Forbidden
     }
     if (!username || username.trim().length < 3) {

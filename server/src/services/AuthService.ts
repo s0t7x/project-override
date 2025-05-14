@@ -10,8 +10,8 @@ import {
   ForbiddenError,
   NotFoundError,
   ValidationError,
-} from '@project-override/shared/dist/misc/ServerError';
-import { IAuthTokens, IJwtPayload } from '@project-override/shared/dist/game/Auth';
+} from '@project-override/shared/dist/messages/ServerError';
+import { IAuthTokens, IJwtPayload } from '@project-override/shared/dist/messages/Auth';
 
 // For storing refresh tokens. In a real app, this MUST be a persistent store (e.g., Redis, DB table).
 // Using a simple in-memory store for this example is NOT production-ready.

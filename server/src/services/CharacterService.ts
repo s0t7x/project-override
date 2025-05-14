@@ -17,8 +17,8 @@ import {
   NotFoundError,
   ForbiddenError,
   BusinessRuleError,
-} from '@project-override/shared/dist/misc/ServerError';
-import { IEquipmentSlot } from '@project-override/shared/dist/game/EquipmentSlot';
+} from '@project-override/shared/dist/messages/ServerError';
+import { IEquipmentSlot } from '@project-override/shared/dist/core/EquipmentSlot';
 import { ICharacterAppearance } from '@project-override/shared/dist/game/CharacterAppearance';
 
 // Define a more complete Character representation for some service methods

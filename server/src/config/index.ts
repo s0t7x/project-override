@@ -12,6 +12,6 @@ export const config = {
     refreshTokenExpiration: process.env.JWT_REFRESH_TOKEN_EXPIRATION || '7d',
   },
   userRegistrationAllowed: process.env.USER_REGISTRATION_ALLOWED === 'true',
-  userPasswordMinLength: parseInt(process.env.USER_PASSWORD_MIN_LENGTH || "8"),
-  userPasswordSaltRounds: parseInt(process.env.USER_PASSWORD_SALT_ROUNDS || "10"),
+  userPasswordMinLength: parseInt(process.env.USER_PASSWORD_MIN_LENGTH || '8'),
+  userPasswordSaltRounds: parseInt(process.env.USER_PASSWORD_SALT_ROUNDS || '10'),
 };

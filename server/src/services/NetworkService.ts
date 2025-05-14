@@ -3,11 +3,12 @@ import { Client, Server } from 'colyseus';
 import {
   IServerErrorMessage,
   ServerError,
-  ServerErrorMessageTypeEnum
-} from '@project-override/shared/dist/misc/ServerError'; // Assuming shared types are available
-import { IMessage, IMessageType } from '@project-override/shared/dist/game/Messages';
+  ServerErrorMessageTypeEnum,
+} from '@project-override/shared/dist/messages/ServerError'; // Assuming shared types are available
+import { IMessage, IMessageType } from '@project-override/shared/dist/messages/Messages';
 
-class NetworkServiceInternal { // Could also just be exported functions
+class NetworkServiceInternal {
+  // Could also just be exported functions
 
   /**
    * Sends a standardized error message to a client.
@@ -16,15 +17,11 @@ class NetworkServiceInternal { // Could also just be exported functions
    * @param error The error object (ideally an instance of AppError or its children).
    * @param customMessageType Optional: A more specific message type for the envelope if needed.
    */
-  public sendError(
-    client: Client,
-    error: Error | ServerError,
-    customMessageType?: string
-  ): void {
+  public sendError(client: Client, error: Error | ServerError, customMessageType?: string): void {
     let payload: IServerErrorMessage;
 
     if (error instanceof ServerError) {
-      payload = {...error}; // Cast to the shared error type
+      payload = { ...error }; // Cast to the shared error type
     } else {
       // Generic error
       payload = {
@@ -44,21 +41,13 @@ class NetworkServiceInternal { // Could also just be exported functions
    * @param client The Colyseus client instance.
    * @param message The message object.
    */
-  public sendMessage(
-    client: Client,
-    message: IMessage
-  ): void {
+  public sendMessage(client: Client, message: IMessage): void {
     client.send(message.type, message);
   }
 
-  public sendRaw(
-    client: Client,
-    messageType: IMessageType,
-    payload: any
-  ): void {
+  public sendRaw(client: Client, messageType: IMessageType, payload: any): void {
     client.send(messageType, payload);
   }
-  
 
   /**
    * Broadcasts a message to all clients in a room.
@@ -70,16 +59,16 @@ class NetworkServiceInternal { // Could also just be exported functions
   public broadcastMessage(
     room: { broadcast: (type: string | number, message?: any, options?: any) => void },
     message: IMessage,
-    options?: any
+    options?: any,
   ): void {
     room.broadcast(message.type, message, options);
   }
 
-public broadcastRaw(
+  public broadcastRaw(
     room: { broadcast: (type: string | number, message?: any, options?: any) => void }, // Duck typing for Room
     messageType: IMessageType,
     payload: any,
-    options?: any
+    options?: any,
   ): void {
     room.broadcast(messageType, payload, options);
   }
@@ -99,9 +88,14 @@ public broadcastRaw(
   ): void {
     let payload: IServerErrorMessage;
     if (error instanceof ServerError) {
-      payload = {...error}; // Cast to the shared error type
+      payload = { ...error }; // Cast to the shared error type
     } else {
-      payload = { type: ServerErrorMessageTypeEnum.InternalServerError, message: error.message, statusCode: 500, timestamp: new Date().toISOString() };
+      payload = {
+        type: ServerErrorMessageTypeEnum.InternalServerError,
+        message: error.message,
+        statusCode: 500,
+        timestamp: new Date().toISOString(),
+      };
     }
     console.warn(`[NetworkService] Broadcasting error to room:`, payload);
     room.broadcast(customMessageType || payload.type, payload, options);

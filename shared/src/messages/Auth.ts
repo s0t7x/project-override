@@ -1,16 +1,16 @@
-import { time } from "console";
-import { IMessage } from "game/Messages";
+import { time } from 'console';
+import { IMessage } from 'messages/Messages';
 
 export const AuthMessageTypeEnum = {
   AuthLoginRequest: 'Auth.LoginRequest',
   AuthLoginResponse: 'Auth.LoginResponse',
-  AuthLogoutRequest: 'Auth.LogoutRequest',
-  AuthLogoutResponse: 'Auth.LogoutResponse',
   AuthRegisterRequest: 'Auth.RegisterRequest',
   AuthRegisterResponse: 'Auth.RegisterResponse',
+  AuthRefreshRequest: 'Auth.RefreshRequest',
+  AuthRefreshResponse: 'Auth.RefreshResponse',
 } as const;
 
-export type AuthMessageType = typeof AuthMessageTypeEnum[keyof typeof AuthMessageTypeEnum];
+export type AuthMessageType = (typeof AuthMessageTypeEnum)[keyof typeof AuthMessageTypeEnum];
 
 export class AuthLoginRequest implements IMessage {
   public readonly type: AuthMessageType = AuthMessageTypeEnum.AuthLoginRequest;
@@ -49,12 +49,31 @@ export class AuthRegisterResponse implements IMessage {
   public readonly type: AuthMessageType = AuthMessageTypeEnum.AuthRegisterResponse;
 }
 
+export class AuthRefreshRequest implements IMessage {
+  public readonly type: AuthMessageType = AuthMessageTypeEnum.AuthRefreshRequest;
+  public readonly token: string;
+
+  constructor(token: string) {
+    this.token = token;
+  }
+}
+
+export class AuthRefreshResponse implements IMessage, IAuthTokens {
+  public readonly type: AuthMessageType = AuthMessageTypeEnum.AuthRefreshResponse;
+  public readonly accessToken: string;
+  public readonly refreshToken: string;
+
+  constructor(tokens: IAuthTokens) {
+    this.accessToken = tokens.accessToken;
+    this.refreshToken = tokens.refreshToken;
+  }
+}
+
 export interface IJwtPayload {
   userId: string;
   username: string;
   role: string;
 }
-
 
 export interface IAuthTokens {
   accessToken: string;
