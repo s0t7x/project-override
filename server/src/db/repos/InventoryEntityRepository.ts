@@ -2,7 +2,7 @@
 import { Prisma, InventoryEntity, Entity, Character } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import { prisma } from '../client'; // Corrected import
-import { IPaginationArgs } from '@project-override/shared/types/misc/PaginationArgs';
+import { IPaginationArgs } from '@project-override/shared/dist/misc/PaginationArgs';
 
 // Data for adding an entity to an inventory.
 // entityId and characterId are key.

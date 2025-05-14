@@ -2,7 +2,7 @@
 import { Prisma, World } from '@prisma/client'; // PrismaClient not needed for class
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import { prisma } from '../client'; // Corrected import
-import { IPaginationArgs } from '@project-override/shared/types/misc/PaginationArgs';
+import { IPaginationArgs } from '@project-override/shared/dist/misc/PaginationArgs';
 
 // Data for creating a new world.
 export type WorldCreateData = Omit<Prisma.WorldCreateInput, 'id' | 'blocks' | 'entitiesInWorld'>;

@@ -9,7 +9,7 @@ import {
   BusinessRuleError,
   ForbiddenError,
   NotFoundError,
-} from '@project-override/shared/errors/server';
+} from '@project-override/shared/dist/errors/server';
 
 interface AuthTokens {
   accessToken: string;

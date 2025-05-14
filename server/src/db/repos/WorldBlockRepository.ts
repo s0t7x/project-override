@@ -1,7 +1,7 @@
 // packages/po_server/src/repositories/WorldBlockRepository.ts
 import { Prisma, WorldBlock } from '@prisma/client';
 import { prisma } from '../client'; // Corrected import
-import { IPaginationArgs } from '@project-override/shared/types/misc/PaginationArgs';
+import { IPaginationArgs } from '@project-override/shared/dist/misc/PaginationArgs';
 
 // Data for creating or updating a single world block.
 // The composite key fields are all required.

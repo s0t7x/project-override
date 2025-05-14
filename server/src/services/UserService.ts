@@ -12,7 +12,7 @@ import {
   NotFoundError,
   BusinessRuleError,
   ValidationError,
-} from '@project-override/shared/errors/server';
+} from '@project-override/shared/dist/errors/server';
 import bcrypt from 'bcryptjs'; // For password hashing
 import { config } from 'src/config';
 

@@ -8,6 +8,7 @@ import cors from 'cors';
 
 import { config } from './config';
 import { constants } from '@project-override/shared';
+import { AuthRoom } from './colyseus/rooms/AuthRoom';
 
 let gameServer: Server;
 let httpServer: any;
@@ -38,6 +39,7 @@ async function bootstrap() {
   });
 
   // Register rooms
+  gameServer.define('auth', AuthRoom);
 
   const originalConsoleLog = console.log;
   console.log = (...args: any[]) => {};

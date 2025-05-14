@@ -17,9 +17,9 @@ import {
   NotFoundError,
   ForbiddenError,
   BusinessRuleError,
-} from '@project-override/shared/errors/server';
-import { EquipmentSlot } from '@project-override/shared/src/types/game/EquipmentSlot';
-import { ICharacterAppearance } from '@project-override/shared/src/types/game/CharacterAppearance';
+} from '@project-override/shared/dist/errors/server';
+import { EquipmentSlot } from '@project-override/shared/dist/game/EquipmentSlot';
+import { ICharacterAppearance } from '@project-override/shared/dist/game/CharacterAppearance';
 
 // Define a more complete Character representation for some service methods
 export type FullCharacterSheet = Character & {

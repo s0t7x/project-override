@@ -16,6 +16,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.8.0",
   "dependencies": {
+    "@colyseus/schema": "^3.0.36",
     "@colyseus/ws-transport": "^0.16.5",
     "@prisma/client": "^6.7.0",
     "@project-override/shared": "workspace:^",
