@@ -39,13 +39,17 @@ export async function CharacterSummaryFromDbObject(character: any) {
       beardIdx: character.appearance?.beardIdx || that.appearance.beardIdx,
       beardColor: new Color3(character.appearance?.beardColor || that.appearance.beardColor),
       hairBackIdx: character.appearance?.hairBackIdx || that.appearance.hairBackIdx,
-      hairBackColor: new Color3(character.appearance?.hairBackColor || that.appearance.hairBackColor),
+      hairBackColor: new Color3(
+        character.appearance?.hairBackColor || that.appearance.hairBackColor,
+      ),
       hairIdx: character.appearance?.hairIdx || that.appearance.hairIdx,
       hairColor: new Color3(character.appearance?.hairColor || that.appearance.hairColor),
       hairFrontIdx: character.appearance?.hairFrontIdx || that.appearance.hairFrontIdx,
-      hairFrontColor: new Color3(character.appearance?.hairFrontColor || that.appearance.hairFrontColor),
+      hairFrontColor: new Color3(
+        character.appearance?.hairFrontColor || that.appearance.hairFrontColor,
+      ),
       eyesIdx: character.appearance?.eyesIdx || that.appearance.eyesIdx,
-      eyesColor: new Color3(character.appearance?.eyesColor || that.appearance.eyesColor)
+      eyesColor: new Color3(character.appearance?.eyesColor || that.appearance.eyesColor),
     });
     that.appearance = appearance;
 
@@ -73,7 +77,7 @@ export async function CharacterSummaryFromDbObject(character: any) {
     }
     return that;
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return null;
   }
 }

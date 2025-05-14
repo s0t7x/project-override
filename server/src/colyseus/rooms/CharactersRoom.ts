@@ -70,7 +70,7 @@ export class CharactersRoom extends Room<CharactersRoomState> {
           const char = await characterService.deleteCharacter(authData.userId, message.characterId);
           this.state.characterSummaries.splice(
             this.state.characterSummaries.findIndex((cm) => cm.id == message.characterId),
-            1
+            1,
           );
           networkService.sendMessage(client, new CharacterDeleteResponse());
           console.log(
