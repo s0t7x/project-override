@@ -9,19 +9,9 @@ import {
   BusinessRuleError,
   ForbiddenError,
   NotFoundError,
-} from '@project-override/shared/dist/errors/server';
-
-interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
-}
-
-export interface JwtPayload {
-  userId: string;
-  username: string;
-  role: User['role'];
-  // You can add other non-sensitive info needed frequently
-}
+  ValidationError,
+} from '@project-override/shared/dist/misc/ServerError';
+import { IAuthTokens, IJwtPayload } from '@project-override/shared/dist/game/Auth';
 
 // For storing refresh tokens. In a real app, this MUST be a persistent store (e.g., Redis, DB table).
 // Using a simple in-memory store for this example is NOT production-ready.
@@ -46,7 +36,7 @@ class AuthServiceInternal {
     username: string,
     plainPasswordPlainText: string,
     ipAddress?: string,
-  ): Promise<AuthTokens> {
+  ): Promise<IAuthTokens> {
     const user = await userRepository.findByUsername(username);
     if (!user) {
       throw new NotFoundError(`User "${username}" not found.`);
@@ -75,8 +65,8 @@ class AuthServiceInternal {
    * Generates new access and refresh tokens for a user.
    * Stores the refresh token (in this example, in-memory - use a DB/Redis in prod).
    */
-  private async generateAndStoreTokens(user: User): Promise<AuthTokens> {
-    const accessTokenPayload: JwtPayload = {
+  private async generateAndStoreTokens(user: User): Promise<IAuthTokens> {
+    const accessTokenPayload: IJwtPayload = {
       userId: user.id,
       username: user.username,
       role: user.role,
@@ -128,7 +118,7 @@ class AuthServiceInternal {
    * @throws BusinessRuleError if refresh token is invalid, expired, or not found.
    * @throws NotFoundError if user associated with token not found.
    */
-  async refreshToken(oldRefreshToken: string): Promise<AuthTokens> {
+  async refreshToken(oldRefreshToken: string): Promise<IAuthTokens> {
     // 1. Validate refresh token structure/signature
     let decodedRefreshPayload: { userId: string; version?: number; iat: number; exp: number };
     try {
@@ -192,9 +182,9 @@ class AuthServiceInternal {
    * @returns The decoded JWT payload if valid.
    * @throws BusinessRuleError if token is invalid or expired.
    */
-  verifyAccessToken(accessToken: string): JwtPayload {
+  verifyAccessToken(accessToken: string): IJwtPayload {
     try {
-      const payload = jwt.verify(accessToken, config.jwt.secret) as JwtPayload;
+      const payload = jwt.verify(accessToken, config.jwt.secret) as IJwtPayload;
       return payload;
     } catch (error: any) {
       if (error instanceof jwt.TokenExpiredError) {
@@ -253,7 +243,7 @@ class AuthServiceInternal {
 
   constructor() {
     // Start periodic cleanup for the in-memory store example
-    setInterval(() => this.cleanupExpiredRefreshTokens(), 60 * 60 * 1000); // Every hour
+    setInterval(() => this.cleanupExpiredRefreshTokens(), 30 * 60_000); // Every 30 min
   }
 }
 

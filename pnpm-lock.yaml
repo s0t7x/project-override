@@ -78,6 +78,12 @@ importers:
 
   server:
     dependencies:
+      '@colyseus/playground':
+        specifier: ^0.16.4
+        version: 0.16.4(@colyseus/auth@0.16.6(@colyseus/core@0.16.17(@colyseus/schema@3.0.36))(express@5.1.0))(@colyseus/core@0.16.17(@colyseus/schema@3.0.36))(express@5.1.0)
+      '@colyseus/schema':
+        specifier: ^3.0.36
+        version: 3.0.36
       '@colyseus/ws-transport':
         specifier: ^0.16.5
         version: 0.16.5(@colyseus/core@0.16.17(@colyseus/schema@3.0.36))
@@ -345,6 +351,13 @@ packages:
 
   '@colyseus/msgpackr@1.11.2':
     resolution: {integrity: sha512-MuwPFhizFKC3zmGfy0fpo+kcnZdNdnQHFVjw81v4WXHCelDeCX8yNRVtuEm8kGlHqq7qiASLC0pu0RPqYOhxXg==}
+
+  '@colyseus/playground@0.16.4':
+    resolution: {integrity: sha512-+pgsHgYQL9hMCHanZIJ6D9EHefg6d+BiomOhg4ZgcXEhcYii1VgdQlQs3tUevy4b6SBSUsLgq/0PiiDf/NVzFw==}
+    peerDependencies:
+      '@colyseus/auth': 0.16.x
+      '@colyseus/core': 0.16.x
+      express: '>=4.16.0'
 
   '@colyseus/redis-driver@0.16.1':
     resolution: {integrity: sha512-dFDyyVEBemfdeHrO2fTt86803fV8iMepGi6UHD7feR7vQO9bdN6yXpAyrBWMJrfBs8EFuEEb73gM3mDUjppH/A==}
@@ -2924,6 +2937,12 @@ snapshots:
   '@colyseus/msgpackr@1.11.2':
     optionalDependencies:
       msgpackr-extract: 3.0.3
+
+  '@colyseus/playground@0.16.4(@colyseus/auth@0.16.6(@colyseus/core@0.16.17(@colyseus/schema@3.0.36))(express@5.1.0))(@colyseus/core@0.16.17(@colyseus/schema@3.0.36))(express@5.1.0)':
+    dependencies:
+      '@colyseus/auth': 0.16.6(@colyseus/core@0.16.17(@colyseus/schema@3.0.36))(express@5.1.0)
+      '@colyseus/core': 0.16.17(@colyseus/schema@3.0.36)
+      express: 5.1.0
 
   '@colyseus/redis-driver@0.16.1(@colyseus/schema@3.0.36)':
     dependencies:

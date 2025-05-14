@@ -1,15 +1,11 @@
 // packages/po_server/src/services/NetworkService.ts
 import { Client, Server } from 'colyseus';
 import {
-  ServerErrorMessage,
-  ServerErrorMessageType,
+  IServerErrorMessage,
   ServerError,
-  ValidationError,
-  NotFoundError,
-  ForbiddenError,
-  BusinessRuleError
-} from '@project-override/shared/dist/errors/server'; // Assuming shared types are available
-import { Message, MessageType } from '@project-override/shared/dist/game/Messages';
+  ServerErrorMessageTypeEnum
+} from '@project-override/shared/dist/misc/ServerError'; // Assuming shared types are available
+import { IMessage, IMessageType } from '@project-override/shared/dist/game/Messages';
 
 class NetworkServiceInternal { // Could also just be exported functions
 
@@ -25,14 +21,14 @@ class NetworkServiceInternal { // Could also just be exported functions
     error: Error | ServerError,
     customMessageType?: string
   ): void {
-    let payload: ServerErrorMessage;
+    let payload: IServerErrorMessage;
 
     if (error instanceof ServerError) {
-      payload = error as ServerErrorMessage; // Cast to the shared error type
+      payload = error as IServerErrorMessage; // Cast to the shared error type
     } else {
       // Generic error
       payload = {
-        type: 'InternalServerError',
+        type: ServerErrorMessageTypeEnum.InternalServerError,
         message: error.message || 'An unexpected error occurred.',
         statusCode: 500,
         timestamp: new Date().toISOString(),
@@ -50,14 +46,14 @@ class NetworkServiceInternal { // Could also just be exported functions
    */
   public sendMessage(
     client: Client,
-    message: Message
+    message: IMessage
   ): void {
     client.send(message.type, message);
   }
 
   public sendRaw(
     client: Client,
-    messageType: MessageType,
+    messageType: IMessageType,
     payload: any
   ): void {
     client.send(messageType, payload);
@@ -73,7 +69,7 @@ class NetworkServiceInternal { // Could also just be exported functions
    */
   public broadcastMessage(
     room: { broadcast: (type: string | number, message?: any, options?: any) => void },
-    message: Message,
+    message: IMessage,
     options?: any
   ): void {
     room.broadcast(message.type, message, options);
@@ -81,7 +77,7 @@ class NetworkServiceInternal { // Could also just be exported functions
 
 public broadcastRaw(
     room: { broadcast: (type: string | number, message?: any, options?: any) => void }, // Duck typing for Room
-    messageType: MessageType,
+    messageType: IMessageType,
     payload: any,
     options?: any
   ): void {
@@ -101,11 +97,11 @@ public broadcastRaw(
     options?: any,
     customMessageType?: string,
   ): void {
-    let payload: ServerErrorMessage;
+    let payload: IServerErrorMessage;
     if (error instanceof ServerError) {
       payload = error; // Cast to the shared error type
     } else {
-      payload = { type: 'InternalServerError', message: error.message, statusCode: 500, timestamp: new Date().toISOString() };
+      payload = { type: ServerErrorMessageTypeEnum.InternalServerError, message: error.message, statusCode: 500, timestamp: new Date().toISOString() };
     }
     console.warn(`[NetworkService] Broadcasting error to room:`, payload);
     room.broadcast(customMessageType || payload.type, payload, options);

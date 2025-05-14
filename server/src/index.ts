@@ -2,6 +2,7 @@ import { prisma } from './db/client';
 
 import { Server } from 'colyseus';
 import { WebSocketTransport } from '@colyseus/ws-transport';
+import { playground } from "@colyseus/playground";
 import { createServer } from 'http';
 import express from 'express';
 import cors from 'cors';
@@ -17,6 +18,8 @@ async function bootstrap() {
   const app = express();
   app.use(cors()); // Basic CORS setup
   app.use(express.json());
+
+  app.use("/playground", playground());
 
   // Simple health check / info endpoint
   app.get('/', (req, res) => {

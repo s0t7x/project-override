@@ -17,8 +17,8 @@ import {
   NotFoundError,
   ForbiddenError,
   BusinessRuleError,
-} from '@project-override/shared/dist/errors/server';
-import { EquipmentSlot } from '@project-override/shared/dist/game/EquipmentSlot';
+} from '@project-override/shared/dist/misc/ServerError';
+import { IEquipmentSlot } from '@project-override/shared/dist/game/EquipmentSlot';
 import { ICharacterAppearance } from '@project-override/shared/dist/game/CharacterAppearance';
 
 // Define a more complete Character representation for some service methods
@@ -190,7 +190,7 @@ class CharacterServiceInternal {
   async equipItemFromInventory(
     characterId: string,
     inventoryEntityId: string,
-    targetSlotType: EquipmentSlot,
+    targetSlotType: IEquipmentSlot,
   ): Promise<EquipmentEntity> {
     // This operation needs to be atomic (all or nothing).
     return prisma.$transaction(async (tx) => {

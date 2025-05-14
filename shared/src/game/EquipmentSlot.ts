@@ -1,4 +1,4 @@
-export type EquipmentSlot =
+export type IEquipmentSlot =
   | 'head'
   | 'chest'
   | 'legs'

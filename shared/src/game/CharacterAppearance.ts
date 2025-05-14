@@ -1,4 +1,4 @@
-import { IVector3 } from 'types/math/Vector3';
+import { IVector3 } from 'math/Vector3';
 
 export interface ICharacterAppearance {
   hairIdx: number;
