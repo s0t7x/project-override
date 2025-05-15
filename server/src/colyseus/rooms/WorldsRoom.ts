@@ -9,10 +9,12 @@ import { networkService } from '../../services/NetworkService';
 
 // App Errors
 import { ServerError, ForbiddenError, NotFoundError, ValidationError } from '@project-override/shared/dist/messages/ServerError';
-import { IJwtPayload } from '@project-override/shared/messages/Auth';
+import { IJwtPayload } from '@project-override/shared/dist/messages/Auth';
 import { WorldsRoomState } from '../states/WorldsRoomState';
 import { CharacterSummary, CharacterSummaryFromDbObject } from '../schemas/CharacterSummary';
 import { WorldSummary } from '../schemas/WorldSummary';
+import { ArraySchema } from '@colyseus/schema';
+import { WorldsRoomMessageTypeEnum, WorldsRoomRefreshRequest } from '@project-override/shared/dist/messages/WorldsRoom';
 
 interface IWorldsRoomAuthData extends IJwtPayload {
 	characterSummary: CharacterSummary;
@@ -20,10 +22,17 @@ interface IWorldsRoomAuthData extends IJwtPayload {
 
 export class WorldsRoom extends Room<WorldsRoomState> {
 	maxClients: number = 1; // Only one character session in this lobby at a time
-	state = new WorldsRoomState();
 
 	async onCreate(_options: any) {
 		console.log(`[WorldsRoom ${this.roomId}] Room created.`);
+
+		this.state = new WorldsRoomState();
+		this.state.availableWorlds = new ArraySchema<WorldSummary>();
+
+		this.onMessage(WorldsRoomMessageTypeEnum.WorldsRoomRefresh, (client: Client, _message: WorldsRoomRefreshRequest) => {
+			this.fetchAvailableWorlds(client);
+		});
+
 		// Fallback for unhandled messages
 		this.onMessage('*', (client, type: any, message) => {
 			if (typeof type === 'object' && message === undefined) {
@@ -86,7 +95,18 @@ export class WorldsRoom extends Room<WorldsRoomState> {
 		console.log(`[WorldsRoom ${this.roomId}] Client ${client.sessionId} (Character: ${authData.characterSummary.id}) joined.`);
 
 		this.state.characterSummary = authData.characterSummary;
+		return this.fetchAvailableWorlds(client);
+	}
 
+	onLeave(client: Client, _consented: boolean) {
+		console.log(`[WorldsRoom ${this.roomId}] Client ${client.sessionId} (Character: ${this.state.characterSummary.id}) left.`);
+	}
+
+	onDispose() {
+		console.log(`[WorldsRoom ${this.roomId}] Room ${this.roomId} disposing.`);
+	}
+
+	async fetchAvailableWorlds(client: Client) {
 		// Fetch and populate available worlds
 		try {
 			const worldsFromDb = await worldService.getAllWorlds({}, { isPrivate: false }, { name: 'asc' }, true); // Include counts
@@ -99,16 +119,9 @@ export class WorldsRoom extends Room<WorldsRoomState> {
 			this.state.availableWorlds.clear(); // Clear before pushing new items
 			worldSummaries.forEach((ws) => this.state.availableWorlds.push(ws));
 		} catch (error: any) {
+			console.dir(error);
 			console.error(`[WorldsRoom ${this.roomId}] Failed to fetch worlds for ${client.sessionId}:`, error.message);
 			networkService.sendError(client, new ServerError('Failed to load available worlds. Please try again.'));
 		}
-	}
-
-	onLeave(client: Client, _consented: boolean) {
-		console.log(`[WorldsRoom ${this.roomId}] Client ${client.sessionId} (Character: ${this.state.characterSummary.id}) left.`);
-	}
-
-	onDispose() {
-		console.log(`[WorldsRoom ${this.roomId}] Room ${this.roomId} disposing.`);
 	}
 }
