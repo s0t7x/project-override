@@ -8,7 +8,7 @@ export class Color3 extends Schema implements IColor3 {
 
 	constructor(colorOrR?: number | IColor3, g?: number, b?: number) {
 		super();
-		if (typeof colorOrR == 'number' || !colorOrR) {
+		if (typeof colorOrR === 'number' || !colorOrR) {
 			this.r = (colorOrR as number) || 0;
 			this.g = g || 0;
 			this.b = b || 0;

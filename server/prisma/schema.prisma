@@ -119,6 +119,8 @@ model WorldBlock {
 model World {
   id     String @id @default(uuid())
   name   String @unique
+  ownerCharacterId String?
+  isPrivate Boolean @default(true)
 
   blocks WorldBlock[]
   entitiesInWorld Entity[]

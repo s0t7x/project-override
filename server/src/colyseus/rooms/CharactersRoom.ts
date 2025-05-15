@@ -1,14 +1,13 @@
-import { Room, Client, Server, AuthContext } from 'colyseus';
-import { UnusedState } from '../states/UnusedState';
+import { Room, Client, AuthContext } from 'colyseus';
 import { ServerError, ValidationError } from '@project-override/shared/dist/messages/ServerError';
 import { networkService } from '../../services/NetworkService';
-import { AuthLoginRequest, AuthLoginResponse, AuthMessageTypeEnum, AuthRegisterRequest, AuthRegisterResponse, IJwtPayload } from '@project-override/shared/dist/messages/Auth';
+import { IJwtPayload } from '@project-override/shared/dist/messages/Auth';
 import { authService } from '../../services/AuthService';
 import { userService } from '../../services/UserService';
 import { CharactersRoomState } from '../states/CharactersRoomState';
 import { characterService } from '../../services/CharacterService';
 import { characterRepository } from '../../db/repos/CharacterRepository';
-import { ArraySchema, MapSchema } from '@colyseus/schema';
+import { ArraySchema } from '@colyseus/schema';
 import { CharacterSummary, CharacterSummaryFromDbObject } from '../schemas/CharacterSummary';
 import { CharacterCreateRequest, CharacterCreateResponse, CharacterDeleteRequest, CharacterDeleteResponse, CharacterMessageTypeEnum } from '@project-override/shared/dist/messages/Character';
 import { CharacterAppearance } from '../schemas/CharacterAppearance';
@@ -16,7 +15,7 @@ import { CharacterAppearance } from '../schemas/CharacterAppearance';
 export class CharactersRoom extends Room<CharactersRoomState> {
 	maxClients: number = 1;
 
-	onCreate(options: any) {
+	onCreate(_options: any) {
 		console.log(`[CharactersRoom ${this.roomId}] Room created.`);
 		this.state = new CharactersRoomState();
 
@@ -46,7 +45,7 @@ export class CharactersRoom extends Room<CharactersRoomState> {
 			try {
 				const char = await characterService.deleteCharacter(authData.userId, message.characterId);
 				this.state.characterSummaries.splice(
-					this.state.characterSummaries.findIndex((cm) => cm.id == message.characterId),
+					this.state.characterSummaries.findIndex((cm) => cm.id === message.characterId),
 					1,
 				);
 				networkService.sendMessage(client, new CharacterDeleteResponse());
@@ -58,7 +57,7 @@ export class CharactersRoom extends Room<CharactersRoomState> {
 
 		// Fallback
 		this.onMessage('*', (client, type: any, message) => {
-			if (typeof type == 'object') {
+			if (typeof type === 'object') {
 				message = type;
 				type = undefined;
 			}
@@ -93,7 +92,7 @@ export class CharactersRoom extends Room<CharactersRoomState> {
 		console.log(`[CharactersRoom ${this.roomId}] Client ${client.sessionId} joined.`);
 	}
 
-	onLeave(client: Client, consented?: boolean) {
+	onLeave(client: Client, _consented?: boolean) {
 		console.log(`[CharactersRoom ${this.roomId}] Client ${client.sessionId} left.`);
 	}
 

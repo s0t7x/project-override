@@ -1,4 +1,3 @@
-import { time } from 'console';
 import { ICharacterAppearance } from 'core/CharacterAppearance';
 import { IMessage } from 'messages/Messages';
 

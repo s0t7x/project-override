@@ -1,5 +1,5 @@
 // packages/po_server/src/repositories/EquipmentEntityRepository.ts
-import { Prisma, EquipmentEntity, Entity, Character } from '@prisma/client';
+import { Prisma, EquipmentEntity } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import { prisma } from '../client'; // Corrected import
 

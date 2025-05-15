@@ -1,5 +1,5 @@
 // packages/po_server/src/repositories/InventoryEntityRepository.ts
-import { Prisma, InventoryEntity, Entity, Character } from '@prisma/client';
+import { Prisma, InventoryEntity } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import { prisma } from '../client'; // Corrected import
 import { IPaginationArgs } from '@project-override/shared/dist/misc/PaginationArgs';

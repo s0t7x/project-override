@@ -1,4 +1,4 @@
-import { Room, Client, Server } from 'colyseus';
+import { Room, Client } from 'colyseus';
 import { UnusedState } from '../states/UnusedState';
 import { ServerError, ValidationError } from '@project-override/shared/dist/messages/ServerError';
 import { networkService } from '../../services/NetworkService';
@@ -15,7 +15,7 @@ import { authService } from '../../services/AuthService';
 import { userService } from '../../services/UserService';
 
 export class AuthRoom extends Room<UnusedState> {
-	onCreate(options: any) {
+	onCreate(_options: any) {
 		console.log(`[AuthRoom ${this.roomId}] Room created.`);
 
 		this.onMessage(AuthMessageTypeEnum.AuthLoginRequest, async (client, message: AuthLoginRequest) => {
@@ -71,7 +71,7 @@ export class AuthRoom extends Room<UnusedState> {
 
 		// Fallback
 		this.onMessage('*', (client, type: any, message) => {
-			if (typeof type == 'object') {
+			if (typeof type === 'object') {
 				message = type;
 				type = undefined;
 			}
@@ -80,11 +80,11 @@ export class AuthRoom extends Room<UnusedState> {
 		});
 	}
 
-	onJoin(client: Client, options?: any) {
+	onJoin(client: Client, _options?: any) {
 		console.log(`[AuthRoom ${this.roomId}] Client ${client.sessionId} joined.`);
 	}
 
-	onLeave(client: Client, consented?: boolean) {
+	onLeave(client: Client, _consented?: boolean) {
 		console.log(`[AuthRoom ${this.roomId}] Client ${client.sessionId} left.`);
 	}
 

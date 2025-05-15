@@ -1,5 +1,5 @@
 // packages/po_server/src/services/NetworkService.ts
-import { Client, Server } from 'colyseus';
+import { Client } from 'colyseus';
 import { IServerErrorMessage, ServerError, ServerErrorMessageTypeEnum } from '@project-override/shared/dist/messages/ServerError'; // Assuming shared types are available
 import { IMessage, IMessageType } from '@project-override/shared/dist/messages/Messages';
 

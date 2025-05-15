@@ -47,7 +47,7 @@ async function bootstrap() {
 	gameServer.define('characters', CharactersRoom);
 
 	const originalConsoleLog = console.log;
-	console.log = (...args: any[]) => {};
+	console.log = (..._args: any[]) => {};
 
 	gameServer.listen(config.serverPort, config.serverHost).then(() => {
 		console.log = originalConsoleLog;
@@ -83,7 +83,7 @@ async function gracefulShutdown(signal: string) {
 	console.log(`[GameServer] Shutting down DB Client...`);
 	await prisma.$disconnect();
 
-	process.exit(signal == 'SIGINT' ? 0 : 1);
+	process.exit(signal === 'SIGINT' ? 0 : 1);
 }
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));

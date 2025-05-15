@@ -1,5 +1,5 @@
 // packages/po_server/src/repositories/CharacterRepository.ts
-import { Prisma, Character, User } from '@prisma/client'; // PrismaClient no longer needed here for class
+import { Prisma, Character } from '@prisma/client'; // PrismaClient no longer needed here for class
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import { prisma } from '../client'; // Import the shared prisma instance
 import { IPaginationArgs } from '@project-override/shared/dist/misc/PaginationArgs';
@@ -31,14 +31,14 @@ class CharacterRepositoryInternal {
 
 	async findByName(name: string, includeUser: boolean = false, includeDeleted: boolean = true): Promise<CharacterWithUser | Character | null> {
 		return prisma.character.findUnique({
-			where: { name, isDeleted: includeDeleted ? undefined : false  },
+			where: { name, isDeleted: includeDeleted ? undefined : false },
 			include: includeUser ? characterIncludeUser : undefined,
 		});
 	}
 
 	async findByUserId(userId: string, { skip, take }: IPaginationArgs = {}, includeDeleted: boolean = true): Promise<Character[]> {
 		return prisma.character.findMany({
-			where: { userId, isDeleted: includeDeleted ? undefined : false  },
+			where: { userId, isDeleted: includeDeleted ? undefined : false },
 			skip,
 			take,
 			orderBy: {
@@ -65,8 +65,8 @@ class CharacterRepositoryInternal {
 			where: { id },
 			data: {
 				isDeleted: true,
-				deletedAt: new Date()
-			}
+				deletedAt: new Date(),
+			},
 		});
 	}
 

@@ -2,10 +2,8 @@
 import { Character, User, Entity, InventoryEntity, EquipmentEntity } from '@prisma/client';
 import { userRepository } from '../db/repos/UserRepository';
 import { characterRepository, CharacterCreateData, CharacterUpdateData } from '../db/repos/CharacterRepository';
-import { entityRepository } from '../db/repos/EntityRepository';
 import { inventoryEntityRepository } from '../db/repos/InventoryEntityRepository';
 import { equipmentEntityRepository } from '../db/repos/EquipmentEntityRepository';
-// Import prisma client if we need to use transactions directly in the service
 import { prisma } from '../db/client';
 import { JsonObject } from '@prisma/client/runtime/library';
 import { ServerError, NotFoundError, ForbiddenError, BusinessRuleError } from '@project-override/shared/dist/messages/ServerError';
@@ -122,7 +120,7 @@ class CharacterServiceInternal {
 			throw new ForbiddenError(`User ${userId} is not authorized to delete character ${characterId}.`);
 		}
 
-		if(character.isDeleted) return characterRepository.delete(characterId)
+		if (character.isDeleted) return characterRepository.delete(characterId);
 		return characterRepository.softDelete(characterId);
 	}
 
@@ -176,7 +174,7 @@ class CharacterServiceInternal {
 				where: { unique_equipment_slot: { characterId, slotType: targetSlotType } },
 			});
 
-			let newInventorySlotIndex = inventoryItem.slotIndex; // Default to item's original slot
+			const newInventorySlotIndex = inventoryItem.slotIndex; // Default to item's original slot
 
 			if (currentEquipped) {
 				// Move the currently equipped item to an available inventory slot (or the slot being freed).
@@ -293,7 +291,7 @@ class CharacterServiceInternal {
 	private async cleanupSoftDeletedCharacters() {
 		await prisma.character.deleteMany({
 			where: { isDeleted: true, deletedAt: { lt: new Date(Date.now() - 60 * 60 * 1000) } },
-		})
+		});
 	}
 
 	constructor() {

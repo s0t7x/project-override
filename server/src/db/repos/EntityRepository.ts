@@ -1,5 +1,5 @@
 // packages/po_server/src/repositories/EntityRepository.ts
-import { Prisma, Entity, Character } from '@prisma/client'; // PrismaClient not needed for class
+import { Prisma, Entity } from '@prisma/client'; // PrismaClient not needed for class
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import { prisma } from '../client'; // Corrected import for the shared prisma instance
 import { IPaginationArgs } from '@project-override/shared/dist/misc/PaginationArgs';

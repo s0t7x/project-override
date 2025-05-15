@@ -5,7 +5,7 @@ import { User } from '@prisma/client';
 import { userRepository } from '../db/repos/UserRepository';
 import { userService } from './UserService'; // For user login recording
 import { config } from '../config';
-import { BusinessRuleError, ForbiddenError, NotFoundError, ValidationError } from '@project-override/shared/dist/messages/ServerError';
+import { BusinessRuleError, ForbiddenError, NotFoundError } from '@project-override/shared/dist/messages/ServerError';
 import { IAuthTokens, IJwtPayload } from '@project-override/shared/dist/messages/Auth';
 
 // For storing refresh tokens. In a real app, this MUST be a persistent store (e.g., Redis, DB table).

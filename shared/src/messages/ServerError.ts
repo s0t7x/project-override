@@ -1,4 +1,3 @@
-import { time } from 'console';
 import { IMessage } from 'messages/Messages';
 
 export interface IServerErrorMessage extends IMessage {
