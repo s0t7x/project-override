@@ -11,6 +11,7 @@ import { config } from './config';
 import { constants } from '@project-override/shared';
 import { AuthRoom } from './colyseus/rooms/AuthRoom';
 import { CharactersRoom } from './colyseus/rooms/CharactersRoom';
+import { WorldsRoom } from './colyseus/rooms/WorldsRoom';
 
 let gameServer: Server;
 let httpServer: any;
@@ -45,6 +46,7 @@ async function bootstrap() {
 	// Register rooms
 	gameServer.define('auth', AuthRoom);
 	gameServer.define('characters', CharactersRoom);
+	gameServer.define('worlds', WorldsRoom);
 
 	const originalConsoleLog = console.log;
 	console.log = (..._args: any[]) => {};
