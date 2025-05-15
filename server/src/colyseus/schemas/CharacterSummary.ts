@@ -15,6 +15,8 @@ export class CharacterSummary extends Schema implements ICharacterSummary {
 	@type('number') level: number = 0;
 	@type('number') lastPlayed: number = 0;
 	@type('boolean') isOnline: boolean = false;
+	@type('boolean') isDeleted: boolean = false;
+	@type('number') deletedAt: number = 0;
 	@type(CharacterAppearance) appearance: CharacterAppearance = new CharacterAppearance();
 	@type({ array: EquipmentVisual }) equipmentVisuals: ArraySchema<EquipmentVisual> = new ArraySchema<EquipmentVisual>();
 }
@@ -26,6 +28,8 @@ export async function CharacterSummaryFromDbObject(character: any) {
 	that.name = character.name || that.name;
 	that.level = character.level || that.level;
 	that.lastPlayed = Math.floor(Date.parse(character.lastPlayedAt?.toString()) / 1000) || that.lastPlayed;
+	that.isDeleted = character.isDeleted || that.isDeleted;
+	that.deletedAt = Math.floor(Date.parse(character.deletedAt?.toString()) / 1000) || that.deletedAt;
 	try {
 		const appearance = new CharacterAppearance();
 		appearance.assign({

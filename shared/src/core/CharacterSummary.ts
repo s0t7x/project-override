@@ -10,4 +10,6 @@ export interface ICharacterSummary {
 	equipmentVisuals: IEquipmentVisual[] | any;
 	lastPlayed: number;
 	isOnline: boolean;
+	isDeleted: boolean;
+	deletedAt: number;
 }

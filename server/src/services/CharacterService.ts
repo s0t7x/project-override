@@ -122,14 +122,8 @@ class CharacterServiceInternal {
 			throw new ForbiddenError(`User ${userId} is not authorized to delete character ${characterId}.`);
 		}
 
-		// Prisma's `onDelete: Cascade` on User->Character relation handles character deletion if user is deleted.
-		// Prisma's `onDelete: Cascade` on Character->InventoryEntity/EquipmentEntity handles those.
-		// Entity.ownerCharacterId is SetNull, so entities owned won't be deleted, just unlinked from owner.
-		// This is usually desired: items might drop to the world or become ownerless.
-		// If you want to delete all owned entities, you'd do that explicitly here:
-		// await entityRepository.deleteMany({ ownerCharacterId: characterId });
-
-		return characterRepository.delete(characterId);
+		if(character.isDeleted) return characterRepository.delete(characterId)
+		return characterRepository.softDelete(characterId);
 	}
 
 	/**
@@ -294,6 +288,16 @@ class CharacterServiceInternal {
 		return characterRepository.update(characterId, {
 			appearance: character.appearance as JsonObject,
 		});
+	}
+
+	private async cleanupSoftDeletedCharacters() {
+		await prisma.character.deleteMany({
+			where: { isDeleted: true, deletedAt: { lt: new Date(Date.now() - 60 * 60 * 1000) } },
+		})
+	}
+
+	constructor() {
+		setInterval(() => this.cleanupSoftDeletedCharacters(), 30 * 60_000); // Every 30 min
 	}
 
 	// TODO:

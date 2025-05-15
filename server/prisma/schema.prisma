@@ -43,6 +43,8 @@ model Character {
   statsBase     Json?     // For JSONB
   statsModified Json?     // For JSONB
   metadata      Json?     // For JSONB
+  isDeleted     Boolean   @default(false)
+  deletedAt     DateTime?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

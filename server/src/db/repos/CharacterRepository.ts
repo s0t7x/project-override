@@ -11,42 +11,34 @@ export type CharacterUpdateData = Partial<Omit<Prisma.CharacterUpdateInput, 'id'
 const characterIncludeUser = {
 	user: { select: { id: true, username: true } },
 } satisfies Prisma.CharacterInclude<DefaultArgs>;
-// const characterIncludeFull = { ... } // Define as before
 export type CharacterWithUser = Prisma.CharacterGetPayload<{
 	include: typeof characterIncludeUser;
 }>;
-// export type CharacterFull = ... // Define as before
 
 class CharacterRepositoryInternal {
-	// All methods will now use `prisma` directly (the imported module-level const)
-
 	async create(data: CharacterCreateData): Promise<Character> {
 		return prisma.character.create({
-			// Use imported `prisma`
 			data,
 		});
 	}
 
-	async findById(id: string, includeUser: boolean = false): Promise<CharacterWithUser | Character | null> {
+	async findById(id: string, includeUser: boolean = false, includeDeleted: boolean = true): Promise<CharacterWithUser | Character | null> {
 		return prisma.character.findUnique({
-			// Use imported `prisma`
-			where: { id },
+			where: { id, isDeleted: includeDeleted ? undefined : false },
 			include: includeUser ? characterIncludeUser : undefined,
 		});
 	}
 
-	async findByName(name: string, includeUser: boolean = false): Promise<CharacterWithUser | Character | null> {
+	async findByName(name: string, includeUser: boolean = false, includeDeleted: boolean = true): Promise<CharacterWithUser | Character | null> {
 		return prisma.character.findUnique({
-			// Use imported `prisma`
-			where: { name },
+			where: { name, isDeleted: includeDeleted ? undefined : false  },
 			include: includeUser ? characterIncludeUser : undefined,
 		});
 	}
 
-	async findByUserId(userId: string, { skip, take }: IPaginationArgs = {}): Promise<Character[]> {
+	async findByUserId(userId: string, { skip, take }: IPaginationArgs = {}, includeDeleted: boolean = true): Promise<Character[]> {
 		return prisma.character.findMany({
-			// Use imported `prisma`
-			where: { userId },
+			where: { userId, isDeleted: includeDeleted ? undefined : false  },
 			skip,
 			take,
 			orderBy: {
@@ -57,7 +49,6 @@ class CharacterRepositoryInternal {
 
 	async update(id: string, data: CharacterUpdateData): Promise<Character> {
 		return prisma.character.update({
-			// Use imported `prisma`
 			where: { id },
 			data,
 		});
@@ -65,8 +56,17 @@ class CharacterRepositoryInternal {
 
 	async delete(id: string): Promise<Character> {
 		return prisma.character.delete({
-			// Use imported `prisma`
 			where: { id },
+		});
+	}
+
+	async softDelete(id: string): Promise<Character> {
+		return prisma.character.update({
+			where: { id },
+			data: {
+				isDeleted: true,
+				deletedAt: new Date()
+			}
 		});
 	}
 
@@ -77,7 +77,6 @@ class CharacterRepositoryInternal {
 		includeUser: boolean = false,
 	): Promise<Array<CharacterWithUser | Character>> {
 		return prisma.character.findMany({
-			// Use imported `prisma`
 			skip,
 			take,
 			where: filter,
@@ -88,14 +87,12 @@ class CharacterRepositoryInternal {
 
 	async count(filter?: Prisma.CharacterWhereInput): Promise<number> {
 		return prisma.character.count({
-			// Use imported `prisma`
 			where: filter,
 		});
 	}
 
 	async nameExists(name: string): Promise<boolean> {
 		const count = await prisma.character.count({
-			// Use imported `prisma`
 			where: { name },
 		});
 		return count > 0;
@@ -103,7 +100,6 @@ class CharacterRepositoryInternal {
 
 	async recordPlaytime(id: string): Promise<Character> {
 		return prisma.character.update({
-			// Use imported `prisma`
 			where: { id },
 			data: {
 				lastPlayedAt: new Date(),
@@ -118,7 +114,6 @@ class CharacterRepositoryInternal {
 		}
 		const newExperience = BigInt(currentCharacter.experience || 0) + BigInt(experienceGained);
 		return prisma.character.update({
-			// Use imported `prisma`
 			where: { id },
 			data: {
 				experience: newExperience,
