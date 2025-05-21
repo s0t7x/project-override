@@ -1,11 +1,16 @@
 import { IMessage } from 'messages/Messages';
 
 export const WorldsRoomMessageTypeEnum = {
-	WorldsRoomRefresh: 'WorldsRoom.RefreshRequest',
+	WorldsRoomRefreshRequest: 'WorldsRoom.RefreshRequest',
+	WorldsRoomRefreshResponse:  'WorldsRoom.RefreshResponse',
 } as const;
 
 export type WorldsRoomMessageType = (typeof WorldsRoomMessageTypeEnum)[keyof typeof WorldsRoomMessageTypeEnum];
 
 export class WorldsRoomRefreshRequest implements IMessage {
-	public readonly type: WorldsRoomMessageType = WorldsRoomMessageTypeEnum.WorldsRoomRefresh;
+	public readonly type: WorldsRoomMessageType = WorldsRoomMessageTypeEnum.WorldsRoomRefreshRequest;
+}
+
+export class WorldsRoomRefreshResponse implements IMessage {
+	public readonly type: WorldsRoomMessageType = WorldsRoomMessageTypeEnum.WorldsRoomRefreshResponse;
 }

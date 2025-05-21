@@ -1,11 +1,11 @@
 import { ArraySchema, Schema, type } from '@colyseus/schema';
 import { ICharacterSummary } from '@project-override/shared/dist/game/CharacterSummary';
+import { IEquipmentComponent } from '@project-override/shared/dist/components/EquipmentComponent';
+import { EntityComponentsTypeEnum, IEntityComponents } from '@project-override/shared/dist/components/EntityComponents';
 import { CharacterAppearance } from './CharacterAppearance';
 import { EquipmentVisual } from './EquipmentVisual';
 import { equipmentEntityRepository } from '../../db/repos/EquipmentEntityRepository';
 import { entityRepository } from '../../db/repos/EntityRepository';
-import { EntityComponentsTypeEnum, IEntityComponents } from '@project-override/shared/dist/components/EntityComponents';
-import { IEquipmentComponent } from '@project-override/shared/dist/components/EquipmentComponent';
 import { Color3 } from './Color3';
 
 export class CharacterSummary extends Schema implements ICharacterSummary {

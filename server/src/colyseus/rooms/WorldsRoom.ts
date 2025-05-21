@@ -14,7 +14,7 @@ import { WorldsRoomState } from '../states/WorldsRoomState';
 import { CharacterSummary, CharacterSummaryFromDbObject } from '../schemas/CharacterSummary';
 import { WorldSummary } from '../schemas/WorldSummary';
 import { ArraySchema } from '@colyseus/schema';
-import { WorldsRoomMessageTypeEnum, WorldsRoomRefreshRequest } from '@project-override/shared/dist/messages/WorldsRoom';
+import { WorldsRoomMessageTypeEnum, WorldsRoomRefreshRequest, WorldsRoomRefreshResponse } from '@project-override/shared/dist/messages/WorldsRoom';
 
 interface IWorldsRoomAuthData extends IJwtPayload {
 	characterSummary: CharacterSummary;
@@ -29,8 +29,10 @@ export class WorldsRoom extends Room<WorldsRoomState> {
 		this.state = new WorldsRoomState();
 		this.state.availableWorlds = new ArraySchema<WorldSummary>();
 
-		this.onMessage(WorldsRoomMessageTypeEnum.WorldsRoomRefresh, (client: Client, _message: WorldsRoomRefreshRequest) => {
-			this.fetchAvailableWorlds(client);
+		this.onMessage(WorldsRoomMessageTypeEnum.WorldsRoomRefreshRequest, (client: Client, _message: WorldsRoomRefreshRequest) => {
+			this.fetchAvailableWorlds(client).then(() => 
+				networkService.sendMessage(client, new WorldsRoomRefreshResponse())
+			)
 		});
 
 		// Fallback for unhandled messages
