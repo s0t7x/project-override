@@ -1,8 +1,8 @@
-import { IVector3 } from "math/Vector3";
+import { IVector3 } from 'math/Vector3';
 
 export interface IWorldBlock {
-	position: IVector3
-	type: string
-	rotation: number
-	customData?: any
+	position: IVector3;
+	type: string;
+	rotation: number;
+	customData?: any;
 }

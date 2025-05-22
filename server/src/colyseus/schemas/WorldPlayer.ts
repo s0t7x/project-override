@@ -1,4 +1,4 @@
-import { Schema, type } from '@colyseus/schema';
+import { type } from '@colyseus/schema';
 import { IWorldPlayer } from '@project-override/shared/dist/core/WorldPlayer';
 import { Vector3 } from './Vector3';
 import { CharacterSummary } from './CharacterSummary';

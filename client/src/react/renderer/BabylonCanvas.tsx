@@ -1,29 +1,26 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useServices } from '../../context/Services';
 import { useGameEngine } from '@/context/GameEngine';
 
 const BabylonCanvas: React.FC = () => {
-    const { gameEngine } = useGameEngine();
-    const { servicesInitialized } = useServices();
+	const { gameEngine } = useGameEngine();
+	const { servicesInitialized } = useServices();
 
-    const canvasRef = useRef<HTMLCanvasElement>(null);
+	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const [initialized, setInitialized] = useState<Boolean>(false);
 
-    useEffect(() => {
-        if (servicesInitialized && canvasRef.current) {
-            gameEngine.initialize(canvasRef.current);
-        }
+	useEffect(() => {
+		if (servicesInitialized && canvasRef.current) {
+			gameEngine.initialize(canvasRef.current);
+			setInitialized(true);
+		}
+		return () => {
+			gameEngine.dispose();
+			setInitialized(false);
+		};
+	}, [servicesInitialized, gameEngine]);
 
-        return () => {
-            gameEngine.dispose();
-        };
-    }, [servicesInitialized, gameEngine]); 
-
-    return (
-        <canvas
-            ref={canvasRef}
-            style={{ width: '100%', height: '100%', display: gameEngine.isInitialized() ? 'block' : 'none' }}
-        />
-    );
+	return <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: initialized ? 'block' : 'none' }} />;
 };
 
 export default BabylonCanvas;

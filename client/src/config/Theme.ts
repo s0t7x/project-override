@@ -1,1 +1,1 @@
-export const ThemeSettings = {}
+export const ThemeSettings = {};

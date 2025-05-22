@@ -27,7 +27,7 @@
 		"declaration": true,
 		"declarationMap": true
 	},
-	"include": ["src/**/*"],
+	"include": ["src/**/*", "../boot.js"],
 	"exclude": ["node_modules", "dist"],
 	"references": [
 		{

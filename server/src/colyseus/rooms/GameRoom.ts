@@ -1,5 +1,5 @@
 // packages/po_server/src/rooms/GameRoom.ts
-import { Room, Client, AuthContext, Server } from 'colyseus';
+import { Room, Client, AuthContext } from 'colyseus';
 
 // Services
 import { authService } from '../../services/AuthService';
@@ -24,19 +24,19 @@ interface IGameRoomAuthData extends IJwtPayload {
 
 export class GameRoom extends Room<GameRoomState> {
 	async onCreate(options: any) {
-		if(!options.worldId) throw new ServerError('Missing worldId option')
-		
+		if (!options.worldId) throw new ServerError('Missing worldId option');
+
 		this.state = new GameRoomState();
 
 		this.state.worldSummary = new WorldSummary();
 		const dbWorld = await worldService.getWorldById(options.worldId);
-		if(!dbWorld) throw new ServerError('World not found')
+		if (!dbWorld) throw new ServerError('World not found');
 		this.state.worldSummary.id = dbWorld.id;
 		this.state.worldSummary.name = dbWorld.name;
 
 		this.state.worldBlocks = new ArraySchema<WorldBlock>();
 		const dbBlocks = await worldService.getAllBlocksForWorld(options.worldId);
-		for(const block of dbBlocks) {
+		for (const block of dbBlocks) {
 			const worldBlock = new WorldBlock();
 			worldBlock.position = new Vector3(block.x, block.y, block.z);
 			worldBlock.type = block.blockType;
@@ -122,7 +122,7 @@ export class GameRoom extends Room<GameRoomState> {
 
 	onLeave(client: Client, _consented: boolean) {
 		const playerId = this.state.playerSessions.get(client.sessionId);
-		if(!playerId) return
+		if (!playerId) return;
 
 		this.state.worldPlayers.delete(playerId);
 		this.state.playerSessions.delete(client.sessionId);

@@ -6,81 +6,78 @@ import { AssetService } from '../services/AssetService';
 import { LocalStorageService } from '../services/LocalStorageService';
 
 interface IContext {
-    networkService: NetworkService;
-    bgmService: BgmService;
-    inputService: InputService;
-    assetService: AssetService;
-    localStorageService: LocalStorageService;
+	networkService: NetworkService;
+	bgmService: BgmService;
+	inputService: InputService;
+	assetService: AssetService;
+	localStorageService: LocalStorageService;
 
-    servicesInitialized: boolean; // To indicate when services are ready
+	servicesInitialized: boolean; // To indicate when services are ready
 }
 
 const ServicesContext = createContext<IContext | undefined>(undefined);
 
 export const useServices = (): IContext => {
-    const context = useContext(ServicesContext);
-    if (context === undefined) {
-        throw new Error('useServices must be used within a ServiceProvider');
-    }
-    return context;
+	const context = useContext(ServicesContext);
+	if (context === undefined) {
+		throw new Error('useServices must be used within a ServiceProvider');
+	}
+	return context;
 };
 
 interface ServiceProviderProps {
-    children: React.ReactNode;
+	children: React.ReactNode;
 }
 
 export const ServiceProvider: React.FC<ServiceProviderProps> = ({ children }) => {
-    const networkServiceRef = useRef<NetworkService | null>(null);
-    const bgmServiceRef = useRef<BgmService | null>(null);
-    const inputServiceRef = useRef<InputService | null>(null);  
-    const assetServiceRef = useRef<AssetService | null>(null);
-    const localStorageServiceRef = useRef<LocalStorageService | null>(null);
+	const networkServiceRef = useRef<NetworkService | null>(null);
+	const bgmServiceRef = useRef<BgmService | null>(null);
+	const inputServiceRef = useRef<InputService | null>(null);
+	const assetServiceRef = useRef<AssetService | null>(null);
+	const localStorageServiceRef = useRef<LocalStorageService | null>(null);
 
-    const [servicesInitialized, setServicesInitialized] = useState(false);
+	const [servicesInitialized, setServicesInitialized] = useState(false);
 
-    useEffect(() => {
-        console.log('Initializing services...');
-        const network = new NetworkService();
-        const bgm = new BgmService();
-        const input = new InputService();
-        const asset = new AssetService();
-        const localStorage = new LocalStorageService();
-        
+	useEffect(() => {
+		console.log('Initializing services...');
+		const network = new NetworkService();
+		const bgm = new BgmService();
+		const input = new InputService();
+		const asset = new AssetService();
+		const localStorage = new LocalStorageService();
 
-        networkServiceRef.current = network;
-        bgmServiceRef.current = bgm;
-        inputServiceRef.current = input;
-        assetServiceRef.current = asset;
-        localStorageServiceRef.current = localStorage;
+		networkServiceRef.current = network;
+		bgmServiceRef.current = bgm;
+		inputServiceRef.current = input;
+		assetServiceRef.current = asset;
+		localStorageServiceRef.current = localStorage;
 
-        bgm.initialize();
+		bgm.initialize();
 
-        setServicesInitialized(true);
-        console.log('Services initialized.');
+		setServicesInitialized(true);
+		console.log('Services initialized.');
 
-        return () => {
-            console.log('Disposing services...');
+		return () => {
+			console.log('Disposing services...');
 
-            // Clean Up
-            bgm.stop();
-            // network.disconnect();
-            // sceneDirector.dispose();
-            // uiDirector.dispose();
-        };
-    }, []);
+			// Clean Up
+			bgm.stop();
+			// network.disconnect();
+			// sceneDirector.dispose();
+			// uiDirector.dispose();
+		};
+	}, []);
 
-    const services: IContext | undefined = servicesInitialized ? {
-        networkService: networkServiceRef.current!,
-        bgmService: bgmServiceRef.current!,
-        inputService: new InputService(),
-        assetService: new AssetService(),
-        localStorageService: new LocalStorageService(),
-        servicesInitialized: true,
-    } : undefined;
+	const services: IContext | undefined = servicesInitialized
+		? {
+				networkService: networkServiceRef.current!,
+				bgmService: bgmServiceRef.current!,
+				inputService: new InputService(),
+				assetService: new AssetService(),
+				localStorageService: new LocalStorageService(),
+				servicesInitialized: true,
+			}
+		: undefined;
 
-    return (
-        <ServicesContext.Provider value={services}>
-            {servicesInitialized ? children : <div>Booting services...</div>}
-        </ServicesContext.Provider>
-    );
+	return <ServicesContext.Provider value={services}>{servicesInitialized ? children : <div>Booting services...</div>}</ServicesContext.Provider>;
 };

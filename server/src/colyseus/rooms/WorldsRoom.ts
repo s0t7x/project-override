@@ -30,9 +30,7 @@ export class WorldsRoom extends Room<WorldsRoomState> {
 		this.state.availableWorlds = new ArraySchema<WorldSummary>();
 
 		this.onMessage(WorldsRoomMessageTypeEnum.WorldsRoomRefreshRequest, (client: Client, _message: WorldsRoomRefreshRequest) => {
-			this.fetchAvailableWorlds(client).then(() => 
-				networkService.sendMessage(client, new WorldsRoomRefreshResponse())
-			)
+			this.fetchAvailableWorlds(client).then(() => networkService.sendMessage(client, new WorldsRoomRefreshResponse()));
 		});
 
 		// Fallback for unhandled messages

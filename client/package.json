@@ -3,12 +3,31 @@
 	"version": "1.0.0",
 	"description": "",
 	"type": "module",
+	"main": "boot.cjs",
+	"build": {
+		"appId": "cc.qsecnet.po_client",
+		"executableName": "po_client",
+		"files": [
+			{
+				"from": "build",
+				"to": ".",
+				"filter": ["**/*"]
+			},
+			"package.json",
+			"boot.cjs"
+		],
+		"asar": true
+	},
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc --noEmit && vite build",
 		"preview": "vite preview",
-		"typecheck": "tsc --noEmit"
-	},
+		"typecheck": "tsc --noEmit",
+		"electron": "electron .",
+		"electron-dev": "pnpm build && electron .",
+		"electron-pack": "electron-builder --dir",
+		"electron-dist": "electron-builder"
+  	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
@@ -21,13 +40,18 @@
 		"arwes": "1.0.0-next.25020502",
 		"colyseus.js": "^0.16.16",
 		"react": "^18.2.0",
-		"react-dom": "^18.2.0"
+		"react-dom": "^18.2.0",
+		"zustand": "^5.0.5"
 	},
 	"devDependencies": {
 		"@types/react": "^18.2.0",
 		"@types/react-dom": "^18.2.0",
 		"@vitejs/plugin-react": "^4.4.1",
+		"electron": "^36.3.0",
+		"electron-builder": "^26.0.12",
+		"electron-packager": "^17.1.2",
 		"typescript": "^5.8.3",
-		"vite": "^6.3.5"
+		"vite": "^6.3.5",
+		"vite-plugin-electron": "^0.29.0"
 	}
 }
