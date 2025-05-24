@@ -16,8 +16,9 @@ export class EntryScene extends BaseScene {
 			console.log('Entry scene loaded');
 			(async () => {
 				useServiceStore.getState().networkService?.initialize();
-				console.log('yip', useNetworkStore.getState().networkService?.isInitialized());
-				useGeneralStore.getState().gameEngine?.changeScene('test');
+				if(useNetworkStore.getState().networkService?.isInitialized()) {
+					useGeneralStore.getState().gameEngine?.changeScene('test');
+				}
 			})();
 		});
 	}

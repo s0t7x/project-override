@@ -2,12 +2,13 @@ import { GameEngine } from '@/babylon/GameEngine';
 import { SceneDirector } from '@/game/SceneDirector';
 import { UiDirector } from '@/game/UiDirector';
 import { useGeneralStore } from '@/stores/GeneralStore';
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState, ReactNode } from 'react';
 
 interface IContext {
 	gameEngine: GameEngine;
-	sceneDirector?: SceneDirector;
-	uiDirector?: UiDirector;
+	sceneDirector: SceneDirector;
+	uiDirector: UiDirector;
+	uiUpdateCount: number; // Increments when UI-related state in UiDirector changes
 }
 
 const GameEngineContext = createContext<IContext | undefined>(undefined);
@@ -21,44 +22,48 @@ export const useGameEngine = (): IContext => {
 };
 
 interface GameEngineProviderProps {
-	children: React.ReactNode;
+	children: ReactNode;
 }
 
 export const GameEngineProvider: React.FC<GameEngineProviderProps> = ({ children }) => {
-	const gameEngineRef = useRef<GameEngine | null>(null);
-	const uiDirectorRef = useRef<UiDirector | null>(null);
-	const sceneDirectorRef = useRef<SceneDirector | null>(null);
-
-	const [gameEngineInitialized, setGameEngineInitialized] = useState(false);
+	const gameEngineInstanceRef = useRef<GameEngine | null>(null);
+	const [isInitialized, setIsInitialized] = useState(false);
+	const [uiUpdateCount, setUiUpdateCount] = useState(0);
 
 	useEffect(() => {
-		const gameEngine = new GameEngine();
-		const sceneDirector = gameEngine.sceneDirector;
-		const uiDirector = gameEngine.uiDirector;
+		console.log('GameEngineProvider: Initializing GameEngine...');
+		const engine = new GameEngine();
 
-		gameEngineRef.current = gameEngine;
-		uiDirectorRef.current = uiDirector;
-		sceneDirectorRef.current = sceneDirector;
-
-		setGameEngineInitialized(true);
-		console.log('GameEngineProvider booting');
-
-		useGeneralStore.setState({
-			gameEngine: gameEngineRef.current,
+		// Setup callback for UiDirector state changes
+		engine.uiDirector.setOnStateChange(() => {
+			setUiUpdateCount(c => c + 1);
 		});
 
+		useGeneralStore.setState({ gameEngine: engine });
+		gameEngineInstanceRef.current = engine;
+		setIsInitialized(true);
+
+		console.log('GameEngineProvider: GameEngine initialized and context ready.');
+
 		return () => {
-			console.log('Disposing...');
+			console.log('GameEngineProvider: Disposing GameEngine...');
+			// If GameEngine has a dispose method, call it here
+			// engine.dispose();
+			// Clear the reference in Zustand store if necessary
+			// useGeneralStore.setState({ gameEngine: null });
 		};
 	}, []);
 
-	const gameEngine: IContext | undefined = gameEngineRef.current
-		? {
-				gameEngine: gameEngineRef.current,
-				sceneDirector: sceneDirectorRef.current || undefined,
-				uiDirector: uiDirectorRef.current || undefined,
-			}
-		: undefined;
+	if (!isInitialized || !gameEngineInstanceRef.current) {
+		return <div>Booting gameEngine...</div>;
+	}
 
-	return <GameEngineContext.Provider value={gameEngine}>{gameEngineInitialized ? children : <div>Booting gameEngine...</div>}</GameEngineContext.Provider>;
+	const contextValue: IContext = {
+		gameEngine: gameEngineInstanceRef.current,
+		sceneDirector: gameEngineInstanceRef.current.sceneDirector,
+		uiDirector: gameEngineInstanceRef.current.uiDirector,
+		uiUpdateCount: uiUpdateCount,
+	};
+
+	return <GameEngineContext.Provider value={contextValue}>{children}</GameEngineContext.Provider>;
 };

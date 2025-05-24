@@ -9,5 +9,5 @@ export interface IGeneralStore {
 
 export const useGeneralStore = create<IGeneralStore>((set: (state: Partial<IGeneralStore>) => void) => ({
 	gameEngine: null,
-	client: null
+	client: null,
 }));

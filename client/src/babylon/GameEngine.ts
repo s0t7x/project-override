@@ -12,6 +12,11 @@ export class GameEngine {
 	private _resizeObserver: ResizeObserver | null = null; // Store observer to disconnect
 
 	constructor() {
+		// --- Setup SceneDirector ---
+		this.sceneDirector = new SceneDirector();
+
+		// --- Setup UiDirector ---
+		this.uiDirector = new UiDirector();
 		console.log('[GameEngine] Instance created.');
 	}
 
@@ -49,14 +54,8 @@ export class GameEngine {
 		});
 		this._resizeObserver.observe(this.babylonCanvas);
 
-		// --- Setup SceneDirector ---
-		this.sceneDirector = new SceneDirector();
-
-		// --- Setup UiDirector ---
-		this.uiDirector = new UiDirector();
-
-		this.sceneDirector.initialize(this.engine);
-		this.uiDirector.initialize();
+		this.sceneDirector!.initialize(this.engine);
+		this.uiDirector!.initialize();
 
 		// --- Start Render Loop ---
 		this.engine.runRenderLoop(() => {

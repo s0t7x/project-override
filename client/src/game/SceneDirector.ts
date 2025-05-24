@@ -4,7 +4,7 @@ import { TestScene } from '@/babylon/scenes/TestScene';
 import * as BABYLON from '@babylonjs/core';
 
 export class SceneDirector {
-	private currentScene: BaseScene | null = null;
+	public currentScene: BaseScene | null = null;
 	private nextSceneName: string | null = null;
 	private _isInitialized: boolean = false;
 	private engine: BABYLON.Engine | null = null;
