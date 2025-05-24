@@ -20,7 +20,12 @@ function requireBoot() {
     mainWindow.webContents.openDevTools({ mode: "detach" });
   };
   function createWindow() {
-    require$$3.electronEnableSteamOverlay();
+    try {
+      require("steamworks.js").electronEnableSteamOverlay();
+    } catch (err) {
+      if (process.env.NODE_ENV !== "development") return;
+      console.log("Cannot connect to steam");
+    }
     const mainWindow = new BrowserWindow({
       width: 1200,
       height: 800,

@@ -1,3 +1,3 @@
 export const NetworkSettings = {
-    endpoint: ""
+    endpoint: "ws://localhost:2567"
 }

@@ -12,20 +12,37 @@ export class NetworkService {
     private messageListeners: Map<string, Map<string | number, Set<Function>>> = new Map();
 
     constructor() {
-
+        useNetworkStore.setState({ networkService: this})
     }
-
 
     public initialize() {
         if (this._isInitialized) {
             return;
         }
-
+        
         this.client = new Client(NetworkSettings.endpoint);
-
-        useNetworkStore.setState({ networkService: this})
+        if(!this.client) {
+            return
+        }
         this._isInitialized = true;
     }
+
+    public isInitialized(): boolean {
+        return this._isInitialized && (this.client !== null);
+    }
+
+    public getClient(): Client | null {
+        return this.client;
+    }
+
+    public getPrimaryRoom(): Room | null {
+        return this.primaryRoom;
+    }
+
+    public getSecondaryRooms(): Map<string, Room> | null {
+        return this.secondaryRooms;
+    }
+
 
     public addMessageListener<T = any>(room: Room | null, type: string | number, handler: (data: T) => void): void {
         const r = room ? room : this.primaryRoom;

@@ -4,6 +4,7 @@ import { BgmService } from '../services/BgmService';
 import { InputService } from '../services/InputService';
 import { AssetService } from '../services/AssetService';
 import { LocalStorageService } from '../services/LocalStorageService';
+import { useServiceStore } from '@/stores/ServiceStore';
 
 interface IContext {
 	networkService: NetworkService;
@@ -52,10 +53,16 @@ export const ServiceProvider: React.FC<ServiceProviderProps> = ({ children }) =>
 		assetServiceRef.current = asset;
 		localStorageServiceRef.current = localStorage;
 
-		bgm.initialize();
-
 		setServicesInitialized(true);
 		console.log('Services initialized.');
+
+		useServiceStore.setState({
+			networkService: network,
+			bgmService: bgm,
+			inputService: input,
+			assetService: asset,
+			localStorageService: localStorage,
+		});
 
 		return () => {
 			console.log('Disposing services...');
@@ -72,9 +79,9 @@ export const ServiceProvider: React.FC<ServiceProviderProps> = ({ children }) =>
 		? {
 				networkService: networkServiceRef.current!,
 				bgmService: bgmServiceRef.current!,
-				inputService: new InputService(),
-				assetService: new AssetService(),
-				localStorageService: new LocalStorageService(),
+				inputService: inputServiceRef.current!,
+				assetService: assetServiceRef.current!,
+				localStorageService: localStorageServiceRef.current!,
 				servicesInitialized: true,
 			}
 		: undefined;
