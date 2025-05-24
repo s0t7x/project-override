@@ -1,6 +1,8 @@
 import * as BABYLON from '@babylonjs/core';
 import { BaseScene } from './BaseScene';
 import { useGeneralStore } from '@/stores/GeneralStore';
+import { useNetworkStore } from '@/stores/NetworkStore';
+import { useServices } from '@/context/Services';
 
 export class EntryScene extends BaseScene {
 	constructor(engine: BABYLON.Engine) {
@@ -11,9 +13,11 @@ export class EntryScene extends BaseScene {
 
 		this.onReadyObservable.addOnce(() => {
 			console.log('Entry scene loaded');
-			setTimeout(() => {
+			(async () => {
+				useServices().networkService.initialize();
+				useNetworkStore.
 				useGeneralStore.getState().gameEngine?.changeScene('test');
-			}, 1000);
+			})();
 		});
 	}
 }

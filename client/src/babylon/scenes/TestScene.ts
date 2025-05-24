@@ -19,7 +19,7 @@ export class TestScene extends BaseScene {
 
 		// Material
 		const mat = new BABYLON.StandardMaterial('mat', this);
-		mat.diffuseColor = new BABYLON.Color3(1, 0, 0); // Red
+		mat.diffuseColor = new BABYLON.Color3(0, 0, 1);
 		sphere.material = mat;
 
 		this.clearColor = new BABYLON.Color4(0.5, 0.5, 0.5, 1); // Light gray background

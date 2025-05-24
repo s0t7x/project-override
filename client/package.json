@@ -6,28 +6,33 @@
 	"main": "boot.cjs",
 	"build": {
 		"appId": "cc.qsecnet.po_client",
+		"productName": "po_client",
 		"executableName": "po_client",
 		"files": [
 			{
 				"from": "build",
 				"to": ".",
-				"filter": ["**/*"]
+				"filter": [
+					"**/*"
+				]
 			},
 			"package.json",
 			"boot.cjs"
 		],
-		"asar": true
+		"asar": false,
+		"extraResource": [
+			"../node_modules/.pnpm/steamworks.js@0.4.0/node_modules/steamworks.js/dist/linux64/libsteam_api.so"
+		]
 	},
 	"scripts": {
-		"dev": "vite",
+		"dev": "NODE_ENV=development vite",
 		"build": "tsc --noEmit && vite build",
 		"preview": "vite preview",
 		"typecheck": "tsc --noEmit",
 		"electron": "electron .",
-		"electron-dev": "pnpm build && electron .",
 		"electron-pack": "electron-builder --dir",
 		"electron-dist": "electron-builder"
-  	},
+	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
@@ -41,17 +46,20 @@
 		"colyseus.js": "^0.16.16",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
+		"steamworks.js": "^0.4.0",
 		"zustand": "^5.0.5"
 	},
 	"devDependencies": {
 		"@types/react": "^18.2.0",
 		"@types/react-dom": "^18.2.0",
 		"@vitejs/plugin-react": "^4.4.1",
+		"concurrently": "^9.1.2",
 		"electron": "^36.3.0",
 		"electron-builder": "^26.0.12",
 		"electron-packager": "^17.1.2",
 		"typescript": "^5.8.3",
 		"vite": "^6.3.5",
-		"vite-plugin-electron": "^0.29.0"
+		"vite-plugin-electron": "^0.29.0",
+		"vite-plugin-native": "^2.2.2"
 	}
 }
