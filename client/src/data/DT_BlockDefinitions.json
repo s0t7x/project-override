@@ -4,8 +4,11 @@
         "isSolid": true,
         "textures": {
             "side": "/assets/textures/dev_64x64-green.png",
-            "top": "https://placehold.co/64.png",
             "bottom": "https://placehold.co/64.png"
+        },
+        "autoTileTop": {
+            "atlasTexturePath": "/assets/textures/dev_npatch.png",
+            "atlasDimensions": { "tilesWide": 3, "tilesHigh": 3 }
         }
     },
     {
