@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useGameEngine } from '@/context/GameEngine';
 import { BaseScreen } from '../screens/BaseScreen';
 import { Alert, AlertProps } from '../common/Alert';
-import ToastComponent, { ToastProps as ExternalToastProps, ToastCorner } from '../common/Toast'; // Renamed to avoid conflict with local variables
+import ToastComponent, { ToastProps as ExternalToastProps, ToastCorner } from '../common/Toast';
 
 // Placeholder component until actual scenes are created
 const PlaceholderUI: React.FC<{ screenName: string }> = ({ screenName }) => (
@@ -24,11 +24,10 @@ const UiOverlay: React.FC = () => {
 			// Update active screen
 			const activeScreenInstance = uiDirector.getActiveScreen();
 			if (activeScreenInstance) {
-				// Here you would typically map the BaseScreen instance to a specific React component.
-				// For now, we'll use the PlaceholderUI with the screen's class name.
-				setCurrentScreenNode(<PlaceholderUI screenName={activeScreenInstance.constructor.name} />);
+				setCurrentScreenNode(activeScreenInstance);
 			} else {
-				setCurrentScreenNode(<PlaceholderUI screenName="" />);
+				// setCurrentScreenNode(<PlaceholderUI screenName="" />);
+				setCurrentScreenNode(null);
 			}
 
 			// Update alerts
@@ -44,11 +43,12 @@ const UiOverlay: React.FC = () => {
 	const renderToastsForCorner = (corner: ToastCorner) => {
 		return currentToasts
 			.filter(toast => (toast.corner || 'top-right') === corner)
-			.map(toast => (
+			.map((toast, index: number) => (
 				<ToastComponent
 					key={toast.id}
 					{...toast}
 					onDismiss={() => uiDirector.removeToast(toast.id)}
+					noBackground={index > 0}
 				/>
 			));
 	};
@@ -57,6 +57,7 @@ const UiOverlay: React.FC = () => {
 		position: 'fixed',
 		zIndex: 1000, // Ensure toasts are above most other UI elements
 		display: 'flex',
+		columnGap: '10px',
 		flexDirection: 'column',
 		pointerEvents: 'none', // Container itself should not catch events
 	};
@@ -78,11 +79,7 @@ const UiOverlay: React.FC = () => {
 					key={alert.title} // Assuming title is unique for active alerts
 					title={alert.title}
 					message={alert.message}
-					callback={() => {
-						alert.callback();
-						// Optionally, close the alert after the callback if it's a dismissive action
-						// uiDirector?.closeAlert(alert.title);
-					}}
+					callback={alert.callback}
 				/>
 			))}
 
@@ -95,7 +92,8 @@ const UiOverlay: React.FC = () => {
 
 			{/* Debugging output: */}
 			<div style={{ position: 'fixed', bottom: '10px', left: '10px', background: 'rgba(200,200,200,0.8)', color: 'black', padding: '5px', pointerEvents: 'auto', zIndex: 200, fontSize: '12px' }}>
-				UI Update Count: {uiUpdateCount} | Alerts: {JSON.stringify(currentAlerts.map(a => a.title))} | Toasts: {currentToasts.length}
+				Active Screen: { currentScreenNode ?? (currentScreenNode as any)?.constructor?.name ?? 'None' }
+				<br/>Update Count: {uiUpdateCount} | Alive Screen: {uiDirector?.currentScreens?.length} | Alerts: {currentAlerts.length} | Toasts: {currentToasts.length}
 			</div>
 		</div>
 	);

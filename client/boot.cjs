@@ -4,6 +4,8 @@ const url = require('url');
 
 let windowCreated = false;
 
+let steamworks = undefined;
+
 const openDevTools = (mainWindow) => {
   const devtools = new BrowserWindow()
   mainWindow.webContents.setDevToolsWebContents(devtools.webContents)
@@ -16,6 +18,7 @@ function createWindow() {
   } catch (err) {
     if(process.env.NODE_ENV !== 'development') return;
     console.log("Cannot connect to steam")
+    steamworks = undefined;
   }
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -57,13 +60,6 @@ function createWindow() {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   if(windowCreated) return;
-  const steamworks = require('steamworks.js')
-
-  // You can pass an appId, or don't pass anything and use a steam_appid.txt file
-  const client = steamworks.init(480)
-
-  // Print Steam username
-  console.log(client.localplayer.getName())
 
   if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();

@@ -12,6 +12,7 @@ interface IContext {
 	inputService: InputService;
 	assetService: AssetService;
 	localStorageService: LocalStorageService;
+	steamworks: any
 
 	servicesInitialized: boolean; // To indicate when services are ready
 }
@@ -53,6 +54,8 @@ export const ServiceProvider: React.FC<ServiceProviderProps> = ({ children }) =>
 		assetServiceRef.current = asset;
 		localStorageServiceRef.current = localStorage;
 
+		bgm.initialize();
+
 		setServicesInitialized(true);
 		console.log('Services initialized.');
 
@@ -62,6 +65,7 @@ export const ServiceProvider: React.FC<ServiceProviderProps> = ({ children }) =>
 			inputService: input,
 			assetService: asset,
 			localStorageService: localStorage,
+			steamworks: (window as any).steamworks || null
 		});
 
 		return () => {
@@ -83,6 +87,7 @@ export const ServiceProvider: React.FC<ServiceProviderProps> = ({ children }) =>
 				assetService: assetServiceRef.current!,
 				localStorageService: localStorageServiceRef.current!,
 				servicesInitialized: true,
+				steamworks: (window as any).steamworks || null
 			}
 		: undefined;
 

@@ -27,6 +27,12 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      try {
+        window.steamworks = require('steamworks.js')
+        window.steamworks.client = steamworks.init(480)
+      } catch(err) {}
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

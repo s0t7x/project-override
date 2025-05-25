@@ -40,8 +40,8 @@ export class UiDirector {
 		console.log('[UI] Initializing...');
 	}
 
-	public showAlert(title: string, message: string, callback: () => void) {
-		this.currentAlerts.set(title, {title, message, callback});
+	public showAlert(title: string, message: string, callback: (() => void) | Map<string, () => void>, children?: any) {
+		this.currentAlerts.set(title, {title, message, callback, children});
 		this.notifyStateChange();
 	}
 
@@ -62,9 +62,9 @@ export class UiDirector {
 
 	// --- Toast Management ---
 
-	public showToast(message: string, duration: number = 5000, corner: ToastCorner = 'top-right'): string {
+	public showToast(message: string, duration: number = 5000, corner: ToastCorner = 'top-right', children?: any): string {
 		const id = `toast-${this.toastIdCounter++}`;
-		const toastProps: ToastProps = { id, message, duration, corner };
+		const toastProps: ToastProps = { id, message, duration, corner, children };
 		this.currentToasts.set(id, toastProps);
 		this.notifyStateChange();
 		return id;

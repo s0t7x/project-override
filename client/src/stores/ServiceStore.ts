@@ -11,6 +11,7 @@ export interface IServiceStore {
     inputService: InputService | null;
     assetService: AssetService | null;
     localStorageService: LocalStorageService | null;
+    steamworks: any | null;
 }
 
 export const useServiceStore = create<IServiceStore>((set: (state: Partial<IServiceStore>) => void) => ({
@@ -19,4 +20,5 @@ export const useServiceStore = create<IServiceStore>((set: (state: Partial<IServ
     inputService: null,
     assetService: null,
     localStorageService: null,
+    steamworks: null
 }));

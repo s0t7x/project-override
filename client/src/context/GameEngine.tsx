@@ -35,7 +35,7 @@ export const GameEngineProvider: React.FC<GameEngineProviderProps> = ({ children
 		const engine = new GameEngine();
 
 		// Setup callback for UiDirector state changes
-		engine.uiDirector.setOnStateChange(() => {
+		engine.uiDirector!.setOnStateChange(() => {
 			setUiUpdateCount(c => c + 1);
 		});
 
@@ -60,8 +60,8 @@ export const GameEngineProvider: React.FC<GameEngineProviderProps> = ({ children
 
 	const contextValue: IContext = {
 		gameEngine: gameEngineInstanceRef.current,
-		sceneDirector: gameEngineInstanceRef.current.sceneDirector,
-		uiDirector: gameEngineInstanceRef.current.uiDirector,
+		sceneDirector: gameEngineInstanceRef.current.sceneDirector!,
+		uiDirector: gameEngineInstanceRef.current.uiDirector!,
 		uiUpdateCount: uiUpdateCount,
 	};
 

@@ -1,5 +1,6 @@
 import { BaseScene } from '@/babylon/scenes/BaseScene';
 import { EntryScene } from '@/babylon/scenes/EntryScene';
+import { FirstTimeSetupScene } from '@/babylon/scenes/FirstTimeSetupScene';
 import { TestScene } from '@/babylon/scenes/TestScene';
 import * as BABYLON from '@babylonjs/core';
 
@@ -66,6 +67,9 @@ export class SceneDirector {
 			switch (next) {
 				case 'test':
 					this.currentScene = new TestScene(this.engine);
+					break;
+				case 'firstTimeSetup':
+					this.currentScene = new FirstTimeSetupScene(this.engine);
 					break;
 				default:
 					console.log('[GameEngine] Invalid Scene Name: ' + next + '.');

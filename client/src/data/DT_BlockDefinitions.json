@@ -1,0 +1,27 @@
+[
+    {
+        "id": "dev_ground_grass",
+        "isSolid": true,
+        "textures": {
+            "side": "/assets/textures/dev_64x64-green.png",
+            "top": "https://placehold.co/64.png",
+            "bottom": "https://placehold.co/64.png"
+        }
+    },
+    {
+        "id": "dev_stone_wall",
+        "isSolid": true,
+        "textures": {
+            "side": "/assets/textures/dev_64x64-orange.png",
+            "top": "https://placehold.co/64.png"
+        }
+    },
+    {
+        "id": "dev_water",
+        "isSolid": false,
+        "textures": {
+            "side": "/assets/textures/dev_64x64-blue.png",
+            "top": "https://placehold.co/64.png"
+        }
+    }
+]

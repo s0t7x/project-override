@@ -40,6 +40,7 @@
 	"dependencies": {
 		"@arwes/react": "1.0.0-next.25020502",
 		"@babylonjs/core": "^8.7.0",
+		"@babylonjs/gui": "^8.9.0",
 		"@babylonjs/loaders": "^8.7.0",
 		"@project-override/shared": "workspace:^",
 		"arwes": "1.0.0-next.25020502",

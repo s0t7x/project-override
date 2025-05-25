@@ -11,19 +11,20 @@ interface WindowProps {
     width?: number | string;
     height?: number | string;
     className?: string;
+    style?: React.CSSProperties;
     children?: React.ReactNode;
 }
 
 type BleepsNames = 'hover' | 'click' | 'assemble' | 'type'
 
-export const Window: React.FC<WindowProps> = ({ children, title = 'Unknown', x = '50%', y = '50%', width = 300, height = 'auto', className = '' }) => {
+export const Window: React.FC<WindowProps> = ({ children, title = 'Unknown', x = '50%', y = '50%', width = 300, height = 'auto', className = '', style = {}}) => {
     return (
         <Animator>
-            <div style={{ position: 'absolute', left: x, top: y, transform: 'translate(-50%, -50%)', width: width, height: height, padding: 10, pointerEvents: 'all', userSelect:'auto'}} className={className} >
+            <div style={{ position: 'absolute', left: x, top: y, transform: 'translate(-50%, -50%)', width: width, height: height, padding: 10, pointerEvents: 'all', color: 'white',userSelect:'auto'}} className={className} >
                 <FrameNefrex
                     style={{
                         // @ts-expect-error css variables
-                        '--arwes-frames-bg-color': 'hsla(180, 75%, 10%, 0.4)',
+                        '--arwes-frames-bg-color': 'hsla(180, 75%, 10%, 0.7)',
                         '--arwes-frames-line-color': 'var(--main-color)',
                         '--arwes-frames-deco-color': 'var(--main-color)',
                         zIndex: -1,
@@ -55,7 +56,7 @@ export const Window: React.FC<WindowProps> = ({ children, title = 'Unknown', x =
                         </marquee>
                     </div>
                 </div>
-                <div style={{ zIndex: 20, marginTop: -45, padding: 5, height: 'calc(100% - (45px/2))', width: '100%' }}>
+                <div style={{ zIndex: 20, marginTop: -45, padding: 5, height: 'calc(100% - (45px/2))', width: '100%', ...style }}>
                     {children}
                 </div>
             </div>

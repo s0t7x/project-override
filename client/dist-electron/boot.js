@@ -1,7 +1,6 @@
 import require$$0 from "electron";
 import require$$1 from "path";
 import require$$2 from "url";
-import require$$3 from "steamworks.js";
 function getDefaultExportFromCjs(x) {
   return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
 }
@@ -55,9 +54,6 @@ function requireBoot() {
   }
   app.whenReady().then(() => {
     if (windowCreated) return;
-    const steamworks = require$$3;
-    const client = steamworks.init(480);
-    console.log(client.localplayer.getName());
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
     }

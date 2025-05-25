@@ -1,0 +1,65 @@
+[
+    {
+        "position": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "dev_ground_grass",
+        "rotation": 0
+    },
+    {
+        "position": {
+            "x": 1,
+            "y": 0,
+            "z": 0
+        },
+        "type": "dev_ground_grass",
+        "rotation": 0
+    },
+    {
+        "position": {
+            "x": 1,
+            "y": 0,
+            "z": 1
+        },
+        "type": "dev_ground_grass",
+        "rotation": 0
+    },
+    {
+        "position": {
+            "x": 0,
+            "y": 0,
+            "z": 1
+        },
+        "type": "dev_ground_grass",
+        "rotation": 0
+    },
+    {
+        "position": {
+            "x": 2,
+            "y": 1,
+            "z": 2
+        },
+        "type": "dev_stone_wall",
+        "rotation": 0
+    },
+    {
+        "position": {
+            "x": 2,
+            "y": 1,
+            "z": 1
+        },
+        "type": "dev_stone_wall",
+        "rotation": 0
+    },
+    {
+        "position": {
+            "x": -2,
+            "y": -22,
+            "z": 1
+        },
+        "type": "dev_water",
+        "rotation": 0
+    }
+]
