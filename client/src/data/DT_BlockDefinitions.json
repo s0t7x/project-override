@@ -8,7 +8,7 @@
         },
         "autoTileTop": {
             "atlasTexturePath": "/assets/textures/dev_npatch.png",
-            "atlasDimensions": { "tilesWide": 3, "tilesHigh": 3 }
+            "atlasDimensions": { "tilesWide": 3, "tilesHigh": 5 }
         }
     },
     {

@@ -18,7 +18,8 @@ export class TestScene extends BaseScene {
 		new BABYLON.HemisphericLight('light', new BABYLON.Vector3(1, 2, 0), this);
 
 		// Camera
-		const camera = new BABYLON.ArcRotateCamera('cam', Math.PI / 2, Math.PI / 4, 5, BABYLON.Vector3.Zero(), this);
+		const camera = new BABYLON.FreeCamera('cam', new BABYLON.Vector3(5, 5, 5), this);
+		camera.fov = 0.5;
 		camera.attachControl(true);
 		this.activeCamera = camera;
 

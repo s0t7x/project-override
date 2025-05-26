@@ -1,3 +1,5 @@
+import AudioSettings from "@/config/Audio";
+
 interface BgmTrack {
 	name: string; // Unique identifier for the track
 	filePath: string; // Path to the audio file (e.g., "/assets/music/menu_theme.ogg")
@@ -8,7 +10,7 @@ interface BgmTrack {
 export class BgmService {
 	private currentAudio: HTMLAudioElement | null = null;
 	private currentTrackName: string | null = null;
-	private targetVolume: number = 0.3;
+	private targetVolume: number = AudioSettings.bgm.volume;
 	private isInitialized: boolean = false;
 	private audioContextUnlocked: boolean = false;
 	private unlockHandlerRef: (() => void) | null = null;

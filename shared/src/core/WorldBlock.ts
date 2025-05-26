@@ -5,4 +5,5 @@ export interface IWorldBlock {
 	type: string;
 	rotation: number;
 	customData?: any;
+	explode?: IVector3;
 }

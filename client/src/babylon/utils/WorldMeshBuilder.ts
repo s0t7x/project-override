@@ -24,6 +24,8 @@ function getChunkKey(chunkX: number, chunkY: number, chunkZ: number): string {
 // (0,0)TL  (1,0)T   (2,0)TR
 // (0,1)L   (1,1)C   (2,1)R
 // (0,2)BL  (1,2)B   (2,2)BR
+// 0,3IBR 1,3IBL
+// 0,4ITR 1,4ITL
 const AUTOTILE_NESW_TO_COORDS = new Map<number, { col: number, row: number }>([
     [0, { col: 1, row: 1 }], // Isolated                                                
     [1, { col: 1, row: 0 }], // N                                                           
@@ -40,7 +42,7 @@ const AUTOTILE_NESW_TO_COORDS = new Map<number, { col: number, row: number }>([
     [12, { col: 2, row: 2 }], // SW                                                             
     [13, { col: 2, row: 1 }], // NSW                                                                
     [14, { col: 1, row: 2 }], // ESW                                                                
-    [15, { col: 1, row: 1 }], // NESW                                                               
+    [15, { col: 1, row: 1 }], // NESW                                                           
 ]);
 
 export class WorldMeshBuilder {
@@ -107,20 +109,20 @@ export class WorldMeshBuilder {
             } else {
                 if (blockDef.textures.top) {
                     texturePath = blockDef.textures.top;
-                    console.log(`[WorldMeshBuilder] DEBUG: Block '${blockIdForLog}', Face 'top': Using specific top texture '${texturePath}'`);
+                    // console.log(`[WorldMeshBuilder] DEBUG: Block '${blockIdForLog}', Face 'top': Using specific top texture '${texturePath}'`);
                 } else {
                     texturePath = blockDef.textures.side;
-                    console.log(`[WorldMeshBuilder] DEBUG: Block '${blockIdForLog}', Face 'top': Specific top texture missing, falling back to side texture '${texturePath}'`);
+                    // console.log(`[WorldMeshBuilder] DEBUG: Block '${blockIdForLog}', Face 'top': Specific top texture missing, falling back to side texture '${texturePath}'`);
                 }
                 materialKeySuffix = `top_${texturePath}`;
             }
         } else if (faceType === 'bottom') {
             if (blockDef.textures.bottom) {
                 texturePath = blockDef.textures.bottom;
-                console.log(`[WorldMeshBuilder] DEBUG: Block '${blockIdForLog}', Face 'bottom': Using specific bottom texture '${texturePath}'`);
+                // console.log(`[WorldMeshBuilder] DEBUG: Block '${blockIdForLog}', Face 'bottom': Using specific bottom texture '${texturePath}'`);
             } else {
                 texturePath = blockDef.textures.side;
-                console.log(`[WorldMeshBuilder] DEBUG: Block '${blockIdForLog}', Face 'bottom': Specific bottom texture missing, falling back to side texture '${texturePath}'`);
+                // console.log(`[WorldMeshBuilder] DEBUG: Block '${blockIdForLog}', Face 'bottom': Specific bottom texture missing, falling back to side texture '${texturePath}'`);
             }
             materialKeySuffix = `bottom_${texturePath}`;
         } else { // side
@@ -172,7 +174,7 @@ export class WorldMeshBuilder {
         const key = getVoxelKey(x, y, z);
         this.voxelData.set(key, blockInfo);
         this.markChunkDirty(x, y, z);
-        this.markNeighborChunksDirtyOnBoundary(x,y,z);
+        this.markNeighborChunksDirtyOnBoundary(x, y, z);
     }
 
     public removeBlock(x: number, y: number, z: number): void {
@@ -180,7 +182,7 @@ export class WorldMeshBuilder {
         if (this.voxelData.has(key)) {
             this.voxelData.delete(key);
             this.markChunkDirty(x, y, z);
-            this.markNeighborChunksDirtyOnBoundary(x,y,z);
+            this.markNeighborChunksDirtyOnBoundary(x, y, z);
         }
     }
 
@@ -190,15 +192,41 @@ export class WorldMeshBuilder {
         const allDirtyChunks = new Set<string>();
 
         worldBlocks.forEach(block => {
+            if(block.explode) {
+                const offX = block.explode.x / 2;
+                const offY = block.explode.y / 2;
+                const offZ = block.explode.z / 2;
+                for(let i = 0; i <= block.explode.x; i++) {
+                    for(let j = 0; j <= block.explode.y; j++) {
+                        for(let k = 0; k <= block.explode.z; k++) {
+                            const { x, y, z } = block.position;
+                            const nx = Math.trunc(x + i - offX);
+                            const ny = Math.trunc(y + j - offY);
+                            const nz = Math.trunc(z + k - offZ);
+                            const key = getVoxelKey(nx,ny,nz);
+                            const ib: IWorldBlock = {
+                                position: { x: nx,y:ny,z:nz},
+                                type: block.type,
+                                explode: undefined,
+                                rotation: block.rotation || 0
+                            }
+                            this.voxelData.set(key, ib);
+
+                            const { cx, cy, cz } = this.getChunkCoordinates(nx,ny,nz);
+                            allDirtyChunks.add(getChunkKey(cx, cy, cz));
+                        }
+                    }
+                }
+                return;
+            }
             const { x, y, z } = block.position;
             const key = getVoxelKey(x, y, z);
             this.voxelData.set(key, block);
 
             const { cx, cy, cz } = this.getChunkCoordinates(x, y, z);
-            allDirtyChunks.add(getChunkKey(cx,cy,cz));
+            allDirtyChunks.add(getChunkKey(cx, cy, cz));
         });
         this.dirtyChunks = allDirtyChunks; // Set all chunks containing initial blocks as dirty
-        console.log(`Marked ${this.dirtyChunks.size} chunks for initial build.`);
         this.update(); // Build all marked chunks
     }
 
@@ -256,180 +284,212 @@ export class WorldMeshBuilder {
         this.dirtyChunks.clear();
     }
 
-    private getAutotilePatternInfo(worldX: number, worldY: number, worldZ: number, blockDef: BlockDefinition): { uv: BABYLON.Vector4, patternKey: string } | null {
+    private getAutotilePatternInfo(
+        worldX: number,
+        worldY: number,
+        worldZ: number,
+        blockDef: BlockDefinition
+    ): { uv: BABYLON.Vector4, patternKey: string } | null {
         if (!blockDef.autoTileTop) return null;
 
         const selfType = blockDef.id;
-        let neighborMask = 0;
+        let mask = 0;
 
-        // Check North (+Z)
-        if (this.getVoxel(worldX, worldY, worldZ + 1)?.type === selfType) neighborMask |= 1;
-        // Check East (+X)
-        if (this.getVoxel(worldX + 1, worldY, worldZ)?.type === selfType) neighborMask |= 2;
-        // Check South (-Z)
-        if (this.getVoxel(worldX, worldY, worldZ - 1)?.type === selfType) neighborMask |= 4;
-        // Check West (-X)
-        if (this.getVoxel(worldX - 1, worldY, worldZ)?.type === selfType) neighborMask |= 8;
+        const isSame = (x: number, y: number, z: number) => this.getVoxel(x, y, z)?.type === selfType;
 
-        const tileCoords = AUTOTILE_NESW_TO_COORDS.get(neighborMask);
-        if (!tileCoords) {
-            console.warn(`[WorldMeshBuilder] Autotile: No coordinate mapping for mask ${neighborMask} for block ${selfType}. Defaulting to center.`);
-            return this.getAutotilePatternInfo(worldX, worldY, worldZ, { ...blockDef, id: "fallback_center_pattern" }); // Recursive call with a mask that maps to center
+        // NESW bitmask
+        if (isSame(worldX, worldY, worldZ + 1)) mask |= 1; // N
+        if (isSame(worldX + 1, worldY, worldZ)) mask |= 2; // E
+        if (isSame(worldX, worldY, worldZ - 1)) mask |= 4; // S
+        if (isSame(worldX - 1, worldY, worldZ)) mask |= 8; // W
+
+        // Diagonal override logic
+        const north = (mask & 1) !== 0;
+        const east = (mask & 2) !== 0;
+        const south = (mask & 4) !== 0;
+        const west = (mask & 8) !== 0;
+
+        const northeast = isSame(worldX + 1, worldY, worldZ + 1);
+        const southeast = isSame(worldX + 1, worldY, worldZ - 1);
+        const southwest = isSame(worldX - 1, worldY, worldZ - 1);
+        const northwest = isSame(worldX - 1, worldY, worldZ + 1);
+
+        const { atlasDimensions } = blockDef.autoTileTop;
+
+        // Check for inner corner cases
+        let tileCoords: { col: number, row: number } | undefined;
+
+        let cornerKey: string = ''
+        if (north && east && !northeast) {
+            cornerKey = 'northeast'
+            tileCoords = { col: 0, row: 3 }; // ITR
+        } else if (north && west && !northwest) {
+            cornerKey = 'northwest'
+            tileCoords = { col: 1, row: 3 }; // ITL
+        } else if (south && east && !southeast) {
+            cornerKey = 'southeast'
+            tileCoords = { col: 0, row: 4 }; // IBR
+        } else if (south && west && !southwest) {
+            cornerKey = 'southwest'
+            tileCoords = { col: 1, row: 4 }; // IBL
+        } else {
+            tileCoords = AUTOTILE_NESW_TO_COORDS.get(mask);
         }
 
-const { atlasDimensions } = blockDef.autoTileTop;
-const u0 = tileCoords.col / atlasDimensions.tilesWide;
-const v0 = tileCoords.row / atlasDimensions.tilesHigh;
-const u1 = (tileCoords.col + 1) / atlasDimensions.tilesWide;
-const v1 = (tileCoords.row + 1) / atlasDimensions.tilesHigh;
+        if (!tileCoords) {
+            console.warn(`[WorldMeshBuilder] Autotile: No coordinate mapping for mask ${mask} for block ${selfType}. Defaulting to center.`);
+            return this.getAutotilePatternInfo(worldX, worldY, worldZ, { ...blockDef, id: "fallback_center_pattern" });
+        }
 
-const uv = new BABYLON.Vector4(u0, v0, u1, v1);
-return { uv, patternKey: neighborMask.toString() };
+        const u0 = tileCoords.col / atlasDimensions.tilesWide;
+        const v0 = tileCoords.row / atlasDimensions.tilesHigh;
+        const u1 = (tileCoords.col + 1) / atlasDimensions.tilesWide;
+        const v1 = (tileCoords.row + 1) / atlasDimensions.tilesHigh;
 
+        const uv = new BABYLON.Vector4(u0, v0, u1, v1);
+        return { uv, patternKey: mask.toString() + cornerKey };
     }
 
-public rebuildChunk(chunkX: number, chunkY: number, chunkZ: number) {
-    const chunkKey = getChunkKey(chunkX, chunkY, chunkZ);
 
-    // Dispose previous chunk contents if they exist
-    const oldChunkNode = this.chunks.get(chunkKey);
-    if (oldChunkNode) {
-        // Dispose all instanced meshes that are children of this node
-        oldChunkNode.getChildMeshes(false, node => node instanceof BABYLON.InstancedMesh).forEach(instance => instance.dispose());
-        oldChunkNode.dispose(); // Dispose the transform node itself
-    }
+    public rebuildChunk(chunkX: number, chunkY: number, chunkZ: number) {
+        const chunkKey = getChunkKey(chunkX, chunkY, chunkZ);
 
-    const chunkNodeName = `chunk_${chunkX}_${chunkY}_${chunkZ}`;
-    const chunkRoot = new BABYLON.TransformNode(chunkNodeName, this.scene);
-    this.chunks.set(chunkKey, chunkRoot); // Store the new chunk node
+        // Dispose previous chunk contents if they exist
+        const oldChunkNode = this.chunks.get(chunkKey);
+        if (oldChunkNode) {
+            // Dispose all instanced meshes that are children of this node
+            oldChunkNode.getChildMeshes(false, node => node instanceof BABYLON.InstancedMesh).forEach(instance => instance.dispose());
+            oldChunkNode.dispose(); // Dispose the transform node itself
+        }
 
-    const BLOCK_SIZE = 1;
+        const chunkNodeName = `chunk_${chunkX}_${chunkY}_${chunkZ}`;
+        const chunkRoot = new BABYLON.TransformNode(chunkNodeName, this.scene);
+        chunkRoot.setPivotPoint(new BABYLON.Vector3(this.CHUNK_SIZE / 2, this.CHUNK_SIZE / 2, this.CHUNK_SIZE / 2));
+        this.chunks.set(chunkKey, chunkRoot); // Store the new chunk node
 
-    for (let x = 0; x < this.CHUNK_SIZE; x++) {
-        for (let y = 0; y < this.CHUNK_SIZE; y++) {
-            for (let z = 0; z < this.CHUNK_SIZE; z++) {
-                const worldX = chunkX * this.CHUNK_SIZE + x;
-                const worldY = chunkY * this.CHUNK_SIZE + y;
-                const worldZ = chunkZ * this.CHUNK_SIZE + z;
+        const BLOCK_SIZE = 2;
 
-                const block = this.getVoxel(worldX, worldY, worldZ);
-                if (!block) continue;
+        for (let x = 0; x < this.CHUNK_SIZE; x++) {
+            for (let y = 0; y < this.CHUNK_SIZE; y++) {
+                for (let z = 0; z < this.CHUNK_SIZE; z++) {
+                    const worldX = chunkX * this.CHUNK_SIZE + x;
+                    const worldY = chunkY * this.CHUNK_SIZE + y;
+                    const worldZ = chunkZ * this.CHUNK_SIZE + z;
 
-                const blockDef = this.getBlockDefinition(block.type);
-                if (!blockDef) {
-                    console.warn(`Block definition not found for type: ${block.type} at ${worldX},${worldY},${worldZ}`);
-                    continue;
-                }
+                    const block = this.getVoxel(worldX, worldY, worldZ);
+                    if (!block) continue;
 
-                // Culling: Skip block if all its faces are occluded by solid neighbors
-                if (
-                    this.isVoxelSolid(worldX + 1, worldY, worldZ) &&
-                    this.isVoxelSolid(worldX - 1, worldY, worldZ) &&
-                    this.isVoxelSolid(worldX, worldY + 1, worldZ) &&
-                    this.isVoxelSolid(worldX, worldY - 1, worldZ) &&
-                    this.isVoxelSolid(worldX, worldY, worldZ + 1) &&
-                    this.isVoxelSolid(worldX, worldY, worldZ - 1)
-                ) {
-                    continue;
-                }
-
-                let baseMeshKey = block.type;
-                let autotileUVs: BABYLON.Vector4 | undefined = undefined;
-
-                if (blockDef.autoTileTop) {
-                    const patternInfo = this.getAutotilePatternInfo(worldX, worldY, worldZ, blockDef);
-                    if (patternInfo) baseMeshKey += `_auto_${patternInfo.patternKey}`;
-                    autotileUVs = patternInfo?.uv;
-                }
-                let baseMesh = this.baseMeshCache.get(baseMeshKey);
-
-                if (!baseMesh) {
-                    const matSide = this.getMaterial(blockDef, 'side');
-                    const matTop = this.getMaterial(blockDef, 'top'); // Handles autoTile and fallbacks
-                    const matBottom = this.getMaterial(blockDef, 'bottom'); // Handles fallbacks
-
-                    // --- BEGIN DIAGNOSTIC LOG ---
-                    if (blockDef.id === 'dev_ground_grass' || blockDef.id === 'dev_stone_wall' || blockDef.id === 'dev_water') { // Log for relevant blocks
-                        console.log(`[WorldMeshBuilder] PRE-MULTIMAT CHECK for Block '${blockDef.id}':`);
-                        console.log(`  matSide (${matSide.name}): Texture URL: ${matSide.diffuseTexture?.url || 'N/A'}`);
-                        console.log(`  matTop (${matTop.name}): Texture URL: ${matTop.diffuseTexture?.url || 'N/A'}`);
-                        console.log(`  matBottom (${matBottom.name}): Texture URL: ${matBottom.diffuseTexture?.url || 'N/A'}`);
-                    }
-                    // --- END DIAGNOSTIC LOG ---
-
-                    let needsMultiMaterial = false;
-                    if (matTop !== matSide || matBottom !== matSide) {
-                        needsMultiMaterial = true;
+                    const blockDef = this.getBlockDefinition(block.type);
+                    if (!blockDef) {
+                        console.warn(`Block definition not found for type: ${block.type} at ${worldX},${worldY},${worldZ}`);
+                        continue;
                     }
 
-                    // Define standard UV coordinates for each face (0,0 to 1,1)
-                    // Face order: Back (-Z), Front (+Z), Right (+X), Left (-X), Top (+Y), Bottom (-Y)
-                    const faceUVs = new Array<BABYLON.Vector4>(6);
-                    for (let i = 0; i < 6; i++) {
-                        faceUVs[i] = new BABYLON.Vector4(0, 0, 1, 1); // Default full UV for most faces
+                    // Culling: Skip block if all its faces are occluded by solid neighbors
+                    if (
+                        this.isVoxelSolid(worldX + 1, worldY, worldZ) &&
+                        this.isVoxelSolid(worldX - 1, worldY, worldZ) &&
+                        this.isVoxelSolid(worldX, worldY + 1, worldZ) &&
+                        this.isVoxelSolid(worldX, worldY - 1, worldZ) &&
+                        this.isVoxelSolid(worldX, worldY, worldZ + 1) &&
+                        this.isVoxelSolid(worldX, worldY, worldZ - 1)
+                    ) {
+                        continue;
                     }
 
-                    if (autotileUVs) {
-                        faceUVs[4] = autotileUVs; // Index 4 is Top face (+Y)
+                    let baseMeshKey = block.type;
+                    let autotileUVs: BABYLON.Vector4 | undefined = undefined;
+
+                    if (blockDef.autoTileTop) {
+                        const patternInfo = this.getAutotilePatternInfo(worldX, worldY, worldZ, blockDef);
+                        if (patternInfo) baseMeshKey += `_auto_${patternInfo.patternKey}`;
+                        autotileUVs = patternInfo?.uv;
+                    }
+                    let baseMesh = this.baseMeshCache.get(baseMeshKey);
+
+                    if (!baseMesh) {
+                        const matSide = this.getMaterial(blockDef, 'side');
+                        const matTop = this.getMaterial(blockDef, 'top'); // Handles autoTile and fallbacks
+                        const matBottom = this.getMaterial(blockDef, 'bottom'); // Handles fallbacks
+
+                        let needsMultiMaterial = false;
+                        if (matTop !== matSide || matBottom !== matSide) {
+                            needsMultiMaterial = true;
+                        }
+
+                        // Define standard UV coordinates for each face (0,0 to 1,1)
+                        // Face order: Back (-Z), Front (+Z), Right (+X), Left (-X), Top (+Y), Bottom (-Y)
+                        const faceUVs = new Array<BABYLON.Vector4>(6);
+                        for (let i = 0; i < 6; i++) {
+                            faceUVs[i] = new BABYLON.Vector4(0, 0, 1, 1); // Default full UV for most faces
+                        }
+
+                        if (autotileUVs) {
+                            faceUVs[4] = autotileUVs; // Index 4 is Top face (+Y)
+                        }
+
+                        const baseMeshName = "baseMesh_" + block.type; // Unique name for the mesh in the scene
+                        baseMesh = BABYLON.MeshBuilder.CreateBox(baseMeshName, {
+                            size: BLOCK_SIZE,
+                            wrap: true,
+                            faceUV: faceUVs, // Explicitly define UVs for each face
+                            updatable: false
+                        }, this.scene);
+
+                        if (needsMultiMaterial) {
+                            const multiMaterial = new BABYLON.MultiMaterial(baseMeshName + "_multiMat", this.scene);
+                            // Standard face order for CreateBox: back, front, right, left, top, bottom
+                            // Indices: 0 (-Z), 1 (+Z), 2 (+X), 3 (-X), 4 (+Y), 5 (-Y)
+                            multiMaterial.subMaterials = [
+                                matSide,   // Face 0: -Z (Back)
+                                matSide,   // Face 1: +Z (Front)
+                                matSide,   // Face 2: +X (Right)
+                                matSide,   // Face 3: -X (Left)
+                                matTop,    // Face 4: +Y (Top)
+                                matBottom  // Face 5: -Y (Bottom)
+                            ];
+                            baseMesh.material = multiMaterial;
+                            baseMesh.subMeshes = []
+                            baseMesh.subMeshes.push(new BABYLON.SubMesh(0, 0, 24, 0, 6, baseMesh));
+                            baseMesh.subMeshes.push(new BABYLON.SubMesh(1, 1, 24, 6, 6, baseMesh));
+                            baseMesh.subMeshes.push(new BABYLON.SubMesh(2, 2, 24, 12, 6, baseMesh));
+                            baseMesh.subMeshes.push(new BABYLON.SubMesh(3, 3, 24, 18, 6, baseMesh));
+                            baseMesh.subMeshes.push(new BABYLON.SubMesh(4, 4, 24, 24, 6, baseMesh)); // Top face
+                            baseMesh.subMeshes.push(new BABYLON.SubMesh(5, 5, 24, 30, 6, baseMesh)); // Bottom face - CORRECTED materialIndex
+
+                        } else {
+                            baseMesh.material = matSide; // All faces use the side material
+                        }
+
+                        baseMesh.setEnabled(false); // Disable rendering and interaction for the source mesh
+                        baseMesh.doNotSyncBoundingInfo = true; // Optimization
+                        baseMesh.isPickable = false;
+                        baseMesh.freezeWorldMatrix(); // Source mesh's world matrix is static
+
+                        this.baseMeshCache.set(baseMeshKey, baseMesh);
                     }
 
-                    const baseMeshName = "baseMesh_" + block.type; // Unique name for the mesh in the scene
-                    baseMesh = BABYLON.MeshBuilder.CreateBox(baseMeshName, {
-                        size: BLOCK_SIZE,
-                        wrap: true,
-                        faceUV: faceUVs // Explicitly define UVs for each face
-                    }, this.scene);
+                    if (baseMesh) {
+                        const instanceName = `cubeInstance_${worldX}_${worldY}_${worldZ}`;
+                        const instance = baseMesh.createInstance(instanceName);
 
-                    if (needsMultiMaterial) {
-                        const multiMaterial = new BABYLON.MultiMaterial(baseMeshName + "_multiMat", this.scene);
-                        // Standard face order for CreateBox: back, front, right, left, top, bottom
-                        // Indices: 0 (-Z), 1 (+Z), 2 (+X), 3 (-X), 4 (+Y), 5 (-Y)
-                        multiMaterial.subMaterials = [
-                            matSide,   // Face 0: -Z (Back)
-                            matSide,   // Face 1: +Z (Front)
-                            matSide,   // Face 2: +X (Right)
-                            matSide,   // Face 3: -X (Left)
-                            matTop,    // Face 4: +Y (Top)
-                            matBottom  // Face 5: -Y (Bottom)
-                        ];
-                        baseMesh.material = multiMaterial;
-                        baseMesh.subMeshes=[]
-                        baseMesh.subMeshes.push(new BABYLON.SubMesh(0, 0, 24, 0, 6, baseMesh));
-                        baseMesh.subMeshes.push(new BABYLON.SubMesh(1, 1, 24, 6, 6, baseMesh));
-                        baseMesh.subMeshes.push(new BABYLON.SubMesh(2, 2, 24, 12, 6, baseMesh));
-                        baseMesh.subMeshes.push(new BABYLON.SubMesh(3, 3, 24, 18, 6, baseMesh));
-                        baseMesh.subMeshes.push(new BABYLON.SubMesh(4, 4, 24, 24, 6, baseMesh)); // Top face
-                        baseMesh.subMeshes.push(new BABYLON.SubMesh(5, 5, 24, 30, 6, baseMesh)); // Bottom face - CORRECTED materialIndex
+                        // Position instance so its center is at (worldX, worldY, worldZ) * BLOCK_SIZE.
+                        // This means the center of the box is at that coordinate. This is usually fine.
+                        instance.position.set(worldX * BLOCK_SIZE, worldY * BLOCK_SIZE, worldZ * BLOCK_SIZE);
+                        instance.showBoundingBox = false;
+                        // instance.doNotSyncBoundingInfo = true;
+                        instance.parent = chunkRoot;
+                        instance.isPickable = true; // Set pickable based on your needs
+                        // instance.freezeWorldMatrix(); // Optional: if instances are static relative to the chunk root
+                        instance.cullingStrategy = BABYLON.AbstractMesh.CULLINGSTRATEGY_OPTIMISTIC_INCLUSION;
 
-                    } else {
-                        baseMesh.material = matSide; // All faces use the side material
                     }
-
-                    baseMesh.setEnabled(false); // Disable rendering and interaction for the source mesh
-                    baseMesh.doNotSyncBoundingInfo = true; // Optimization
-                    baseMesh.isPickable = false;
-                    baseMesh.freezeWorldMatrix(); // Source mesh's world matrix is static
-
-                    this.baseMeshCache.set(baseMeshKey, baseMesh);
-                }
-
-                if (baseMesh) {
-                    const instanceName = `cubeInstance_${worldX}_${worldY}_${worldZ}`;
-                    const instance = baseMesh.createInstance(instanceName);
-                    
-                    // Position instance so its center is at (worldX, worldY, worldZ) * BLOCK_SIZE.
-                     // This means the center of the box is at that coordinate. This is usually fine.
-                    instance.position.set(worldX * BLOCK_SIZE, worldY * BLOCK_SIZE, worldZ * BLOCK_SIZE);
-
-                    instance.parent = chunkRoot;
-                    instance.isPickable = true; // Set pickable based on your needs
-                    // instance.freezeWorldMatrix(); // Optional: if instances are static relative to the chunk root
                 }
             }
         }
+        chunkRoot.computeWorldMatrix(true);
+        // chunkRoot.freezeWorldMatrix();
     }
-    // chunkRoot.freezeWorldMatrix(); // Freeze after all children are added and positioned if chunk itself is static
-}
 
     public dispose(): void {
         this.chunks.forEach(node => { // Assuming node is TransformNode
