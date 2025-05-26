@@ -9,6 +9,8 @@ import { BlockDefinition } from '../utils/BlockDefinition';
 
 import DEV_TESTMAP from '@/data/dev_TestMap.json'
 import blockDefinitionsData from '@/data/DT_BlockDefinitions.json'
+import { ICharacterSummary } from '@project-override/shared/core/CharacterSummary';
+import { SpriteSheetCharacter } from '../utils/SpriteSheetCharacter';
 
 export class TestScene extends BaseScene {
 	constructor(engine: BABYLON.Engine) {
@@ -32,6 +34,32 @@ export class TestScene extends BaseScene {
 		const exampleInitialWorld: IWorldBlock[] = DEV_TESTMAP;
 
 		worldBuilder.loadInitialWorld(exampleInitialWorld);
+
+		const testCharSummary: ICharacterSummary = {
+			id: '',
+			userId: '',
+			name: 'testChar',
+			level: 1,
+			lastPlayed: 0,
+			isOnline: false,
+			isDeleted: false,
+			deletedAt: 0,
+			appearance: {
+				bodyIdx: 4711,
+				eyesIdx: 0,
+				beardIdx: 0,
+				hairIdx: 0,
+				hairFrontIdx: 0,
+				hairBackIdx: 0,
+			},
+			equipmentVisuals: []
+		}
+
+		// spriteSheetChar uses assetService so we need to set scene here
+		useServiceStore.getState().assetService?.setScene(this)
+
+		const testCharObject = new SpriteSheetCharacter('testChar', this, new BABYLON.Vector3(10, 1.5, 10))
+		testCharObject.setCharacter(testCharSummary);
 
 		this.onReadyObservable.addOnce(() => {
 			const uiDirector = useGeneralStore.getState().gameEngine?.uiDirector;

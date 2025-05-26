@@ -367,7 +367,7 @@ export class WorldMeshBuilder {
         chunkRoot.setPivotPoint(new BABYLON.Vector3(this.CHUNK_SIZE / 2, this.CHUNK_SIZE / 2, this.CHUNK_SIZE / 2));
         this.chunks.set(chunkKey, chunkRoot); // Store the new chunk node
 
-        const BLOCK_SIZE = 2;
+        const BLOCK_SIZE = 1;
 
         for (let x = 0; x < this.CHUNK_SIZE; x++) {
             for (let y = 0; y < this.CHUNK_SIZE; y++) {
