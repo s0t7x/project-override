@@ -1,6 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 import { BlockDefinition } from './BlockDefinition';
 import { IWorldBlock } from '@project-override/shared/core/WorldBlock';
+import { TileMapTexture } from './TileMapTexture';
 
 export interface AutoTileConfig {
     atlasTexturePath: string;
@@ -443,6 +444,7 @@ export class WorldMeshBuilder {
                             autotileUVs = patternInfo.uv;
                         }
                     }
+                    
                     let baseMesh = this.baseMeshCache.get(baseMeshKey);
 
                     if (!baseMesh) {
@@ -453,7 +455,44 @@ export class WorldMeshBuilder {
 
                         const faceUVs = new Array<BABYLON.Vector4>(6);
                         for (let i = 0; i < 6; i++) faceUVs[i] = new BABYLON.Vector4(0, 0, 1, 1);
+
                         if (autotileUVs) faceUVs[4] = autotileUVs;
+                        else if(blockDef.textures.top  && typeof blockDef.textures.top !== 'string') {
+                            const tmt = blockDef.textures.top as TileMapTexture;
+                            const texture = this.textureCache.get(tmt.texturePath);
+                            if (texture) {
+                                const tw = 1/(texture.getSize().width/tmt.frameWidth);
+                                const th = 1/(texture.getSize().height/tmt.frameHeight);
+                                const ix = tmt.frameX / tmt.frameWidth;
+                                const iy = tmt.frameY / tmt.frameHeight;
+                                faceUVs[4] = new BABYLON.Vector4(ix*tw, iy*th, ix*tw+tw, iy*th+th);
+                            }
+                        }
+                        
+                        if(blockDef.textures.side  && typeof blockDef.textures.side !== 'string') {
+                            const tmt = blockDef.textures.side as TileMapTexture;
+                            const texture = this.textureCache.get(tmt.texturePath);
+                            if (texture) {
+                                const tw = 1/(texture.getSize().width/tmt.frameWidth);
+                                const th = 1/(texture.getSize().height/tmt.frameHeight);
+                                const ix = tmt.frameX / tmt.frameWidth;
+                                const iy = tmt.frameY / tmt.frameHeight;
+                                for(let i = 0; i < 4; i++)
+                                    faceUVs[i] = new BABYLON.Vector4(ix*tw, iy*th, ix*tw+tw, iy*th+th);
+                            }
+                        }
+
+                        if(blockDef.textures.bottom  && typeof blockDef.textures.bottom !== 'string') {
+                            const tmt = blockDef.textures.bottom as TileMapTexture;
+                            const texture = this.textureCache.get(tmt.texturePath);
+                            if (texture) {
+                                const tw = 1/(texture.getSize().width/tmt.frameWidth);
+                                const th = 1/(texture.getSize().height/tmt.frameHeight);
+                                const ix = tmt.frameX / tmt.frameWidth;
+                                const iy = tmt.frameY / tmt.frameHeight;
+                                faceUVs[5] = new BABYLON.Vector4(ix*tw, iy*th, ix*tw+tw, iy*th+th);
+                            }
+                        }
 
                         const baseMeshName = "baseMesh_" + baseMeshKey.replace(/[^a-zA-Z0-9_.-]/g, '_'); // Sanitize name
                         baseMesh = BABYLON.MeshBuilder.CreateBox(baseMeshName, {

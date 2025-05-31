@@ -62,10 +62,22 @@ export class GameEngine {
 		this.sceneDirector!.initialize(this.engine);
 		this.uiDirector!.initialize();
 
+		const resPath = (process as any).resourcesPath;
+		if(resPath) {
+			console.log('Res path', resPath)
+			if((resPath as string).includes('node_modules')){
+				const p = process as any;
+				Object.defineProperty(p, 'resourcesPath', {
+					value: undefined,
+					configurable: true,
+					writable: true,
+				});
+			}
+		}
 		// @ts-except-error
-		this.physics = await HavokPhysics({
-			locateFile: (_path) => (process as any).resourcesPath ? (process as any).resourcesPath + `/app/HavokPhysics.wasm` : '/HavokPhysics.wasm',
-		});
+		// this.physics = await HavokPhysics({
+		// 	locateFile: (_path) => (process as any).resourcesPath ? (process as any).resourcesPath + `/app/HavokPhysics.wasm` : `/HavokPhysics.wasm`,
+		// });
 	
 		// --- Start Render Loop ---
 		this.engine!.runRenderLoop(() => {

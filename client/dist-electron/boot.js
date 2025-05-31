@@ -1,57 +1,74 @@
-import f from "electron";
-import p from "path";
-import w from "url";
-function h(e) {
-  return e && e.__esModule && Object.prototype.hasOwnProperty.call(e, "default") ? e.default : e;
+import require$$0 from "electron";
+import require$$1 from "path";
+import require$$2 from "url";
+function getDefaultExportFromCjs(x) {
+  return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
 }
-var l = {}, i;
-function m() {
-  if (i) return l;
-  i = 1;
-  const { app: e, BrowserWindow: o, Menu: b } = f, c = p, u = w;
-  let r = !1;
-  const d = async (t) => {
-    const n = new o();
-    t.webContents.setDevToolsWebContents(n.webContents), t.webContents.openDevTools({ mode: "detach" });
-    const a = await e.getGPUInfo("basic");
-    console.log(e.getGPUFeatureStatus(), a);
+var boot$1 = {};
+var hasRequiredBoot;
+function requireBoot() {
+  if (hasRequiredBoot) return boot$1;
+  hasRequiredBoot = 1;
+  const { app, BrowserWindow, Menu } = require$$0;
+  const path = require$$1;
+  const url = require$$2;
+  let windowCreated = false;
+  const openDevTools = async (mainWindow) => {
+    const devtools = new BrowserWindow();
+    mainWindow.webContents.setDevToolsWebContents(devtools.webContents);
+    mainWindow.webContents.openDevTools({ mode: "detach" });
+    const gpuInfo = await app.getGPUInfo("basic");
+    console.log(app.getGPUFeatureStatus(), gpuInfo);
   };
-  function s() {
+  function createWindow() {
     try {
       require("steamworks.js").electronEnableSteamOverlay();
-    } catch {
+    } catch (err) {
       if (process.env.NODE_ENV !== "development") return;
       console.log("Cannot connect to steam");
     }
-    const t = new o({
+    const mainWindow = new BrowserWindow({
       width: 1200,
       height: 800,
       webPreferences: {
-        nodeIntegration: !0,
+        nodeIntegration: true,
         // Keep false for security
-        contextIsolation: !1,
+        contextIsolation: false,
         // Keep true for security
-        webSecurity: !1
+        webSecurity: false
         // Keep true for security
       }
-    }), n = process.env.NODE_ENV === "development" ? "http://localhost:3000" : u.format({
-      pathname: c.join(__dirname, "index.html"),
+    });
+    const startUrl = process.env.NODE_ENV === "development" ? "http://localhost:3000" : url.format({
+      pathname: path.join(__dirname, "index.html"),
       // Adjust if your build output is different
       protocol: "file:",
-      slashes: !0
+      slashes: true
     });
-    t.loadURL(n), d(t), r = !0;
+    mainWindow.loadURL(startUrl);
+    openDevTools(mainWindow);
+    windowCreated = true;
   }
-  return e.whenReady().then(() => {
-    r || (o.getAllWindows().length === 0 && s(), e.on("activate", () => {
-      o.getAllWindows().length === 0 && s();
-    }));
-  }), e.on("window-all-closed", () => {
-    process.platform !== "darwin" && e.quit();
-  }), l;
+  app.whenReady().then(() => {
+    if (windowCreated) return;
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+    app.on("activate", () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
+      }
+    });
+  });
+  app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") {
+      app.quit();
+    }
+  });
+  return boot$1;
 }
-var v = m();
-const C = /* @__PURE__ */ h(v);
+var bootExports = requireBoot();
+const boot = /* @__PURE__ */ getDefaultExportFromCjs(bootExports);
 export {
-  C as default
+  boot as default
 };
