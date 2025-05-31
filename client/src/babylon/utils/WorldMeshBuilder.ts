@@ -28,7 +28,7 @@ const AUTOTILE_NESW_TO_COORDS = new Map<number, { col: number, row: number }>([
 export class WorldMeshBuilder {
     private scene: BABYLON.Scene;
     private blockDefinitions: Map<string, BlockDefinition>;
-    private voxelData: Map<string, IWorldBlock>;
+    public voxelData: Map<string, IWorldBlock>;
 
     public readonly CHUNK_SIZE = 16;
     public readonly BLOCK_SIZE = 1; // Added for clarity and consistent use
@@ -41,7 +41,7 @@ export class WorldMeshBuilder {
     private baseMeshCache: Map<string, BABYLON.Mesh>;
 
     // --- Physics Related Members ---
-    private chunkCollisionMeshes: Map<string, BABYLON.Mesh>;
+    public chunkCollisionMeshes: Map<string, BABYLON.Mesh>;
     private chunkCollisionUpdateQueue: Set<string>;
     private isUpdatingChunkCollisions: boolean;
 
@@ -67,9 +67,15 @@ export class WorldMeshBuilder {
     private preloadTextures() {
         const texturePaths = new Set<string>();
         this.blockDefinitions.forEach(def => {
-            if (def.textures.side) texturePaths.add(def.textures.side);
-            if (def.textures.top) texturePaths.add(def.textures.top);
-            if (def.textures.bottom) texturePaths.add(def.textures.bottom);
+            if (def.textures.side)
+                if(typeof def.textures.side === 'string') texturePaths.add(def.textures.side);
+                else texturePaths.add(def.textures.side.texturePath);
+            if(def.textures.top)
+                if(typeof def.textures.top === 'string') texturePaths.add(def.textures.top);
+                else texturePaths.add(def.textures.top.texturePath);
+            if (def.textures.bottom)
+                if(typeof def.textures.bottom === 'string') texturePaths.add(def.textures.bottom);
+                else texturePaths.add(def.textures.bottom.texturePath);
             if (def.autoTileTop?.atlasTexturePath) texturePaths.add(def.autoTileTop.atlasTexturePath);
         });
 
@@ -90,20 +96,38 @@ export class WorldMeshBuilder {
         let materialKeySuffix: string;
         const blockIdForLog = blockDef.id || 'UNKNOWN_BLOCK_ID';
 
+        let isTilemapTexture = false;
+
         if (faceType === 'top') {
             if (blockDef.autoTileTop) {
                 texturePath = blockDef.autoTileTop.atlasTexturePath;
                 materialKeySuffix = `autotile_top_atlas_${texturePath}`;
             } else {
-                texturePath = blockDef.textures.top || blockDef.textures.side;
-                materialKeySuffix = `top_${texturePath || 'fallback_side'}`;
+                if(blockDef.textures.top) {
+                    if(typeof blockDef.textures.top === 'string') texturePath = blockDef.textures.top;
+                    else {texturePath = blockDef.textures.top.texturePath; isTilemapTexture = true;}
+                    materialKeySuffix = `top_${texturePath}`;
+
+                } else {
+                    if(typeof blockDef.textures.side === 'string') texturePath = blockDef.textures.side;
+                    else { texturePath = blockDef.textures.side.texturePath; isTilemapTexture = true;}
+                    materialKeySuffix = `top_fallback_side`;
+                }
             }
         } else if (faceType === 'bottom') {
-            texturePath = blockDef.textures.bottom || blockDef.textures.side;
-            materialKeySuffix = `bottom_${texturePath || 'fallback_side'}`;
+            if( blockDef.textures.bottom) {
+                if(typeof blockDef.textures.bottom === 'string') texturePath = blockDef.textures.bottom;
+                else { texturePath = blockDef.textures.bottom.texturePath; isTilemapTexture = true;}
+                materialKeySuffix = `bottom_${texturePath}`;
+            } else {
+                if(typeof blockDef.textures.side === 'string') texturePath = blockDef.textures.side;
+                    else { texturePath = blockDef.textures.side.texturePath; isTilemapTexture = true;}
+                    materialKeySuffix = `bottom_fallback_side`;
+            }
         } else { // side
-            texturePath = blockDef.textures.side;
-            materialKeySuffix = `side_${texturePath || 'undefined'}`;
+            if(typeof blockDef.textures.side === 'string') texturePath = blockDef.textures.side;
+            else {texturePath = blockDef.textures.side.texturePath; isTilemapTexture = true;}
+            materialKeySuffix = `side_${texturePath}`;
         }
 
         if (!texturePath) {
@@ -261,7 +285,7 @@ export class WorldMeshBuilder {
         if ((z % this.CHUNK_SIZE) === (this.CHUNK_SIZE - 1)) this.markChunkDirty(x, y, z + 1, alsoMarkForCollision);
     }
 
-    private getVoxel(x: number, y: number, z: number): IWorldBlock | undefined {
+    public getVoxel(x: number, y: number, z: number): IWorldBlock | undefined {
         return this.voxelData.get(getVoxelKey(x, y, z));
     }
 
@@ -269,7 +293,7 @@ export class WorldMeshBuilder {
         return this.blockDefinitions.get(type);
     }
 
-    private isVoxelSolid(x: number, y: number, z: number): boolean {
+    public isVoxelSolid(x: number, y: number, z: number): boolean {
         const voxel = this.getVoxel(x, y, z);
         if (!voxel) return false;
         const def = this.getBlockDefinition(voxel.type);
@@ -457,7 +481,7 @@ export class WorldMeshBuilder {
 
                         baseMesh.setEnabled(false);
                         baseMesh.doNotSyncBoundingInfo = true;
-                        baseMesh.isPickable = false;
+                        baseMesh.isPickable = true;
                         this.baseMeshCache.set(baseMeshKey, baseMesh);
                     }
 

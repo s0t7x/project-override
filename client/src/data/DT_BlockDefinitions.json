@@ -15,13 +15,19 @@
         "id": "dev_stone_wall",
         "isSolid": true,
         "textures": {
-            "side": "/assets/textures/dev_64x64-orange.png",
-            "top": "https://placehold.co/64.png"
+            "side": {
+                "texturePath": "/assets/textures/my_tile_atlas.png",
+                "frameX": 256,
+                "frameY": 448,
+                "frameWidth": 64,
+                "frameHeight": 64
+            },
+            "top": "/assets/textures/dev_64x64-orange.png"
         }
     },
     {
         "id": "dev_water",
-        "isSolid": false,
+        "isSolid": true,
         "textures": {
             "side": "/assets/textures/dev_64x64-blue.png",
             "top": "https://placehold.co/64.png"

@@ -1,6 +1,7 @@
 import { BaseScene } from '@/babylon/scenes/BaseScene';
 import { EntryScene } from '@/babylon/scenes/EntryScene';
 import { FirstTimeSetupScene } from '@/babylon/scenes/FirstTimeSetupScene';
+import { TestEditorScene } from '@/babylon/scenes/TestEditorScene';
 import { TestScene } from '@/babylon/scenes/TestScene';
 import * as BABYLON from '@babylonjs/core';
 
@@ -65,6 +66,9 @@ export class SceneDirector {
 
 			console.log("[SceneDirector] Setting Scene to '" + next + "'...");
 			switch (next) {
+				case 'testEditor':
+					this.currentScene = new TestEditorScene(this.engine);
+					break;
 				case 'test':
 					this.currentScene = new TestScene(this.engine);
 					break;

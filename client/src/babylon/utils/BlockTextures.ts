@@ -1,5 +1,7 @@
+import { TileMapTexture } from "./TileMapTexture";
+
 export interface BlockTextures {
-    side: string;       // Texture path for sides (and default for top/bottom)
-    top?: string;      // Optional: Texture path for top
-    bottom?: string;   // Optional: Texture path for bottom
+    side: string | TileMapTexture;       // Texture path for sides (and default for top/bottom)
+    top?: string | TileMapTexture;      // Optional: Texture path for top
+    bottom?: string | TileMapTexture;   // Optional: Texture path for bottom
 }
