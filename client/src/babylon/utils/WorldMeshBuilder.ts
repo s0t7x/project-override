@@ -81,7 +81,10 @@ export class WorldMeshBuilder {
 
         texturePaths.forEach(path => {
             if (path && !this.textureCache.has(path)) {
-                const texture = new BABYLON.Texture(path, this.scene,
+                let filePath = '' + path;
+                if((process as any).resourcesPath && !path.startsWith('http')) filePath = (process as any).resourcesPath + '/app' + path;
+                console.warn('Asset URL ' + path);
+                const texture = new BABYLON.Texture(filePath, this.scene,
                     false, true, BABYLON.Texture.NEAREST_SAMPLINGMODE
                 );
                 texture.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
@@ -129,6 +132,8 @@ export class WorldMeshBuilder {
             else {texturePath = blockDef.textures.side.texturePath; isTilemapTexture = true;}
             materialKeySuffix = `side_${texturePath}`;
         }
+
+        console.log(isTilemapTexture)
 
         if (!texturePath) {
             console.warn(`[WorldMeshBuilder] WARN: No texture path for block '${blockIdForLog}' face '${faceType}'. Using fallback magenta.`);
@@ -466,7 +471,7 @@ export class WorldMeshBuilder {
                             // Manual SubMesh creation (as in original) ensures it if there are issues.
                             // Ensure vertex count is correct. For a standard box (24 vertices, 36 indices):
                             const vertexCount = baseMesh.getTotalVertices(); // Should be 24 for a box
-                            const indicesCount = baseMesh.getTotalIndices(); // Should be 36
+                            // const indicesCount = baseMesh.getTotalIndices(); // Should be 36
                             baseMesh.subMeshes = []; // Clear any default submeshes if we are defining them manually
                             // Indices per face for a box is 6
                             baseMesh.subMeshes.push(new BABYLON.SubMesh(0, 0, vertexCount, 0, 6, baseMesh));   // Back

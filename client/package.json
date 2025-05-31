@@ -16,13 +16,24 @@
 					"**/*"
 				]
 			},
+			{
+				"from": "../node_modules/.pnpm/steamworks.js@0.4.0/node_modules/steamworks.js/dist/linux64",
+				"to": ".",
+				"filter": [
+					"libsteam_api.so"
+				]
+			},
+			{
+				"from": "build",
+				"to": ".",
+				"filter": [
+					"**/*"
+				]
+			},
 			"package.json",
 			"boot.cjs"
 		],
-		"asar": false,
-		"extraResource": [
-			"../node_modules/.pnpm/steamworks.js@0.4.0/node_modules/steamworks.js/dist/linux64/libsteam_api.so"
-		]
+		"asar": false
 	},
 	"scripts": {
 		"dev": "NODE_ENV=development vite",
@@ -53,6 +64,7 @@
 		"zustand": "^5.0.5"
 	},
 	"devDependencies": {
+		"@types/node": "^22.15.17",
 		"@types/react": "^18.2.0",
 		"@types/react-dom": "^18.2.0",
 		"@vitejs/plugin-react": "^4.4.1",

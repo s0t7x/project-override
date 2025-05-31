@@ -1,8 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import { BaseScene } from './BaseScene';
 import { useGeneralStore } from '@/stores/GeneralStore';
-import { useServiceStore } from '@/stores/ServiceStore';
-import { Button } from '@/react/common/Button';
 
 export class FirstTimeSetupScene extends BaseScene {
 	constructor(engine: BABYLON.Engine) {
@@ -44,13 +42,19 @@ export class FirstTimeSetupScene extends BaseScene {
 
 	showPlayFairPolicy(uiDirector: any) {
 		uiDirector.showAlert(
-				'Fairplay',
-				`No mobbing, no cheating, no scamming, no harrasment!`,
+				'Dev Build',
+				``,
 				new Map([[
-						'continue',
+						'Test Scene',
 						() => {
-							uiDirector.closeAlert('Fairplay');
+							uiDirector.closeAlert('Dev Build');
 							useGeneralStore.getState().gameEngine?.changeScene('test');
+						}
+					],[
+						'Editor',
+						() => {
+							uiDirector.closeAlert('Dev Build');
+							useGeneralStore.getState().gameEngine?.changeScene('testEditor');
 						}
 					]]
 			))

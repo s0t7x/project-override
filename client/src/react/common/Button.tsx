@@ -1,4 +1,4 @@
-import { Animated, BleepsProviderSettings, Illuminator, useBleeps } from '@arwes/react';
+import { Animated, useBleeps } from '@arwes/react';
 
 
 type BleepsNames = 'hover' | 'click'

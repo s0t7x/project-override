@@ -2,7 +2,7 @@
 import { Animator } from '@arwes/react'
 import { FrameHeader, FrameNefrex } from '@arwes/react'
 import { Illuminator } from '@arwes/react'
-import { BleepsOnAnimator, styleFrameClipKranox, styleFrameClipOctagon } from '@arwes/react';
+import { BleepsOnAnimator, styleFrameClipOctagon } from '@arwes/react';
 
 interface WindowProps {
     title?: string;

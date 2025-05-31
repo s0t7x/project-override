@@ -1,10 +1,10 @@
 import { AssetService } from '@/services/AssetService';
 import { useServiceStore } from '@/stores/ServiceStore';
 import * as B from '@babylonjs/core';
-import { Vector3, TmpVectors, Observer, Nullable, Quaternion, Color3, SubMesh, StandardMaterial, MultiMaterial, Texture, MeshBuilder, Mesh } from '@babylonjs/core';
+import { Vector3, TmpVectors, Observer, Nullable, Quaternion, Color3, Texture } from '@babylonjs/core';
 import { ICharacterAppearance } from '@project-override/shared/core/CharacterAppearance';
 import { ICharacterSummary } from '@project-override/shared/core/CharacterSummary';
-import { IEquipmentVisual } from '@project-override/shared/core/EquipmentVisual';
+// import { IEquipmentVisual } from '@project-override/shared/core/EquipmentVisual';
 import { IColor3 } from '@project-override/shared/math/Color3';
 
 // --- Constants (keep as they are) ---
@@ -216,6 +216,8 @@ export class SpriteSheetCharacter {
         // let currentTexture: Texture | null = samplerBlock.texture ?? null;
 
         if (textureUrl && textureUrl.length > 0) {
+            // if((process as any).resourcesPath && !textureUrl.startsWith("http")) textureUrl = (process as any).resourcesPath + '/app' + textureUrl;
+            console.warn('Asset URL ' + textureUrl);
             // --- Texture URL Provided ---
             try {
                 let newTexture: B.Texture | null = null;
@@ -466,12 +468,12 @@ export class SpriteSheetCharacter {
         console.log(`[SpriteSheetCharacter:${this.name}] No base texture or character summary. Hidden.`);
     }
 
-    private applyHueShift(material: B.NodeMaterial, hue: number): void {
-        const inputBlock = material.getBlockByName(HUE_SHIFT_UNIFORM_NAME) as Nullable<B.InputBlock>;
-        if (inputBlock) {
-            inputBlock.value = hue;
-        }
-    }
+    // private applyHueShift(material: B.NodeMaterial, hue: number): void {
+    //     const inputBlock = material.getBlockByName(HUE_SHIFT_UNIFORM_NAME) as Nullable<B.InputBlock>;
+    //     if (inputBlock) {
+    //         inputBlock.value = hue;
+    //     }
+    // }
 
     private colorize(material: B.NodeMaterial, color: IColor3, strength: number = 255.0): void {
         if(!material || !color) return;

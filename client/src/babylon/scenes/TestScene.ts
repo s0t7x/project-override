@@ -10,6 +10,7 @@ import DEV_TESTMAP from '@/data/dev_TestMap_Big.json';
 import blockDefinitionsData from '@/data/DT_BlockDefinitions.json';
 import { ICharacterSummary } from '@project-override/shared/core/CharacterSummary';
 import { SpriteSheetCharacter, CharacterDirection } from '../prefabs/SpriteSheetCharacter'; // Ensure CharacterDirection is exported
+import { Plant } from '../prefabs/Plant';
 
 export class TestScene extends BaseScene {
     private worldBuilder: WorldMeshBuilder | undefined;
@@ -42,15 +43,20 @@ export class TestScene extends BaseScene {
 
             new BABYLON.HemisphericLight('light', new BABYLON.Vector3(0.5, 1, 0.25), this);
 
+            useServiceStore.getState().assetService?.setScene(this); // Important for asset loading in SpriteSheetCharacter
+            
+            const plant = new Plant('plant_test', this, new BABYLON.Vector3(12, 1, 12));
+            await plant.applyTexture('/assets/textures/dev_grass.png');
+
             // Player Character (visuals and physics body)
             // Initial position on the ground, e.g., Y=2 assuming ground is at Y=0 or Y=1
             // Ensure the player starts at a reasonable height above the ground blocks
             const playerInitialPosition = new BABYLON.Vector3(10, 5, 10); 
             this.playerCharacter = new SpriteSheetCharacter('playerChar', this, playerInitialPosition);
             
-            useServiceStore.getState().assetService?.setScene(this); // Important for asset loading in SpriteSheetCharacter
             const testCharSummary: ICharacterSummary = { id: 'char1', userId: 'user1', name: 'Player', level: 1, lastPlayed: 0, isOnline: false, isDeleted: false, deletedAt: 0, appearance: { bodyIdx: 4711, eyesIdx: 0, beardIdx: 0, hairIdx: 0, hairFrontIdx: 0, hairBackIdx: 0 }, equipmentVisuals: [] };
             await this.playerCharacter.setCharacter(testCharSummary); // Make sure setCharacter is awaited if it loads assets
+            this.playerCharacter.billboard = true;
 
             if (this.playerCharacter.plane) { // Ensure plane exists
                 this.playerCharacter.plane.physicsBody = new BABYLON.PhysicsBody(
@@ -73,7 +79,6 @@ export class TestScene extends BaseScene {
                     parameters: { radius: capsuleRadius, pointA: new BABYLON.Vector3(0, -0.5, 0), pointB: new BABYLON.Vector3(0, 0.5, 0), center: new BABYLON.Vector3(0, -0.5, 0) },
                 }, this);
                 this.playerCharacter.plane.physicsBody.shape = playerShape;
-                this.playerCharacter.plane.showBoundingBox = true;
 
                 console.log("Player collision body and shape created.");
             } else {

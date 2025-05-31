@@ -1,7 +1,7 @@
-import { Alert, AlertProps } from '@/react/common/Alert';
+import { AlertProps } from '@/react/common/Alert';
 import { ToastProps, ToastCorner } from '@/react/common/Toast'; // Import ToastProps and ToastCorner
 import { BaseScreen } from '@/react/screens/BaseScreen';
-import React from 'react';
+
 export class UiDirector {
 	public currentScreens: BaseScreen[] = [];
 	public currentAlerts: Map<string, AlertProps> = new Map(); // Maps title to AlertProps

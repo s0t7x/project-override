@@ -16,9 +16,9 @@
         "isSolid": true,
         "textures": {
             "side": {
-                "texturePath": "/assets/textures/my_tile_atlas.png",
-                "frameX": 256,
-                "frameY": 448,
+                "texturePath": "/assets/textures/dev_npatch.png",
+                "frameX": 128,
+                "frameY": 0,
                 "frameWidth": 64,
                 "frameHeight": 64
             },

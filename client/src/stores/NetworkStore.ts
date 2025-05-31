@@ -13,7 +13,7 @@ export interface INetworkStore {
     primaryRoomState: RoomState;
 }
 
-export const useNetworkStore = create<INetworkStore>((set: (state: Partial<INetworkStore>) => void) => ({
+export const useNetworkStore = create<INetworkStore>((_set: (state: Partial<INetworkStore>) => void) => ({
     networkService: null,
     primaryRoomState: null
 }));

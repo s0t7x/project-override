@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useGameEngine } from '@/context/GameEngine';
-import { BaseScreen } from '../screens/BaseScreen';
 import { Alert, AlertProps } from '../common/Alert';
 import ToastComponent, { ToastProps as ExternalToastProps, ToastCorner } from '../common/Toast';
 

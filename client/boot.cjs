@@ -6,10 +6,12 @@ let windowCreated = false;
 
 let steamworks = undefined;
 
-const openDevTools = (mainWindow) => {
+const openDevTools = async (mainWindow) => {
   const devtools = new BrowserWindow()
   mainWindow.webContents.setDevToolsWebContents(devtools.webContents)
   mainWindow.webContents.openDevTools({ mode: 'detach' })
+  const gpuInfo = await app.getGPUInfo('basic');
+  console.log(app.getGPUFeatureStatus(), gpuInfo);
 } 
 
 function createWindow() {
@@ -20,6 +22,8 @@ function createWindow() {
     console.log("Cannot connect to steam")
     steamworks = undefined;
   }
+
+
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1200,
@@ -39,20 +43,18 @@ function createWindow() {
         protocol: 'file:',
         slashes: true
       });
-
-  mainWindow.loadURL(startUrl);
-
+      
+      mainWindow.loadURL(startUrl);
+      
   // Open the DevTools.
-  if(process.env.NODE_ENV === 'development') {
+  // if(process.env.NODE_ENV === 'development') {
     openDevTools(mainWindow)
-  } else {
-    Menu.setApplicationMenu(false)
-    mainWindow.setFullScreen(true)
-  }
+  // } else {
+  //   Menu.setApplicationMenu(false)
+  //   mainWindow.setFullScreen(true)
+  // }
 
   windowCreated = true;
-
-
 }
 
 // This method will be called when Electron has finished

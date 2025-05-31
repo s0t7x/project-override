@@ -7,7 +7,7 @@ export interface IAuthStore {
     payload: IJwtPayload | null;
 }
 
-export const useAuthStore = create<IAuthStore>((set: (state: Partial<IAuthStore>) => void) => ({
+export const useAuthStore = create<IAuthStore>((_set: (state: Partial<IAuthStore>) => void) => ({
     isAuthenticated: false,
     authTokens: null,
     payload: null

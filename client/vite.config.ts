@@ -17,7 +17,7 @@ export default defineConfig({
                         // Tell Vite to treat 'steamworks.js' as an external module.
                         // It will leave `require('steamworks.js')` as is, and Node.js
                         // will resolve it from node_modules at runtime.
-                        external: ['steamworks.js'],
+                        external: ['steamworks.js', '/HavokPhysics.wasm'],
                     },
                 },
             },
@@ -29,7 +29,7 @@ export default defineConfig({
 			'@': path.resolve(__dirname, './src'),
 			'@project-override/shared': path.resolve(__dirname, '../shared/src'),
 		},
-		external: [ './boot.cjs' ]
+		external: [ './boot.cjs', '/HavokPhysics.wasm' ]
 	},
 	build: {
 		outDir: 'build',

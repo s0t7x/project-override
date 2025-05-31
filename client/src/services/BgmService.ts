@@ -129,7 +129,9 @@ export class BgmService {
 		const fadeOutPromise = this.fadeAudioTo(oldAudio, 0, fadeDuration);
 
 		console.log(`[BgmService] Creating new Audio element for "${requestedTrackName}"`);
-		const newAudio = new Audio(track.filePath);
+		let filepath = track.filePath;
+		if((process as any).resourcesPath && !filepath.startsWith('http')) filepath = (process as any).resourcesPath + '/app' + filepath;
+		const newAudio = new Audio(filepath);
 		newAudio.loop = track.loop !== undefined ? track.loop : true;
 		newAudio.volume = 0;
 		newAudio.addEventListener('error', (e) => {

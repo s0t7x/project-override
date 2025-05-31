@@ -14,7 +14,7 @@ export interface IServiceStore {
     steamworks: any | null;
 }
 
-export const useServiceStore = create<IServiceStore>((set: (state: Partial<IServiceStore>) => void) => ({
+export const useServiceStore = create<IServiceStore>((_set: (state: Partial<IServiceStore>) => void) => ({
     networkService: null,
     bgmService: null,
     inputService: null,

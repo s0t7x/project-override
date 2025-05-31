@@ -37,10 +37,10 @@ export class AssetService {
             this.assetsManager.onTaskErrorObservable.add((task) => {
                 console.error(`[AssetService] Error loading asset task: ${task.name} - ${task.errorObject?.message}`, task.errorObject?.exception);
             });
-            this.assetsManager.onTaskSuccessObservable.add((task) => {
+            this.assetsManager.onTaskSuccessObservable.add((_task) => {
                 // console.log(`[AssetService] Successfully loaded asset task: ${task.name}`); // Can be noisy
             });
-            this.assetsManager.onProgressObservable.add((event) => {
+            this.assetsManager.onProgressObservable.add((_event) => {
                 // console.log(`[AssetService] Loading progress: ${event.remainingCount}/${event.totalCount} tasks remaining.`);
                 // Update loading UI progress bar here
             });
@@ -59,6 +59,7 @@ export class AssetService {
             console.error("[AssetService] Cannot load mesh, scene context not set.");
             return null;
         }
+        if((process as any).resourcesPath && !filePath.startsWith("http")) filePath = (process as any).resourcesPath + '/app' + filePath;
         if (this.meshCache.has(filePath)) {
             // console.log(`[AssetService] Returning cached mesh: ${filePath}`);
             // Need to clone meshes if they are reused multiple times in the scene
@@ -78,7 +79,7 @@ export class AssetService {
                 resolve(task.loadedMeshes.map(mesh => mesh.clone(`${mesh.name}_clone`, null) as B.AbstractMesh));
             };
 
-            task.onError = (task, message, exception) => {
+            task.onError = (_task, message, exception) => {
                 console.error(`[AssetService] Failed to load mesh ${filePath}: ${message}`, exception);
                 reject(null); // Indicate failure
             };
@@ -100,6 +101,7 @@ export class AssetService {
             console.error("[AssetService] Cannot load texture, scene context not set.");
             return null;
         }
+        if((process as any).resourcesPath && !filePath.startsWith("http")) filePath = (process as any).resourcesPath + '/app' + filePath;
         if (this.textureCache.has(filePath)) {
             // console.log(`[AssetService] Returning cached texture: ${filePath}`);
             return this.textureCache.get(filePath)!;
@@ -113,7 +115,7 @@ export class AssetService {
                 this.textureCache.set(filePath, task.texture);
                 resolve(task.texture);
             };
-            task.onError = (task, message, exception) => {
+            task.onError = (_task, message, exception) => {
                 console.error(`[AssetService] Failed to load texture ${filePath}: ${message}`, exception);
                 reject(null);
             };
@@ -126,10 +128,12 @@ export class AssetService {
             console.error("[AssetService] Cannot load texture, scene context not set.");
             return undefined;
         }
+        if((process as any).resourcesPath && !filePath.startsWith("http")) filePath = (process as any).resourcesPath + '/app' + filePath;
         if (this.textureCache.has(filePath)) {
             // console.log(`[AssetService] Returning cached texture: ${filePath}`);
             return this.textureCache.get(filePath)!;
         }
+        return undefined
     }
 
     public async loadTextureFromComposition(composition: { cacheKey: string, canvas: HTMLCanvasElement}): Promise<B.Texture | null> {
@@ -137,6 +141,7 @@ export class AssetService {
             console.error("[AssetService] Cannot load texture, scene context not set.");
             return null;
         }
+        
         if (this.textureCache.has(composition.cacheKey)) {
             // console.log(`[AssetService] Returning cached texture: ${filePath}`);
             return this.textureCache.get(composition.cacheKey)!;
@@ -178,12 +183,13 @@ export class AssetService {
             console.error("[AssetService] Cannot load sound, scene context not set.");
             return null;
         }
+        if((process as any).resourcesPath && !filePath.startsWith("http")) filePath = (process as any).resourcesPath + '/app' + filePath;
         if (this.soundCache.has(soundName)) {
             // console.log(`[AssetService] Returning cached sound: ${soundName}`);
             return this.soundCache.get(soundName)!;
         }
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, _reject) => {
             const sound = new B.Sound(soundName, filePath, this.scene!, () => {
                 // Success callback
                 console.log(`[AssetService] Sound loaded: ${soundName} (${filePath})`);

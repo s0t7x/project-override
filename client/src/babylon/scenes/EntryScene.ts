@@ -21,7 +21,7 @@ export class EntryScene extends BaseScene {
 
 	// Placeholder logo URLs - replace with actuals
 	private readonly LOGO_URLS = [
-		"https://www.havok.com/wp-content/uploads/2020/05/havok-games-technology.png",
+		"https://upload.wikimedia.org/wikipedia/de/thumb/1/14/Havoklogo.svg/1200px-Havoklogo.svg.png",
 		"https://www.babylonjs.com/assets/logo-babylonjs-social-twitter.png",
 		"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGrqsoP9f7Wyo5mKW-WFIcpyaSwLY-_lIVS_W14ZJ1IZvON-p0pUgIxSbXzgqF84RJXA&usqp=CAU"
 	];
@@ -275,7 +275,7 @@ export class EntryScene extends BaseScene {
 		if (evt.type === BABYLON.KeyboardEventTypes.KEYDOWN && (evt.event.key === "Escape" || evt.event.key === "Enter")) this._skipHandler();
 	};
 
-	private _onPointerDown = (eventData: BABYLON.PointerInfo): void => this._skipHandler();
+	private _onPointerDown = (_eventData: BABYLON.PointerInfo): void => this._skipHandler();
 
 	private _pointerDownObserver: BABYLON.Observer<BABYLON.PointerInfo> | null = null;
 	private _keyDownAction: BABYLON.IAction | null = null;

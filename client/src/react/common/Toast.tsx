@@ -1,4 +1,4 @@
-import { Animator, FrameNefrex, FrameNero, Text } from '@arwes/react';
+import { Animator, FrameNero, Text } from '@arwes/react';
 import React, { useEffect } from 'react';
 
 export type ToastCorner = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
@@ -8,7 +8,8 @@ export interface ToastProps {
     message: string;
     duration?: number; // in milliseconds
     corner?: ToastCorner;
-    noBackground: boolean;
+    noBackground?: boolean;
+    children: any;
     // Optional: type?: 'info' | 'success' | 'warning' | 'error'; // For different styling
 }
 
