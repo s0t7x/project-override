@@ -10,10 +10,12 @@ const BabylonCanvas: React.FC = () => {
 	const [initialized, setInitialized] = useState<Boolean>(false);
 
 	useEffect(() => {
-		if (servicesInitialized && canvasRef.current) {
-			gameEngine.initialize(canvasRef.current);
-			setInitialized(true);
-		}
+		(async () => {
+			if (servicesInitialized && canvasRef.current) {
+				await gameEngine.initialize(canvasRef.current);
+				setInitialized(true);
+			}
+		})();
 		return () => {
 			gameEngine.dispose();
 			setInitialized(false);

@@ -2,6 +2,7 @@
 import * as B from '@babylonjs/core';
 import { SceneDirector } from '../game/SceneDirector'; // Import the actual type now
 import { UiDirector } from '@/game/UiDirector';
+import HavokPhysics, { HavokPhysicsWithBindings } from '@babylonjs/havok';
 
 export class GameEngine {
 	public engine: B.Engine | null = null;
@@ -10,6 +11,7 @@ export class GameEngine {
 	public uiDirector: UiDirector | null = null;
 	private _isInitialized: boolean = false;
 	private _resizeObserver: ResizeObserver | null = null; // Store observer to disconnect
+	public physics: HavokPhysicsWithBindings | null = null;
 
 	constructor() {
 		// --- Setup SceneDirector ---
@@ -17,10 +19,12 @@ export class GameEngine {
 
 		// --- Setup UiDirector ---
 		this.uiDirector = new UiDirector();
+
+
 		console.log('[GameEngine] Instance created.');
 	}
 
-	public initialize(canvas: HTMLCanvasElement): void {
+	public async initialize(canvas: HTMLCanvasElement): Promise<void> {
 		if (this._isInitialized) {
 			console.warn('[GameEngine] Already initialized.');
 			return;
@@ -57,8 +61,13 @@ export class GameEngine {
 		this.sceneDirector!.initialize(this.engine);
 		this.uiDirector!.initialize();
 
+		// @ts-except-error
+		this.physics = await HavokPhysics({
+			locateFile: (_path) => `/HavokPhysics.wasm`,
+		});
+	
 		// --- Start Render Loop ---
-		this.engine.runRenderLoop(() => {
+		this.engine!.runRenderLoop(() => {
 			if (!this.engine) {
 				console.error('[GameEngine] Engine is null during render loop.');
 				return;

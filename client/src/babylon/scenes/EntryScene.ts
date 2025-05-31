@@ -21,7 +21,7 @@ export class EntryScene extends BaseScene {
 
 	// Placeholder logo URLs - replace with actuals
 	private readonly LOGO_URLS = [
-		"https://upload.wikimedia.org/wikipedia/commons/2/2e/Bullet_Physics_Logo.svg",
+		"https://www.havok.com/wp-content/uploads/2020/05/havok-games-technology.png",
 		"https://www.babylonjs.com/assets/logo-babylonjs-social-twitter.png",
 		"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGrqsoP9f7Wyo5mKW-WFIcpyaSwLY-_lIVS_W14ZJ1IZvON-p0pUgIxSbXzgqF84RJXA&usqp=CAU"
 	];
