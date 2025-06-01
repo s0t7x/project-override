@@ -48,6 +48,9 @@ export class TestScene extends BaseScene {
             const plant = new Plant('plant_test', this, new BABYLON.Vector3(12, 1, 12));
             await plant.applyTexture('/assets/textures/dev_grass.png');
 
+            const chest = new Plant('chest_test', this, new BABYLON.Vector3(12, 1, 18));
+            await chest.applyTexture('/assets/textures/dev_chest.png');
+
             // Player Character (visuals and physics body)
             // Initial position on the ground, e.g., Y=2 assuming ground is at Y=0 or Y=1
             // Ensure the player starts at a reasonable height above the ground blocks

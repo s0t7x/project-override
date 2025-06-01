@@ -12,17 +12,33 @@
         }
     },
     {
+        "id": "dev_stone_wall_bottom",
+        "isSolid": true,
+        "textures": {
+            "side": {
+                "texturePath": "/assets/textures/SF_Outside_A4.png",
+                "frameX": 696,
+                "frameY": 240,
+                "frameWidth": 48,
+                "frameHeight": 48
+            },
+            "top": "/assets/textures/dev_64x64-orange.png",
+            "bottom": "/assets/textures/dev_64x64-orange.png"
+        }
+    },
+    {
         "id": "dev_stone_wall",
         "isSolid": true,
         "textures": {
             "side": {
-                "texturePath": "/assets/textures/dev_npatch.png",
-                "frameX": 128,
-                "frameY": 0,
-                "frameWidth": 64,
-                "frameHeight": 64
+                "texturePath": "/assets/textures/SF_Outside_A4.png",
+                "frameX": 696,
+                "frameY": 264,
+                "frameWidth": 48,
+                "frameHeight": 48
             },
-            "top": "/assets/textures/dev_64x64-orange.png"
+            "top": "/assets/textures/dev_64x64-orange.png",
+            "bottom": "/assets/textures/dev_64x64-orange.png"
         }
     },
     {
