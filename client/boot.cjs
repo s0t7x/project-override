@@ -6,6 +6,14 @@ let windowCreated = false;
 
 let steamworks = undefined;
 
+app.commandLine.appendSwitch('ignore-gpu-blacklist');
+app.commandLine.appendSwitch('use-angle', 'd3d11');
+app.commandLine.appendSwitch('enable-gpu-rasterization');
+app.commandLine.appendSwitch('enable-zero-copy');
+app.commandLine.appendSwitch('disable-software-rasterizer');
+app.commandLine.appendSwitch('disable-gpu-sandbox');
+app.commandLine.appendSwitch('no-sandbox');
+
 const openDevTools = async (mainWindow) => {
   const devtools = new BrowserWindow()
   mainWindow.webContents.setDevToolsWebContents(devtools.webContents)
@@ -38,6 +46,7 @@ function createWindow() {
   // Load the index.html of the app.
   // Assuming your built client app is in a 'dist' or 'build' folder relative to main.js
   // If your client is served directly from 'public', you might need to adjust this path.
+  console.log(process.env.NODE_ENV)
   const startUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : url.format({
         pathname: path.join(__dirname, 'index.html'), // Adjust if your build output is different
         protocol: 'file:',

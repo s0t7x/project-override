@@ -75,9 +75,9 @@ export class GameEngine {
 			}
 		}
 		// @ts-except-error
-		// this.physics = await HavokPhysics({
-		// 	locateFile: (_path) => (process as any).resourcesPath ? (process as any).resourcesPath + `/app/HavokPhysics.wasm` : `/HavokPhysics.wasm`,
-		// });
+		this.physics = await HavokPhysics({
+			locateFile: (_path) => (process as any).resourcesPath ? (process as any).resourcesPath + `/app/HavokPhysics.wasm` : `/HavokPhysics.wasm`,
+		});
 	
 		// --- Start Render Loop ---
 		this.engine!.runRenderLoop(() => {

@@ -13,6 +13,13 @@ function requireBoot() {
   const path = require$$1;
   const url = require$$2;
   let windowCreated = false;
+  app.commandLine.appendSwitch("ignore-gpu-blacklist");
+  app.commandLine.appendSwitch("use-angle", "d3d11");
+  app.commandLine.appendSwitch("enable-gpu-rasterization");
+  app.commandLine.appendSwitch("enable-zero-copy");
+  app.commandLine.appendSwitch("disable-software-rasterizer");
+  app.commandLine.appendSwitch("disable-gpu-sandbox");
+  app.commandLine.appendSwitch("no-sandbox");
   const openDevTools = async (mainWindow) => {
     const devtools = new BrowserWindow();
     mainWindow.webContents.setDevToolsWebContents(devtools.webContents);
@@ -39,6 +46,7 @@ function requireBoot() {
         // Keep true for security
       }
     });
+    console.log(process.env.NODE_ENV);
     const startUrl = process.env.NODE_ENV === "development" ? "http://localhost:3000" : url.format({
       pathname: path.join(__dirname, "index.html"),
       // Adjust if your build output is different
