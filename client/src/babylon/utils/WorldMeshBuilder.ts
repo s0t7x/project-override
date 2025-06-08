@@ -31,6 +31,8 @@ export class WorldMeshBuilder {
     private blockDefinitions: Map<string, BlockDefinition>;
     public voxelData: Map<string, IWorldBlock>;
 
+    private shadowGenerator: BABYLON.ShadowGenerator | null = null;
+
     public readonly CHUNK_SIZE = 16;
     public readonly BLOCK_SIZE = 1; // Added for clarity and consistent use
 
@@ -46,8 +48,10 @@ export class WorldMeshBuilder {
     private chunkCollisionUpdateQueue: Set<string>;
     private isUpdatingChunkCollisions: boolean;
 
-    constructor(scene: BABYLON.Scene, blockDefs: BlockDefinition[]) {
+    constructor(scene: BABYLON.Scene, blockDefs: BlockDefinition[], shadowGenerator?: BABYLON.ShadowGenerator) {
         this.scene = scene;
+        this.shadowGenerator = shadowGenerator || null;
+        
         this.blockDefinitions = new Map();
         blockDefs.forEach(def => this.blockDefinitions.set(def.id, def));
 
@@ -153,9 +157,11 @@ export class WorldMeshBuilder {
         const texture = this.textureCache.get(texturePath);
         if (texture) {
             material.diffuseTexture = texture;
+            // material.useAlphaFromDiffuseTexture = true;
+            // material.transparencyMode = 3;
             material.specularColor = new BABYLON.Color3(0, 0, 0);
             if (texturePath.toLowerCase().endsWith(".png") && material.diffuseTexture) {
-                material.diffuseTexture.hasAlpha = true;
+                material.diffuseTexture.hasAlpha = false;
             }
         } else {
             console.warn(`[WorldMeshBuilder] WARN: Texture '${texturePath}' not found for material key '${materialKey}'. Block '${blockIdForLog}', Face '${faceType}'. Using gray fallback.`);
@@ -502,6 +508,8 @@ export class WorldMeshBuilder {
                             updatable: false
                         }, this.scene);
 
+                        baseMesh.receiveShadows = true;
+
                         if (needsMultiMaterial) {
                             const multiMaterial = new BABYLON.MultiMaterial(baseMeshName + "_multiMat", this.scene);
                             multiMaterial.subMaterials = [matSide, matSide, matSide, matSide, matTop, matBottom];
@@ -541,7 +549,9 @@ export class WorldMeshBuilder {
                         if (block.rotation) {
                             instance.rotation.y = BABYLON.Tools.ToRadians(block.rotation);
                         }
+                        instance.receiveShadows = true;
                         instance.parent = chunkRoot;
+
                         instance.cullingStrategy = BABYLON.AbstractMesh.CULLINGSTRATEGY_OPTIMISTIC_INCLUSION;
                         console.log('created instance of block at', instance.position.x, instance.position.y, instance.position.z)
                     }
@@ -614,6 +624,8 @@ export class WorldMeshBuilder {
         const oldCollisionMesh = this.chunkCollisionMeshes.get(chunkKey);
         if (oldCollisionMesh) {
             if (oldCollisionMesh.physicsImpostor) oldCollisionMesh.physicsImpostor.dispose();
+            if (oldCollisionMesh.physicsBody) oldCollisionMesh.physicsBody.dispose();
+
             oldCollisionMesh.dispose();
             this.chunkCollisionMeshes.delete(chunkKey);
         }
@@ -668,9 +680,14 @@ export class WorldMeshBuilder {
             this.scene
         );
 
+        mergedChunkCollisionMesh.computeWorldMatrix(true);
+
         const shape = new BABYLON.PhysicsShape({ type: BABYLON.PhysicsShapeType.MESH, parameters: { mesh: mergedChunkCollisionMesh } }, this.scene);
 
         mergedChunkCollisionMesh.physicsBody.shape = shape;
+
+        if(this.shadowGenerator)
+                            this.shadowGenerator.addShadowCaster(mergedChunkCollisionMesh);
 
         // mergedChunkCollisionMesh.physicsImpostor = new BABYLON.PhysicsImpostor(
         //     mergedChunkCollisionMesh,

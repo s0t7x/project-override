@@ -1,6 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 import { BaseScene } from './BaseScene';
 import { useGeneralStore } from '@/stores/GeneralStore';
+import { useServiceStore } from '@/stores/ServiceStore';
 
 export class FirstTimeSetupScene extends BaseScene {
 	constructor(engine: BABYLON.Engine) {
@@ -20,9 +21,16 @@ export class FirstTimeSetupScene extends BaseScene {
 			const uiDirector = useGeneralStore.getState().gameEngine?.uiDirector;
 			if (!uiDirector) return;
 
+			const localStorage = useServiceStore.getState().localStorageService;
+			if (localStorage) {
+				const eulaAccepted = localStorage.getItem<boolean>('eulaAccepted');
+				if (eulaAccepted) {
+					// should change scene here but right now fairPlayPolicy is a scene selector lol
+					this.showPlayFairPolicy(uiDirector);
+					return;
+				}
+			}
 			this.showEula(uiDirector);
-
-			console.log(uiDirector);
 		});
 	}
 
@@ -33,6 +41,10 @@ export class FirstTimeSetupScene extends BaseScene {
 				new Map([[
 						'ACCEPT & CONTINUE',
 						() => {
+							const localStorage = useServiceStore.getState().localStorageService;
+							if (localStorage) {
+								localStorage.setItem('eulaAccepted', true);
+							}
 							this.showPlayFairPolicy(uiDirector);
 							uiDirector.closeAlert('EULA');
 						}

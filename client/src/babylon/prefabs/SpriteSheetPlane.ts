@@ -3,6 +3,7 @@ import { useServiceStore } from '@/stores/ServiceStore';
 import * as B from '@babylonjs/core';
 import { Vector3, TmpVectors, Observer, Nullable, Quaternion, Color3, Texture} from '@babylonjs/core';
 import * as HueShiftSpriteMaterialSnippet from "../materials/HueShiftSpriteMaterial.json"
+import { IColor3 } from '@project-override/shared/math/Color3';
 
 const HUE_SHIFT_TEXTURE_SAMPLER_NAME = "diffuseTexture";
 const HUE_SHIFT_UNIFORM_NAME = "hueShift";
@@ -10,26 +11,30 @@ const HUE_SHIFT_UNIFORM_NAME = "hueShift";
 // ---
 
 export class SpriteSheetPlane {
-    private scene: B.Scene;
-    private assetService?: AssetService;
+    protected scene: B.Scene;
+    protected assetService?: AssetService;
     public name: string;
-    public plane: B.Mesh;
-    private material: B.NodeMaterial; // Renamed for clarity
-    private texture: B.Texture | null = null;
+    public mesh: B.Mesh;
+    public collisionMesh: B.Mesh;
+    protected material: B.NodeMaterial; // Renamed for clarity
+    protected texture: B.Texture | null = null;
+    protected planeSize: number = 1;
     
-    private updateObserver: Nullable<Observer<B.Scene>> = null;
+    protected updateObserver: Nullable<Observer<B.Scene>> = null;
 
-    private static baseHueShiftMaterial: Nullable<B.NodeMaterial> = null;
+    protected static baseHueShiftMaterial: Nullable<B.NodeMaterial> = null;
 
     public billboard: boolean = false;
 
     constructor(
         name: string,
         scene: B.Scene,
-        initialPosition: B.Vector3 = Vector3.Zero()
+        initialPosition: B.Vector3 = Vector3.Zero(),
+        planeSize: number = 1
     ) {
         this.name = name;
         this.scene = scene;
+        this.planeSize = planeSize;
         this.assetService = useServiceStore.getState().assetService || undefined;
 
         if (!SpriteSheetPlane.baseHueShiftMaterial) {
@@ -41,23 +46,27 @@ export class SpriteSheetPlane {
             console.log("[SpriteSheetPlane] Base hue shift NodeMaterial loaded.");
         }
 
-          // 1. Create the Plane Mesh
-        this.plane = B.MeshBuilder.CreatePlane(`${name}_plane`, { size: 1 }, this.scene);
-        this.plane.position = initialPosition.clone();
-        this.plane.billboardMode = B.Mesh.BILLBOARDMODE_NONE; // Manual rotation
-        this.plane.isPickable = false;
-        this.plane.rotationQuaternion = Quaternion.Identity(); // Use Quaternion
-        this.plane.visibility = 0;
+        this.mesh = B.MeshBuilder.CreatePlane(`${name}_plane`, { size: this.planeSize }, this.scene);
+        this.mesh.position = initialPosition.clone();
+        this.mesh.billboardMode = B.Mesh.BILLBOARDMODE_NONE; // Manual rotation
+        this.mesh.isPickable = false;
+        this.mesh.rotationQuaternion = Quaternion.Identity(); // Use Quaternion
+        this.mesh.visibility = 0;
+
+        this.collisionMesh = B.MeshBuilder.CreateBox(`${name}_collision`, { size: this.planeSize * 0.9}, this.scene);
+        this.collisionMesh.parent = this.mesh;
+        this.collisionMesh.isPickable = false;
+        this.collisionMesh.visibility = 0;
 
         this.material = this.createLayerMaterial(`${name}_mat_base`, false);
 
-        this.plane.material = this.material;
+        this.mesh.material = this.material;
 
         this.updateObserver = this.scene.onBeforeRenderObservable.add(this.update);
-        console.log(`[SpriteSheetPlane:${this.name}] Initialized with MultiMaterial.`);
     }
 
-    private createLayerMaterial(name: string, disableDepthWrite: boolean): B.NodeMaterial {
+
+    protected createLayerMaterial(name: string, disableDepthWrite: boolean): B.NodeMaterial {
         if (!SpriteSheetPlane.baseHueShiftMaterial) {
             // Handle case where material isn't loaded yet (important!)
             console.error(`[${name}] Base NodeMaterial not ready!`);
@@ -93,7 +102,7 @@ export class SpriteSheetPlane {
     }
 
     // --- Helper function using NodeMaterial specifics ---
-    private async loadLayerTexture(
+    protected async loadLayerTexture(
         textureUrl: string | undefined | null,
         material: B.NodeMaterial,
         layerName: string
@@ -189,7 +198,7 @@ export class SpriteSheetPlane {
                     // this.material.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
                     this.material.alpha = 0.0;
                 }
-                this.plane.visibility = 1;
+                this.mesh.visibility = 1;
             } catch (error) {
                 console.error(`[SpriteSheetPlane:${this.name}] Error loading hair texture: ${url}`, error);
                 this.texture = null;
@@ -206,29 +215,57 @@ export class SpriteSheetPlane {
         }
     }
 
-    // private applyHueShift(material: B.NodeMaterial, hue: number): void {
-    //     const inputBlock = material.getBlockByName(HUE_SHIFT_UNIFORM_NAME) as Nullable<B.InputBlock>;
-    //     if (inputBlock) {
-    //         inputBlock.value = hue;
-    //     }
-    // }
+    public applyHueShift(material: B.NodeMaterial, hue: number): void {
+        const inputBlock = material.getBlockByName(HUE_SHIFT_UNIFORM_NAME) as Nullable<B.InputBlock>;
+        if (inputBlock) {
+            inputBlock.value = hue;
+        }
+    }
 
-    // private colorize(material: B.NodeMaterial, color: IColor3, strength: number = 255.0): void {
-    //     if(!material || !color) return;
-    //     if(color.r + color.g + color.b == 0) return; // it never gets truly black but who the fuck will see anyway :)
-    //     const inputBlock = material.getBlockByName("targetColor") as Nullable<B.InputBlock>;
-    //     if (inputBlock) {
-    //         inputBlock.value = new B.Color4(color.r, color.g, color.b, strength);
-    //     }
-    // }
-    
-    public setPosition(position: B.Vector3): void { this.plane.position.copyFrom(position); }
-    public getPosition(): B.Vector3 { return this.plane.position; }
+    public colorize(material: B.NodeMaterial, color: IColor3, strength: number = 255.0): void {
+        if(!material || !color) return;
+        if(color.r + color.g + color.b == 0) return; // it never gets truly black but who the fuck will see anyway :)
+        const inputBlock = material.getBlockByName("targetColor") as Nullable<B.InputBlock>;
+        if (inputBlock) {
+            inputBlock.value = new B.Color4(color.r, color.g, color.b, strength);
+        }
+    }
+
+
+    public enableShadows(shadowGenerator: B.ShadowGenerator): void {
+        console.log(`[${this.name}] Enabling shadows...`);
+        
+        // Add the character's main plane to the shadow caster list
+        shadowGenerator.addShadowCaster(this.collisionMesh);
+        this.mesh.receiveShadows = true;
+        
+        console.log(`[${this.name}] Shadow setup complete.`);
+    }
+
+
+    public enablePhysics(): void {
+        this.mesh.physicsBody = new B.PhysicsBody(
+            this.mesh, B.PhysicsMotionType.DYNAMIC, false, this.scene
+        );
+        this.mesh.physicsBody.setMassProperties({
+            mass: 2,
+            inertia: new B.Vector3(1e7, 0.5, 1e7),
+        });
+        this.mesh.physicsBody.setAngularDamping(1000);
+        const playerShape = new B.PhysicsShape({
+            type: B.PhysicsShapeType.MESH,
+            parameters: { mesh: this.collisionMesh },
+        }, this.scene);
+        this.mesh.physicsBody.shape = playerShape;
+    }
+
+    public setPosition(position: B.Vector3): void { this.mesh.position.copyFrom(position); }
+    public getPosition(): B.Vector3 { return this.mesh.position; }
     public hasTexture(): boolean { return this.texture !== null; } // Check base texture
 
-    private update = (): void => {
+    protected update = (): void => {
         // Only update if visible and has a base texture
-        if (this.plane.visibility === 0 || !this.texture) {
+        if (this.mesh.visibility === 0 || !this.texture) {
             return;
         }
 
@@ -236,11 +273,11 @@ export class SpriteSheetPlane {
     }
 
     // --- Direction Logic (Keep as is, seems fine) ---
-    private updateCurrentDirection(): void {
+    protected updateCurrentDirection(): void {
         const cam = this.scene.activeCamera;
-        const charPos = this.plane.position;
+        const charPos = this.mesh.position;
 
-        if (!cam || !cam.getViewMatrix() || !this.plane.rotationQuaternion) return;
+        if (!cam || !cam.getViewMatrix() || !this.mesh.rotationQuaternion) return;
 
         // Use temporary vectors from the pool
         const viewDirectionXZ = TmpVectors.Vector3[0]; // Use index 0
@@ -255,10 +292,10 @@ export class SpriteSheetPlane {
         if (this.billboard) {
             // Simple billboard (face camera directly on Y axis)
             const angleToCamera = cameraAngle + Math.PI
-            Quaternion.RotationYawPitchRollToRef(angleToCamera, 0, 0, this.plane.rotationQuaternion);
+            Quaternion.RotationYawPitchRollToRef(angleToCamera, 0, 0, this.mesh.rotationQuaternion);
         } else {
             const targetAngle = Math.round(cameraAngle / (Math.PI / 2)) * (Math.PI / 2) + Math.PI;
-            Quaternion.RotationYawPitchRollToRef(targetAngle, 0, 0, this.plane.rotationQuaternion); // Directly set rotation based on lookDirection
+            Quaternion.RotationYawPitchRollToRef(targetAngle, 0, 0, this.mesh.rotationQuaternion); // Directly set rotation based on lookDirection
         }
     }
 
@@ -274,11 +311,8 @@ export class SpriteSheetPlane {
             this.updateObserver = null;
         }
         // Dispose mesh and materials
-        this.plane.dispose(false, true); // Dispose geometry and children, but not materials yet
-        this.material.dispose(true); // Dispose multimaterial and its submaterials
-        // this.material_base.dispose(); // Already disposed by multiMaterial.dispose(true)
-        // this.material_eyes.dispose();
-        // this.material.dispose();
+        this.mesh.dispose(false, true);
+        this.material.dispose(true);
 
         // Dispose textures if not managed by AssetService
         if (!this.assetService) {

@@ -47,7 +47,7 @@ export class SceneDirector {
 		this._isInitialized = true;
 	}
 
-	public _advanceScene(): void {
+	public async _advanceScene(): Promise<void> {
 		if (!this._isInitialized || !this.engine) {
 			console.log('[SceneDirector] Cant update because not initialized yet...');
 			return;
@@ -65,29 +65,32 @@ export class SceneDirector {
 			}
 
 			console.log("[SceneDirector] Setting Scene to '" + next + "'...");
+			let newScene = null;
 			switch (next) {
 				case 'testEditor':
-					this.currentScene = new TestEditorScene(this.engine);
+					newScene = new TestEditorScene(this.engine);
 					break;
 				case 'test':
-					this.currentScene = new TestScene(this.engine);
+					newScene = new TestScene(this.engine);
 					break;
 				case 'firstTimeSetup':
-					this.currentScene = new FirstTimeSetupScene(this.engine);
+					newScene = new FirstTimeSetupScene(this.engine);
 					break;
 				default:
 					console.log('[GameEngine] Invalid Scene Name: ' + next + '.');
-					this.currentScene = null;
+					newScene = null;
 					break;
-			}
-			if (this.currentScene) {
+				}
+			this.nextSceneName = null;
+			if (newScene) {
+				this.currentScene = newScene;
+				await this.currentScene.initialize();
 				console.log('Scene cameras:', this.currentScene.cameras);
 				console.log('Active camera:', this.currentScene.activeCamera);
 				console.log('Scene lights:', this.currentScene.lights);
 				console.log('Engine canvas:', this.engine.getRenderingCanvas());
 			}
 
-			this.nextSceneName = null;
 		}
 	}
 }

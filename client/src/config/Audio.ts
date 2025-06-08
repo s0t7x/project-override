@@ -1,6 +1,6 @@
 const AudioSettings = {
     bgm: {
-        volume: 0.3
+        volume: 0//.3
     }
 }
 

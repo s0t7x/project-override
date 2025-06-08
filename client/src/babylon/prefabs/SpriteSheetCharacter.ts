@@ -28,6 +28,8 @@ type AnimationName = keyof typeof ANIMATION_DEFINITIONS;
 const DEFAULT_ANIMATION: AnimationName = 'idle_down';
 const BASE_FRAME_DURATION = 120 / 1000;
 
+const CHARACTER_SIZE = 2;
+
 export enum CharacterDirection {
     Up = 'up',
     Down = 'down',
@@ -36,82 +38,67 @@ export enum CharacterDirection {
 }
 const DEFAULT_DIRECTION = CharacterDirection.Down;
 
-import * as HueShiftSpriteMaterialSnippet from "../materials/HueShiftSpriteMaterial.json"
-
-const HUE_SHIFT_TEXTURE_SAMPLER_NAME = "diffuseTexture";
-const HUE_SHIFT_UNIFORM_NAME = "hueShift";
+import { SpriteSheetPlane } from './SpriteSheetPlane';
 
 // ---
 
-export class SpriteSheetCharacter {
-    private scene: B.Scene;
-    private assetService?: AssetService;
-    public name: string;
-    public plane: B.Mesh;
-    private multiMaterial: B.MultiMaterial; // Renamed for clarity
+export class SpriteSheetCharacter extends SpriteSheetPlane {
+    protected multiMaterial: B.MultiMaterial; // Renamed for clarity
 
     // Use StandardMaterial as created
-    private material_base:          B.NodeMaterial;
-    private material_eyes:          B.NodeMaterial;
-    private material_hair:          B.NodeMaterial;
-    private material_equip_legs:    B.NodeMaterial;
-    private material_equip_body:    B.NodeMaterial;
+    protected material_eyes:          B.NodeMaterial;
+    protected material_hair:          B.NodeMaterial;
+    protected material_equip_legs:    B.NodeMaterial;
+    protected material_equip_body:    B.NodeMaterial;
 
     // Keep separate texture references for each layer
-    private texture_base: B.Texture | null = null;
-    private texture_eyes: B.Texture | null = null;
-    private texture_hair: B.Texture | null = null;
-    private texture_equip_legs: B.Texture | null = null;
-    private texture_equip_body: B.Texture | null = null;
+    protected texture_base: B.Texture | null = null;
+    protected texture_eyes: B.Texture | null = null;
+    protected texture_hair: B.Texture | null = null;
+    protected texture_equip_legs: B.Texture | null = null;
+    protected texture_equip_body: B.Texture | null = null;
 
     // Logical view direction
     public lookDirection: CharacterDirection = DEFAULT_DIRECTION;
-    private currentDirection: CharacterDirection = DEFAULT_DIRECTION; // Direction for sprite choice
+    protected currentDirection: CharacterDirection = DEFAULT_DIRECTION; // Direction for sprite choice
 
     // Animation State
     public animationState: string | null = null; // e.g., 'walk', 'idle'
-    private currentFullAnimation: AnimationName = DEFAULT_ANIMATION;
-    private currentFrameIndex: number = 0;
-    private animationTimer: number = 0;
-    private currentFrameDuration: number = BASE_FRAME_DURATION;
-    private isAnimationPlaying: boolean = true;
+    protected currentFullAnimation: AnimationName = DEFAULT_ANIMATION;
+    protected currentFrameIndex: number = 0;
+    protected animationTimer: number = 0;
+    protected currentFrameDuration: number = BASE_FRAME_DURATION;
+    protected isAnimationPlaying: boolean = true;
 
-    private readonly uvScaleX: number = 1 / SHEET_COLUMNS;
-    private readonly uvScaleY: number = 1 / SHEET_ROWS;
-    private updateObserver: Nullable<Observer<B.Scene>> = null;
+    protected readonly uvScaleX: number = 1 / SHEET_COLUMNS;
+    protected readonly uvScaleY: number = 1 / SHEET_ROWS;
 
-    private static baseHueShiftMaterial: Nullable<B.NodeMaterial> = null;
-
-    public billboard: boolean = false;
+    protected planeSize: number = 2;
 
     constructor(
         name: string,
         scene: B.Scene,
         initialPosition: B.Vector3 = Vector3.Zero()
     ) {
-        this.name = name;
-        this.scene = scene;
-        this.assetService = useServiceStore.getState().assetService || undefined;
+        super(name, scene, initialPosition);
 
-        if (!SpriteSheetCharacter.baseHueShiftMaterial) {
-            const parsedMaterial = B.NodeMaterial.Parse(HueShiftSpriteMaterialSnippet, this.scene)
-            parsedMaterial.backFaceCulling = false;
-            parsedMaterial.alphaMode = B.Engine.ALPHA_COMBINE;
-            // Store the parsed material
-            SpriteSheetCharacter.baseHueShiftMaterial = parsedMaterial;
-            console.log("[SpriteSheetCharacter] Base hue shift NodeMaterial loaded.");
-        }
+        this.mesh.dispose();
+        this.mesh = B.MeshBuilder.CreatePlane(`${name}_plane`, { size: this.planeSize }, this.scene);
+        this.mesh.position = initialPosition.clone();
+        console.log(this.mesh.getPivotPoint())
+        this.mesh.setPivotPoint(this.mesh.getPivotPoint().subtract(new Vector3(0, 10, 0)))
+        this.mesh.billboardMode = B.Mesh.BILLBOARDMODE_NONE; // Manual rotation
+        this.mesh.isPickable = false;
+        this.mesh.rotationQuaternion = Quaternion.Identity(); // Use Quaternion
+        this.mesh.visibility = 0;
 
-          // 1. Create the Plane Mesh
-        this.plane = B.MeshBuilder.CreatePlane(`${name}_plane`, { size: 2 }, this.scene);
-        this.plane.position = initialPosition.clone();
-        this.plane.billboardMode = B.Mesh.BILLBOARDMODE_NONE; // Manual rotation
-        this.plane.isPickable = false;
-        this.plane.rotationQuaternion = Quaternion.Identity(); // Use Quaternion
-        this.plane.visibility = 0;
+        this.collisionMesh?.dispose();
+        this.collisionMesh = B.MeshBuilder.CreateCapsule(`${name}_collision`, { radius: CHARACTER_SIZE * 0.2, height: CHARACTER_SIZE * 0.8}, this.scene);
+        this.collisionMesh.parent = this.mesh;
+        this.collisionMesh.isPickable = false;
+        this.collisionMesh.visibility = 0;
 
         // 2. Create Individual Materials for Each Layer
-        this.material_base = this.createLayerMaterial(`${name}_mat_base`, false);
         this.material_eyes = this.createLayerMaterial(`${name}_mat_eyes`, true);
         this.material_hair = this.createLayerMaterial(`${name}_mat_hair`, true);
         this.material_equip_legs = this.createLayerMaterial(`${name}_mat_equip_legs`, true);
@@ -119,7 +106,7 @@ export class SpriteSheetCharacter {
 
         // 3. Create the MultiMaterial
         this.multiMaterial = new B.MultiMaterial(`${name}_multimat`, this.scene);
-        this.multiMaterial.subMaterials.push(this.material_base); // Index 0
+        this.multiMaterial.subMaterials.push(this.material); // Index 0
         this.multiMaterial.subMaterials.push(this.material_eyes); // Index 1
         this.multiMaterial.subMaterials.push(this.material_hair); // Index 2
         this.multiMaterial.subMaterials.push(this.material_equip_legs);
@@ -129,151 +116,38 @@ export class SpriteSheetCharacter {
         // A standard plane has 4 vertices and 6 indices (0, 1, 2, 0, 2, 3)
         const vertexCount = 4;
         const indexCount = 6;
-        this.plane.subMeshes = []; // Clear default submesh
+        this.mesh.subMeshes = []; // Clear default submesh
 
         // Create a submesh for each material layer, all covering the entire geometry
-        new B.SubMesh(0, 0, vertexCount, 0, indexCount, this.plane); // For material_base
-        new B.SubMesh(1, 0, vertexCount, 0, indexCount, this.plane); // For material_eyes
-        new B.SubMesh(2, 0, vertexCount, 0, indexCount, this.plane); // For material_hair
-        new B.SubMesh(3, 0, vertexCount, 0, indexCount, this.plane);
-        new B.SubMesh(4, 0, vertexCount, 0, indexCount, this.plane);
+        new B.SubMesh(0, 0, vertexCount, 0, indexCount, this.mesh); // For material
+        new B.SubMesh(1, 0, vertexCount, 0, indexCount, this.mesh); // For material_eyes
+        new B.SubMesh(2, 0, vertexCount, 0, indexCount, this.mesh); // For material_hair
+        new B.SubMesh(3, 0, vertexCount, 0, indexCount, this.mesh);
+        new B.SubMesh(4, 0, vertexCount, 0, indexCount, this.mesh);
 
         // 5. Assign the MultiMaterial to the Plane
-        this.plane.material = this.multiMaterial;
+        this.mesh.material = this.multiMaterial;
 
+        this.updateObserver!.remove();
         this.updateObserver = this.scene.onBeforeRenderObservable.add(this.update);
+
         console.log(`[SpriteSheetCharacter:${this.name}] Initialized with MultiMaterial.`);
     }
 
-    // private createLayerMaterial(name: string, disableDepthWrite: boolean): B.StandardMaterial {
-    //     const material = new B.StandardMaterial(name, this.scene);
-
-    //     material.useAlphaFromDiffuseTexture = true;
-    //     material.diffuseTexture = null;
-
-    //     // --- Alpha Blending Settings ---
-    //     material.alphaMode = B.Engine.ALPHA_COMBINE;
-
-    //     // --- Depth Settings ---
-    //     material.disableDepthWrite = disableDepthWrite; 
-
-    //     // --- Other common sprite settings ---
-    //     material.backFaceCulling = false;            // Show back face if needed
-    //     material.disableLighting = false;             // Sprites often ignore scene lighting
-
-    //     return material;
-    // }
-
-    private createLayerMaterial(name: string, disableDepthWrite: boolean): B.NodeMaterial {
-        if (!SpriteSheetCharacter.baseHueShiftMaterial) {
-            // Handle case where material isn't loaded yet (important!)
-            console.error(`[${name}] Base NodeMaterial not ready!`);
-            // Return a temporary placeholder or throw error
-            // ... (Placeholder logic from previous answer) ...
-            const dummyMat = new B.StandardMaterial(name + "_dummy", this.scene);
-            dummyMat.emissiveColor = Color3.Magenta();
-            return dummyMat as any;
-        }
-
-        // <<< CLONE the base material >>>
-        const material = SpriteSheetCharacter.baseHueShiftMaterial.clone(name);
-
-        // Apply instance-specific settings
-        material.disableDepthWrite = disableDepthWrite;
-        material.alpha = 0.0; // Start invisible
-
-        // Initialize texture sampler to null
-        const samplerBlock = material.getBlockByName(HUE_SHIFT_TEXTURE_SAMPLER_NAME) as Nullable<B.TextureBlock>;
-        if (samplerBlock) {
-            samplerBlock.texture = null; // <<< Set the .texture property of the block
-        } else {
-            console.warn(`[${name}] Sampler block '${HUE_SHIFT_TEXTURE_SAMPLER_NAME}' not found during init.`);
-        }
-
-        // Initialize hue shift uniform to 0
-        const inputBlock = material.getBlockByName(HUE_SHIFT_UNIFORM_NAME) as Nullable<B.InputBlock>;
-        if (inputBlock) {
-            inputBlock.value = 0;
-        }
-
-        return material;
-    }
-
-    // --- Helper function using NodeMaterial specifics ---
-    private async loadLayerTexture(
-        textureUrl: string | undefined | null,
-        material: B.NodeMaterial,
-        layerName: string
-    ): Promise<Texture | null> {
-
-        const samplerBlock = material.getBlockByName(HUE_SHIFT_TEXTURE_SAMPLER_NAME) as Nullable<B.TextureBlock>;
-        if (!samplerBlock) {
-            console.error(`[${this.name}] Cannot find sampler block '${HUE_SHIFT_TEXTURE_SAMPLER_NAME}' in material ${material.name}`);
-            material.alpha = 0.0;
-            return null;
-        }
-        // We don't necessarily need currentTexture ref here unless managing disposal carefully
-        // let currentTexture: Texture | null = samplerBlock.texture ?? null;
-
-        if (textureUrl && textureUrl.length > 0) {
-            // if((process as any).resourcesPath && !textureUrl.startsWith("http")) textureUrl = (process as any).resourcesPath + '/app' + textureUrl;
-            console.warn('Asset URL ' + textureUrl);
-            // --- Texture URL Provided ---
-            try {
-                let newTexture: B.Texture | null = null;
-                let currentTextureInBlock = samplerBlock.texture; // Get texture currently in block
-                const needsLoading = !currentTextureInBlock || currentTextureInBlock.url !== textureUrl;
-
-                if (needsLoading) {
-                    if (this.assetService) {
-                        newTexture = await this.assetService.loadTexture(textureUrl);
-                    } else {
-                        // Dispose old manually ONLY if it exists and we loaded it (not from asset service)
-                        currentTextureInBlock?.dispose();
-                        newTexture = new B.Texture(textureUrl, this.scene, false, true, B.Texture.NEAREST_SAMPLINGMODE);
-                    }
-                } else {
-                    newTexture = currentTextureInBlock; // Reuse existing texture
-                }
-
-                if (newTexture) {
-                    newTexture.hasAlpha = true;
-                    // --- CORRECT WAY to assign the texture ---
-                    samplerBlock.texture = newTexture; // <<< Assign to the block's .texture property
-                    material.alpha = 1.0;
-                    console.log(`[SpriteSheetCharacter:${this.name}] ${layerName} Texture updated: ${textureUrl}`);
-                    // needsUVUpdate = true; // Flag this in setCharacter if needed
-                    return newTexture;
-                } else {
-                    // Loading failed
-                    console.error(`[SpriteSheetCharacter:${this.name}] ${layerName} Texture failed to load: ${textureUrl}`);
-                    if (needsLoading && !this.assetService) currentTextureInBlock?.dispose(); // Dispose if manually loaded
-                    // --- CORRECT WAY to set null texture ---
-                    samplerBlock.texture = null; // <<< Set block's texture to null
-                    material.alpha = 0.0;
-                    return null;
-                } 
-            } catch (error) {
-                // Error during loading
-                console.error(`[SpriteSheetCharacter:${this.name}] Error loading ${layerName} texture: ${textureUrl}`, error);
-                // Consider if currentTextureInBlock needs disposal here based on needsLoading/assetService
-                // --- CORRECT WAY to set null texture ---
-                samplerBlock.texture = null; // <<< Set block's texture to null
-                material.alpha = 0.0;
-                return null;
-            }
-        } else {
-            // --- No Texture URL Provided ---
-            let currentTextureInBlock = samplerBlock.texture;
-            if (currentTextureInBlock && !this.assetService) {
-                currentTextureInBlock.dispose();
-            }
-            // --- CORRECT WAY to set null texture ---
-            samplerBlock.texture = null; // <<< Set block's texture to null
-            material.alpha = 0.0;
-            console.log(`[SpriteSheetCharacter:${this.name}] ${layerName} Texture set to null. Material alpha = 0.`);
-            return null;
-        }
+    public enablePhysics(): void {
+        this.mesh.physicsBody = new B.PhysicsBody(
+            this.mesh, B.PhysicsMotionType.DYNAMIC, false, this.scene
+        );
+        this.mesh.physicsBody.setMassProperties({
+            mass: 2,
+            inertia: new B.Vector3(1e7, 1e7, 1e7),
+        });
+        this.mesh.physicsBody.setAngularDamping(1000);
+        const playerShape = new B.PhysicsShape({
+            type: B.PhysicsShapeType.MESH,
+            parameters: { mesh: this.collisionMesh },
+        }, this.scene);
+        this.mesh.physicsBody.shape = playerShape;
     }
 
     public getTextureURLForIdx(idx: number) {
@@ -290,30 +164,30 @@ export class SpriteSheetCharacter {
             try {
                 const textureUrl = this.getTextureURLForIdx(customization.bodyIdx);
                 if (!textureUrl) throw Error('naa, no textureUrl for idx ' + customization.bodyIdx);
-                let newTexture: B.Texture | null = await this.loadLayerTexture(textureUrl, this.material_base, "Base");
+                let newTexture: B.Texture | null = await this.loadLayerTexture(textureUrl, this.material, "Base");
                 if (newTexture) {
                     this.texture_base = newTexture;
                     this.texture_base.hasAlpha = true;
-                    // this.material_base.diffuseTexture = this.texture_base;
-                    // this.material_base.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, this.texture_base);
+                    // this.material.diffuseTexture = this.texture_base;
+                    // this.material.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, this.texture_base);
                     console.log(`[SpriteSheetCharacter:${this.name}] Base Texture updated.`);
                 } else {
                     console.error(`[SpriteSheetCharacter:${this.name}] Base Texture failed to load: ${textureUrl}`);
                     this.texture_base = null;
-                    // this.material_base.diffuseTexture = null;
-                    // this.material_base.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
+                    // this.material.diffuseTexture = null;
+                    // this.material.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
                 }
             } catch (error) {
                 console.error(`[SpriteSheetCharacter:${this.name}] Error loading base texture: ${customization.bodyIdx}`, error);
                 this.texture_base = null;
-                // this.material_base.diffuseTexture = null;
-                // this.material_base.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
+                // this.material.diffuseTexture = null;
+                // this.material.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
             }
         } else {
             this.texture_base = null;
-            // this.material_base.diffuseTexture = null;
-            // this.material_base.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
-            this.texture_base = await this.loadLayerTexture(null, this.material_base, "Base");
+            // this.material.diffuseTexture = null;
+            // this.material.setTexture(HUE_SHIFT_TEXTURE_SAMPLER_NAME, null);
+            this.texture_base = await this.loadLayerTexture(null, this.material, "Base");
         }
 
         // --- Hair Layer ---
@@ -387,7 +261,7 @@ export class SpriteSheetCharacter {
 
         // Apply hue shift if needed (requires custom shader or node material)
         if (customization) {
-            // this.applyHueShift(this.material_base, customization?.baseHue);
+            // this.applyHueShift(this.material, customization?.baseHue);
             // this.applyHueShift(this.material_eyes, customization?.eyesHue);
             // this.applyHueShift(this.material_hair, customization?.hairHue);
             if(customization.bodyColor) this.colorizeBase(customization.bodyColor)
@@ -458,35 +332,19 @@ export class SpriteSheetCharacter {
             // await this.applyEquipmentVisuals(characterSummary.equipmentVisuals || null);
             if(this.texture_base) {
                 this.setAnimationInternal(initialAnimation || this.currentFullAnimation || DEFAULT_ANIMATION, true); // Force UV update
-                this.plane.visibility = 1;
+                this.mesh.visibility = 1;
                 console.log(`[SpriteSheetCharacter:${this.name}] Character setup complete. Visible.`);
                 return;
             }
         }
-        this.plane.visibility = 0;
+        this.mesh.visibility = 0;
         this.stopAnimation();
         console.log(`[SpriteSheetCharacter:${this.name}] No base texture or character summary. Hidden.`);
     }
 
-    // private applyHueShift(material: B.NodeMaterial, hue: number): void {
-    //     const inputBlock = material.getBlockByName(HUE_SHIFT_UNIFORM_NAME) as Nullable<B.InputBlock>;
-    //     if (inputBlock) {
-    //         inputBlock.value = hue;
-    //     }
-    // }
-
-    private colorize(material: B.NodeMaterial, color: IColor3, strength: number = 255.0): void {
-        if(!material || !color) return;
-        if(color.r + color.g + color.b == 0) return; // it never gets truly black but who the fuck will see anyway :)
-        const inputBlock = material.getBlockByName("targetColor") as Nullable<B.InputBlock>;
-        if (inputBlock) {
-            inputBlock.value = new B.Color4(color.r, color.g, color.b, strength);
-        }
-    }
-
     public colorizeBase(color: IColor3, strength: number = 255.0): void {
-        if (!this.material_base) return;
-        this.colorize(this.material_base, color, strength);
+        if (!this.material) return;
+        this.colorize(this.material, color, strength);
     }
 
     public colorizeEyes(color: IColor3, strength: number = 255.0): void {
@@ -501,13 +359,13 @@ export class SpriteSheetCharacter {
 
     public stopAnimation(): void { this.isAnimationPlaying = false; }
     public resumeAnimation(): void { this.isAnimationPlaying = true; }
-    public setPosition(position: B.Vector3): void { this.plane.position.copyFrom(position); }
-    public getPosition(): B.Vector3 { return this.plane.position; }
+    public setPosition(position: B.Vector3): void { this.mesh.position.copyFrom(position); }
+    public getPosition(): B.Vector3 { return this.mesh.position; }
     public hasTexture(): boolean { return this.texture_base !== null; } // Check base texture
 
-    private update = (): void => {
+    protected update = (): void => {
         // Only update if visible and has a base texture
-        if (this.plane.visibility === 0 || !this.texture_base) {
+        if (this.mesh.visibility === 0 || !this.texture_base) {
             return;
         }
 
@@ -519,11 +377,11 @@ export class SpriteSheetCharacter {
     }
 
     // --- Direction Logic (Keep as is, seems fine) ---
-    private updateCurrentDirection(): void {
+    protected updateCurrentDirection(): void {
         const cam = this.scene.activeCamera;
-        const charPos = this.plane.position;
+        const charPos = this.mesh.position;
 
-        if (!cam || !cam.getViewMatrix() || !this.plane.rotationQuaternion) return;
+        if (!cam || !cam.getViewMatrix() || !this.mesh.rotationQuaternion) return;
 
         // Use temporary vectors from the pool
         const viewDirectionXZ = TmpVectors.Vector3[0]; // Use index 0
@@ -544,10 +402,10 @@ export class SpriteSheetCharacter {
         if (this.billboard) {
             // Simple billboard (face camera directly on Y axis)
             const angleToCamera = cameraAngle + Math.PI
-            Quaternion.RotationYawPitchRollToRef(angleToCamera, 0, 0, this.plane.rotationQuaternion);
+            Quaternion.RotationYawPitchRollToRef(angleToCamera, 0, 0, this.mesh.rotationQuaternion);
         } else {
             const targetAngle = Math.round(cameraAngle / (Math.PI / 2)) * (Math.PI / 2) + Math.PI;
-            Quaternion.RotationYawPitchRollToRef(targetAngle, 0, 0, this.plane.rotationQuaternion); // Directly set rotation based on lookDirection
+            Quaternion.RotationYawPitchRollToRef(targetAngle, 0, 0, this.mesh.rotationQuaternion); // Directly set rotation based on lookDirection
         }
 
         const characterLookVector = TmpVectors.Vector3[1]; // Use index 1
@@ -582,13 +440,9 @@ export class SpriteSheetCharacter {
         }
     }
 
-    public applyAssetService(assetService: AssetService) {
-        this.assetService = assetService;
-        // Potentially reload textures if needed, or just use it for future loads
-    }
     public turnAtCamera(): void {
         const cam = this.scene.activeCamera;
-        const charPos = this.plane.position;
+        const charPos = this.mesh.position;
 
         if (!cam || !cam.getViewMatrix()) return;
 
@@ -599,18 +453,18 @@ export class SpriteSheetCharacter {
 
         viewDirectionXZ.normalize();
 
-        const dot = Vector3.Dot(this.plane.forward, viewDirectionXZ);
-        const crossY = this.plane.forward.z * viewDirectionXZ.x - this.plane.forward.x * viewDirectionXZ.z;
+        const dot = Vector3.Dot(this.mesh.forward, viewDirectionXZ);
+        const crossY = this.mesh.forward.z * viewDirectionXZ.x - this.mesh.forward.x * viewDirectionXZ.z;
         let relativeAngle = Math.atan2(crossY, dot); // Angle from characterLookVector to viewDirectionXZ (-PI to PI)
 
-        if (this.plane.rotationQuaternion)
-            Quaternion.RotationYawPitchRollToRef(relativeAngle, 0.1, 0, this.plane.rotationQuaternion);
+        if (this.mesh.rotationQuaternion)
+            Quaternion.RotationYawPitchRollToRef(relativeAngle, 0.1, 0, this.mesh.rotationQuaternion);
 
     }
 
     public lookAtCamera(): void {
         const cam = this.scene.activeCamera;
-        const charPos = this.plane.position;
+        const charPos = this.mesh.position;
 
         if (!cam || !cam.getViewMatrix()) return;
 
@@ -672,7 +526,7 @@ export class SpriteSheetCharacter {
         }
     }
 
-    private updateAnimationName(forceUpdateUV: boolean = false): void {
+    protected updateAnimationName(forceUpdateUV: boolean = false): void {
         // Determine the correct animation name based on the current state (e.g., 'walk') and sprite direction (e.g., 'left')
         const prefix = this.animationState || 'idle';
         const newAnimationName = `${prefix}_${this.currentDirection}` as AnimationName;
@@ -681,7 +535,7 @@ export class SpriteSheetCharacter {
         this.setAnimationInternal(newAnimationName, forceUpdateUV);
     }
 
-    private setAnimationInternal(name: AnimationName, forceUpdateUV: boolean = false): void {
+    protected setAnimationInternal(name: AnimationName, forceUpdateUV: boolean = false): void {
         // Find the animation definition
         let animDef = ANIMATION_DEFINITIONS[name];
         if (!animDef) {
@@ -732,7 +586,7 @@ export class SpriteSheetCharacter {
     }
 
 
-    private advanceAnimationFrame(): void {
+    protected advanceAnimationFrame(): void {
         if (!this.isAnimationPlaying || !this.currentFullAnimation || !this.scene) return;
 
         // Check if we have textures to animate
@@ -767,7 +621,7 @@ export class SpriteSheetCharacter {
 
 
     // Corrected UV Update
-    private _updateUVs(): void {
+    protected _updateUVs(): void {
         const animDef = ANIMATION_DEFINITIONS[this.currentFullAnimation];
         // Ensure we have an animation definition and at least one texture exists
         if (!animDef || (!this.texture_base && !this.texture_eyes && !this.texture_hair)) {
@@ -833,9 +687,9 @@ export class SpriteSheetCharacter {
             this.updateObserver = null;
         }
         // Dispose mesh and materials
-        this.plane.dispose(false, true); // Dispose geometry and children, but not materials yet
+        this.mesh.dispose(false, true); // Dispose geometry and children, but not materials yet
         this.multiMaterial.dispose(true); // Dispose multimaterial and its submaterials
-        // this.material_base.dispose(); // Already disposed by multiMaterial.dispose(true)
+        // this.material.dispose(); // Already disposed by multiMaterial.dispose(true)
         // this.material_eyes.dispose();
         // this.material_hair.dispose();
 

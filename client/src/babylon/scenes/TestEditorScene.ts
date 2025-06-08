@@ -34,10 +34,9 @@ export class TestEditorScene extends BaseScene {
         }
         this.currentBlockTypeIndex = 0;
         this.currentBlockTypeId = this.availableBlockTypes[this.currentBlockTypeIndex].id;
-        this.initialize();
     }
 
-    private async initialize(): Promise<void> {
+    public async initialize(): Promise<void> {
         console.log("Initializing TestEditorScene...");
 
         const camera = new BABYLON.ArcRotateCamera('editorCam', -Math.PI / 2, Math.PI / 3, 30, new BABYLON.Vector3(8, 5, 8), this);

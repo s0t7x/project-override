@@ -64,7 +64,6 @@ export class GameEngine {
 
 		const resPath = (process as any).resourcesPath;
 		if(resPath) {
-			console.log('Res path', resPath)
 			if((resPath as string).includes('node_modules')){
 				const p = process as any;
 				Object.defineProperty(p, 'resourcesPath', {
@@ -89,16 +88,17 @@ export class GameEngine {
 				console.error('[GameEngine] SceneDirector is null during render loop.');
 				return;
 			}
-			this.sceneDirector._advanceScene();
-			const activeScene = this.sceneDirector.getActiveScene();
-			if (activeScene && activeScene.isReady()) {
-				// console.log("[GameEngine] Rendering scene...", activeScene.constructor.name)
-				try {
-					activeScene.render();
-				} catch (error: any) {
-					console.error(error);
+			this.sceneDirector._advanceScene().then(() => {
+				const activeScene = this.sceneDirector!.getActiveScene();
+				if (activeScene && activeScene.isReady()) {
+					// console.log("[GameEngine] Rendering scene...", activeScene.constructor.name)
+					try {
+						activeScene.render();
+					} catch (error: any) {
+						console.error(error);
+					}
 				}
-			}
+			});
 		});
 
 		this._isInitialized = true;
