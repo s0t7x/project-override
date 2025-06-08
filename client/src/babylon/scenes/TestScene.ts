@@ -48,23 +48,24 @@ export class TestScene extends BaseScene {
                 return;
             }
 
+            // --- Asset Service Setup ---
+            useServiceStore.getState().assetService?.setScene(this);
+            
             // --- Player Setup (Now beautifully simple) ---
             const playerInitialPosition = new BABYLON.Vector3(10, 5, 10);
             const testCharSummary: ICharacterSummary = { id: 'char1', userId: 'user1', name: 'Player', level: 1, lastPlayed: 0, isOnline: false, isDeleted: false, deletedAt: 0, appearance: { bodyIdx: 4711, eyesIdx: 0, beardIdx: 0, hairIdx: 0, hairFrontIdx: 0, hairBackIdx: 0 }, equipmentVisuals: [] };
-
+            
             this.player = new PlayerController(this, {
                 initialPosition: playerInitialPosition,
                 characterSummary: testCharSummary
             });
             await this.player.initialize(testCharSummary);
-
+            
             // Set the scene's active camera to the one created and managed by the player controller
             this.activeCamera = this.player.camera;
             this.setupPostProcessing(this.activeCamera); // Setup post-processing on the final active camera
-
+            
             // --- World & Prop Setup ---
-            useServiceStore.getState().assetService?.setScene(this);
-
             this.worldBuilder = new WorldMeshBuilder(this, blockDefinitionsData as BlockDefinition[]);
             const exampleInitialWorld: IWorldBlock[] = DEV_TESTMAP as IWorldBlock[];
             await this.worldBuilder.loadInitialWorld(exampleInitialWorld);
