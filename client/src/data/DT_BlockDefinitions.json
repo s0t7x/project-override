@@ -30,7 +30,13 @@
         "id": "dev_stone_wall",
         "isSolid": true,
         "textures": {
-            "side": "/assets/textures/dev_64x64-orange.png",
+            "side": {
+                "texturePath": "/assets/textures/SF_Outside_A4.png",
+                "frameX": 696,
+                "frameY": 288,
+                "frameWidth": 48,
+                "frameHeight": 48
+            },
             "top": "/assets/textures/dev_64x64-orange.png",
             "bottom": "/assets/textures/dev_64x64-orange.png"
         }

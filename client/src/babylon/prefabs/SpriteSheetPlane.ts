@@ -52,6 +52,7 @@ export class SpriteSheetPlane {
         this.mesh.isPickable = false;
         this.mesh.rotationQuaternion = Quaternion.Identity(); // Use Quaternion
         this.mesh.visibility = 0;
+        this.mesh.receiveShadows = true;
 
         this.collisionMesh = B.MeshBuilder.CreateBox(`${name}_collision`, { size: this.planeSize * 0.9}, this.scene);
         this.collisionMesh.parent = this.mesh;
@@ -77,13 +78,12 @@ export class SpriteSheetPlane {
             return dummyMat as any;
         }
 
-        // <<< CLONE the base material >>>
         const material = SpriteSheetPlane.baseHueShiftMaterial.clone(name);
 
         // Apply instance-specific settings
         material.disableDepthWrite = disableDepthWrite;
         material.alpha = 0.0; // Start invisible
-
+        
         // Initialize texture sampler to null
         const samplerBlock = material.getBlockByName(HUE_SHIFT_TEXTURE_SAMPLER_NAME) as Nullable<B.TextureBlock>;
         if (samplerBlock) {

@@ -15,7 +15,7 @@ export class PlayerController {
     
     // Public getter for the main mesh, useful for external interactions like the physics viewer
     public get mesh(): BABYLON.TransformNode {
-        return this.character.mesh;
+        return this.character.dummyMesh || this.character.mesh;
     }
 
     // --- Private Properties ---
@@ -75,7 +75,9 @@ export class PlayerController {
 
     // Arrow function preserves 'this' context when called by the observable
     private _update = (): void => {
-        const body = this.character.mesh.physicsBody;
+        if(!this.character.dummyMesh) return;
+
+        const body = this.character.dummyMesh.physicsBody;
         if (!body) return;
 
         const cameraForward = this.camera.getDirection(BABYLON.Axis.Z);

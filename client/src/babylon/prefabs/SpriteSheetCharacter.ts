@@ -1,7 +1,5 @@
-import { AssetService } from '@/services/AssetService';
-import { useServiceStore } from '@/stores/ServiceStore';
 import * as B from '@babylonjs/core';
-import { Vector3, TmpVectors, Observer, Nullable, Quaternion, Color3, Texture } from '@babylonjs/core';
+import { Vector3, TmpVectors, Quaternion } from '@babylonjs/core';
 import { ICharacterAppearance } from '@project-override/shared/core/CharacterAppearance';
 import { ICharacterSummary } from '@project-override/shared/core/CharacterSummary';
 // import { IEquipmentVisual } from '@project-override/shared/core/EquipmentVisual';
@@ -75,6 +73,8 @@ export class SpriteSheetCharacter extends SpriteSheetPlane {
 
     protected planeSize: number = 2;
 
+    public dummyMesh: B.Mesh | null;
+
     constructor(
         name: string,
         scene: B.Scene,
@@ -82,19 +82,23 @@ export class SpriteSheetCharacter extends SpriteSheetPlane {
     ) {
         super(name, scene, initialPosition);
 
+        this.dummyMesh = B.MeshBuilder.CreatePlane(`${name}_transformNode`, { size: this.planeSize },this.scene);
+        this.dummyMesh.isPickable = false;
+        this.dummyMesh.position = initialPosition.clone();
+        this.dummyMesh.visibility = 0;
+
         this.mesh.dispose();
         this.mesh = B.MeshBuilder.CreatePlane(`${name}_plane`, { size: this.planeSize }, this.scene);
-        this.mesh.position = initialPosition.clone();
-        console.log(this.mesh.getPivotPoint())
-        this.mesh.setPivotPoint(this.mesh.getPivotPoint().subtract(new Vector3(0, 10, 0)))
+        this.mesh.parent = this.dummyMesh;
+        this.mesh.position = new B.Vector3(0, 0.1, 0);
         this.mesh.billboardMode = B.Mesh.BILLBOARDMODE_NONE; // Manual rotation
         this.mesh.isPickable = false;
         this.mesh.rotationQuaternion = Quaternion.Identity(); // Use Quaternion
         this.mesh.visibility = 0;
 
         this.collisionMesh?.dispose();
-        this.collisionMesh = B.MeshBuilder.CreateCapsule(`${name}_collision`, { radius: CHARACTER_SIZE * 0.2, height: CHARACTER_SIZE * 0.8}, this.scene);
-        this.collisionMesh.parent = this.mesh;
+        this.collisionMesh = B.MeshBuilder.CreateCapsule(`${name}_collision`, { radius: CHARACTER_SIZE * 0.2, height: CHARACTER_SIZE * 0.8, }, this.scene);
+        this.collisionMesh.parent = this.dummyMesh;
         this.collisionMesh.isPickable = false;
         this.collisionMesh.visibility = 0;
 
@@ -135,19 +139,20 @@ export class SpriteSheetCharacter extends SpriteSheetPlane {
     }
 
     public enablePhysics(): void {
-        this.mesh.physicsBody = new B.PhysicsBody(
-            this.mesh, B.PhysicsMotionType.DYNAMIC, false, this.scene
+        if(!this.dummyMesh) return;
+        this.dummyMesh.physicsBody = new B.PhysicsBody(
+            this.dummyMesh, B.PhysicsMotionType.DYNAMIC, false, this.scene
         );
-        this.mesh.physicsBody.setMassProperties({
-            mass: 2,
-            inertia: new B.Vector3(1e7, 1e7, 1e7),
+        this.dummyMesh.physicsBody.setMassProperties({
+            mass: 1,
+            inertia: new B.Vector3(1e7, 1, 1e7)
         });
-        this.mesh.physicsBody.setAngularDamping(1000);
+        this.dummyMesh.physicsBody.setAngularDamping(1000);
         const playerShape = new B.PhysicsShape({
             type: B.PhysicsShapeType.MESH,
             parameters: { mesh: this.collisionMesh },
         }, this.scene);
-        this.mesh.physicsBody.shape = playerShape;
+        this.dummyMesh.physicsBody.shape = playerShape;
     }
 
     public getTextureURLForIdx(idx: number) {

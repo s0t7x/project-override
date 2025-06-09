@@ -66,7 +66,7 @@ export class TestScene extends BaseScene {
             this.setupPostProcessing(this.activeCamera); // Setup post-processing on the final active camera
             
             // --- World & Prop Setup ---
-            this.worldBuilder = new WorldMeshBuilder(this, blockDefinitionsData as BlockDefinition[]);
+            this.worldBuilder = new WorldMeshBuilder(this, blockDefinitionsData as BlockDefinition[], shadowGenerator);
             const exampleInitialWorld: IWorldBlock[] = DEV_TESTMAP as IWorldBlock[];
             await this.worldBuilder.loadInitialWorld(exampleInitialWorld);
 
@@ -111,17 +111,19 @@ export class TestScene extends BaseScene {
 
         // Add a soft, ambient light to fill in shadows so they aren't pure black.
         const ambientLight = new BABYLON.HemisphericLight("ambientLight", new BABYLON.Vector3(0, 1, 0), this);
-        ambientLight.intensity = 0.1;
+        ambientLight.intensity = 0.2;
         ambientLight.specular = BABYLON.Color3.Black(); // No shiny reflections
 
         // This is our main "sun" light, creating the strong shadows.
         const directionalLight = new BABYLON.DirectionalLight("dirLight", new BABYLON.Vector3(-0.5, -1, -0.7), this);
         directionalLight.position = new BABYLON.Vector3(20, 40, 20);
-        directionalLight.intensity = 1.4;
+        directionalLight.intensity = 1.2;
 
-        directionalLight.autoCalcShadowZBounds = false; // Turn OFF automatic calculation.
-        directionalLight.shadowMinZ = 1;   // Start casting shadows 1 unit away from the light's position.
-        directionalLight.shadowMaxZ = 1000; // Stop casting shadows 100 units away.
+        directionalLight.autoUpdateExtends = true;
+
+        // directionalLight.autoCalcShadowZBounds = false; // Turn OFF automatic calculation.
+        // directionalLight.shadowMinZ = 1;   // Start casting shadows 1 unit away from the light's position.
+        // directionalLight.shadowMaxZ = 1000; // Stop casting shadows 100 units away.
 
 
         // Create the shadow generator

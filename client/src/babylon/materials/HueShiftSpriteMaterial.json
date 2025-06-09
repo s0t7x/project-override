@@ -1,1318 +1,1726 @@
 {
-    "tags": null,
-    "ignoreAlpha": false,
-    "maxSimultaneousLights": 4,
-    "mode": 0,
-    "forceAlphaBlending": false,
-    "id": "node",
-    "name": "node",
-    "checkReadyOnEveryCall": false,
-    "checkReadyOnlyOnce": false,
-    "state": "",
-    "alpha": 1,
-    "backFaceCulling": true,
-    "cullBackFaces": true,
-    "alphaMode": 2,
-    "_needDepthPrePass": false,
-    "disableDepthWrite": false,
-    "disableColorWrite": false,
-    "forceDepthWrite": false,
-    "depthFunction": 0,
-    "separateCullingPass": false,
-    "fogEnabled": true,
-    "pointSize": 1,
-    "zOffset": 0,
-    "zOffsetUnits": 0,
-    "pointsCloud": false,
-    "fillMode": 0,
-    "editorData": {
-        "locations": [
-            {
-                "blockId": 5023,
-                "x": 840,
-                "y": 140,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5024,
-                "x": 600,
-                "y": 80,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5025,
-                "x": 320,
-                "y": 0,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5026,
-                "x": 0,
-                "y": 0,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5027,
-                "x": 0,
-                "y": 160,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5028,
-                "x": 300,
-                "y": 220,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5029,
-                "x": 2740,
-                "y": 500,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5030,
-                "x": 2360,
-                "y": -20,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5031,
-                "x": 1840,
-                "y": 280,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5032,
-                "x": 1500,
-                "y": 380,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5033,
-                "x": 1400,
-                "y": 780,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5034,
-                "x": 1120,
-                "y": 860,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5035,
-                "x": 1060,
-                "y": 340,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5036,
-                "x": 820,
-                "y": 340,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5037,
-                "x": 400,
-                "y": 440,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5038,
-                "x": 0,
-                "y": 500,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5039,
-                "x": 760,
-                "y": 840,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5040,
-                "x": 300,
-                "y": 880,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5041,
-                "x": 500,
-                "y": 980,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5042,
-                "x": 2120,
-                "y": -120,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5043,
-                "x": 2160,
-                "y": -400,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5044,
-                "x": 1740,
-                "y": -420,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5045,
-                "x": 1560,
-                "y": -360,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5046,
-                "x": 1320,
-                "y": -300,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5047,
-                "x": 1040,
-                "y": -280,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5048,
-                "x": 1560,
-                "y": -60,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5049,
-                "x": 1200,
-                "y": 40,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5050,
-                "x": 860,
-                "y": 600,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5051,
-                "x": 400,
-                "y": 760,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5052,
-                "x": 1840,
-                "y": -180,
-                "isCollapsed": false
-            },
-            {
-                "blockId": 5146,
-                "x": 1860,
-                "y": -40,
-                "isCollapsed": false
-            }
-        ],
-        "frames": [],
-        "x": -529.2652835908264,
-        "y": 326.0392125774333,
-        "zoom": 0.6657303360494526
-    },
-    "customType": "BABYLON.NodeMaterial",
-    "outputNodes": [
-        5023,
-        5029
+  "tags": null,
+  "ignoreAlpha": false,
+  "maxSimultaneousLights": 4,
+  "mode": 0,
+  "forceAlphaBlending": false,
+  "id": "node",
+  "name": "node",
+  "checkReadyOnEveryCall": false,
+  "checkReadyOnlyOnce": false,
+  "state": "",
+  "alpha": 1,
+  "backFaceCulling": true,
+  "cullBackFaces": true,
+  "alphaMode": 2,
+  "_needDepthPrePass": false,
+  "disableDepthWrite": false,
+  "disableColorWrite": false,
+  "forceDepthWrite": false,
+  "depthFunction": 0,
+  "separateCullingPass": false,
+  "fogEnabled": true,
+  "pointSize": 1,
+  "zOffset": 0,
+  "zOffsetUnits": 0,
+  "pointsCloud": false,
+  "fillMode": 0,
+  "editorData": {
+    "locations": [
+      {
+        "blockId": 857,
+        "x": 840,
+        "y": 140,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 858,
+        "x": 600,
+        "y": 80,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 859,
+        "x": 320,
+        "y": 0,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 860,
+        "x": 1500,
+        "y": 1260,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 861,
+        "x": 0,
+        "y": 160,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 862,
+        "x": 300,
+        "y": 220,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 863,
+        "x": 3860,
+        "y": 560,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 864,
+        "x": 3300,
+        "y": 400,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 865,
+        "x": 2360,
+        "y": -20,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 866,
+        "x": 1840,
+        "y": 280,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 867,
+        "x": 1500,
+        "y": 380,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 868,
+        "x": 1400,
+        "y": 780,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 869,
+        "x": 1120,
+        "y": 860,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 870,
+        "x": 1120,
+        "y": 360,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 871,
+        "x": 820,
+        "y": 340,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 872,
+        "x": 400,
+        "y": 440,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 873,
+        "x": 0,
+        "y": 500,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 874,
+        "x": 760,
+        "y": 840,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 875,
+        "x": 300,
+        "y": 880,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 876,
+        "x": 500,
+        "y": 980,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 877,
+        "x": 2120,
+        "y": -120,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 878,
+        "x": 2160,
+        "y": -400,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 879,
+        "x": 1740,
+        "y": -420,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 880,
+        "x": 1560,
+        "y": -360,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 881,
+        "x": 1320,
+        "y": -300,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 882,
+        "x": 1040,
+        "y": -280,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 883,
+        "x": 1840,
+        "y": -180,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 884,
+        "x": 1860,
+        "y": -40,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 885,
+        "x": 1560,
+        "y": -60,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 886,
+        "x": 1200,
+        "y": 40,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 887,
+        "x": 2620,
+        "y": 900,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 888,
+        "x": 2180,
+        "y": 1140,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 889,
+        "x": 2140,
+        "y": 760,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 890,
+        "x": 2120,
+        "y": 1420,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 891,
+        "x": 1760,
+        "y": 1460,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 892,
+        "x": 860,
+        "y": 600,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 893,
+        "x": 400,
+        "y": 760,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 894,
+        "x": 3000,
+        "y": 1340,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 895,
+        "x": 2620,
+        "y": 1460,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 896,
+        "x": 2980,
+        "y": 960,
+        "isCollapsed": false
+      },
+      {
+        "blockId": 897,
+        "x": 3320,
+        "y": 680,
+        "isCollapsed": false
+      }
     ],
-    "blocks": [
+    "frames": [],
+    "x": -2234.443026485451,
+    "y": -170.2895310172337,
+    "zoom": 0.8857893828960678
+  },
+  "customType": "BABYLON.NodeMaterial",
+  "outputNodes": [
+    857,
+    863
+  ],
+  "blocks": [
+    {
+      "customType": "BABYLON.VertexOutputBlock",
+      "id": 857,
+      "name": "VertexOutput",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 1,
+      "inputs": [
         {
-            "customType": "BABYLON.VertexOutputBlock",
-            "id": 5023,
-            "name": "VertexOutput",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 1,
-            "inputs": [
-                {
-                    "name": "vector",
-                    "inputName": "vector",
-                    "targetBlockId": 5024,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "customType": "BABYLON.TransformBlock",
-            "id": 5024,
-            "name": "WorldPos * ViewProjectionTransform",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 1,
-            "inputs": [
-                {
-                    "name": "vector",
-                    "inputName": "vector",
-                    "targetBlockId": 5025,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "transform",
-                    "inputName": "transform",
-                    "targetBlockId": 5028,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "output"
-                },
-                {
-                    "name": "xyz"
-                }
-            ],
-            "complementZ": 0,
-            "complementW": 1
-        },
-        {
-            "customType": "BABYLON.TransformBlock",
-            "id": 5025,
-            "name": "WorldPos",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 1,
-            "inputs": [
-                {
-                    "name": "vector",
-                    "inputName": "vector",
-                    "targetBlockId": 5026,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "transform",
-                    "inputName": "transform",
-                    "targetBlockId": 5027,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "output"
-                },
-                {
-                    "name": "xyz"
-                }
-            ],
-            "complementZ": 0,
-            "complementW": 1
-        },
-        {
-            "customType": "BABYLON.InputBlock",
-            "id": 5026,
-            "name": "position",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 1,
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "output"
-                }
-            ],
-            "type": 8,
-            "mode": 1,
-            "animationType": 0,
-            "min": 0,
-            "max": 0,
-            "isBoolean": false,
-            "matrixMode": 0,
-            "isConstant": false,
-            "groupInInspector": "",
-            "convertToGammaSpace": false,
-            "convertToLinearSpace": false
-        },
-        {
-            "customType": "BABYLON.InputBlock",
-            "id": 5027,
-            "name": "World",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 1,
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "output"
-                }
-            ],
-            "type": 128,
-            "mode": 0,
-            "systemValue": 1,
-            "animationType": 0,
-            "min": 0,
-            "max": 0,
-            "isBoolean": false,
-            "matrixMode": 0,
-            "isConstant": false,
-            "groupInInspector": "",
-            "convertToGammaSpace": false,
-            "convertToLinearSpace": false
-        },
-        {
-            "customType": "BABYLON.InputBlock",
-            "id": 5028,
-            "name": "ViewProjection",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 1,
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "output"
-                }
-            ],
-            "type": 128,
-            "mode": 0,
-            "systemValue": 4,
-            "animationType": 0,
-            "min": 0,
-            "max": 0,
-            "isBoolean": false,
-            "matrixMode": 0,
-            "isConstant": false,
-            "groupInInspector": "",
-            "convertToGammaSpace": false,
-            "convertToLinearSpace": false
-        },
-        {
-            "customType": "BABYLON.FragmentOutputBlock",
-            "id": 5029,
-            "name": "FragmentOutput",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 2,
-            "inputs": [
-                {
-                    "name": "rgba"
-                },
-                {
-                    "name": "rgb",
-                    "inputName": "rgb",
-                    "targetBlockId": 5030,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "a",
-                    "inputName": "a",
-                    "targetBlockId": 5050,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "glow"
-                }
-            ],
-            "outputs": [],
-            "convertToGammaSpace": false,
-            "convertToLinearSpace": false,
-            "useLogarithmicDepth": false
-        },
-        {
-            "customType": "BABYLON.LerpBlock",
-            "id": 5030,
-            "name": "Lerp",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 4,
-            "inputs": [
-                {
-                    "name": "left",
-                    "inputName": "left",
-                    "targetBlockId": 5031,
-                    "targetConnectionName": "rgb",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "right",
-                    "inputName": "right",
-                    "targetBlockId": 5042,
-                    "targetConnectionName": "rgb",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "gradient",
-                    "inputName": "gradient",
-                    "targetBlockId": 5048,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "output"
-                }
-            ]
-        },
-        {
-            "customType": "BABYLON.ColorConverterBlock",
-            "id": 5031,
-            "name": "ColorConverter",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 4,
-            "inputs": [
-                {
-                    "name": "rgb ",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "hsl ",
-                    "inputName": "hsl ",
-                    "targetBlockId": 5032,
-                    "targetConnectionName": "xyz",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "rgb"
-                },
-                {
-                    "name": "hsl"
-                }
-            ]
-        },
-        {
-            "customType": "BABYLON.VectorMergerBlock",
-            "id": 5032,
-            "name": "VectorMerger",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 4,
-            "inputs": [
-                {
-                    "name": "xyzw "
-                },
-                {
-                    "name": "xyz "
-                },
-                {
-                    "name": "xy "
-                },
-                {
-                    "name": "zw "
-                },
-                {
-                    "name": "x",
-                    "inputName": "x",
-                    "targetBlockId": 5033,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "y",
-                    "inputName": "y",
-                    "targetBlockId": 5035,
-                    "targetConnectionName": "y",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "z",
-                    "inputName": "z",
-                    "targetBlockId": 5035,
-                    "targetConnectionName": "z",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "w"
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "xyzw"
-                },
-                {
-                    "name": "xyz"
-                },
-                {
-                    "name": "xy"
-                },
-                {
-                    "name": "zw"
-                }
-            ],
-            "xSwizzle": "x",
-            "ySwizzle": "y",
-            "zSwizzle": "z",
-            "wSwizzle": "w"
-        },
-        {
-            "customType": "BABYLON.TrigonometryBlock",
-            "id": 5033,
-            "name": "Fract",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 4,
-            "inputs": [
-                {
-                    "name": "input",
-                    "inputName": "input",
-                    "targetBlockId": 5034,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "output"
-                }
-            ],
-            "operation": 14
-        },
-        {
-            "customType": "BABYLON.AddBlock",
-            "id": 5034,
-            "name": "Add",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 4,
-            "inputs": [
-                {
-                    "name": "left",
-                    "inputName": "left",
-                    "targetBlockId": 5035,
-                    "targetConnectionName": "x",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "right",
-                    "inputName": "right",
-                    "targetBlockId": 5039,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "output"
-                }
-            ]
-        },
-        {
-            "customType": "BABYLON.VectorSplitterBlock",
-            "id": 5035,
-            "name": "VectorSplitter",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 4,
-            "inputs": [
-                {
-                    "name": "xyzw"
-                },
-                {
-                    "name": "xyz ",
-                    "inputName": "xyz ",
-                    "targetBlockId": 5036,
-                    "targetConnectionName": "hsl",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "xy "
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "xyz"
-                },
-                {
-                    "name": "xy"
-                },
-                {
-                    "name": "zw"
-                },
-                {
-                    "name": "x"
-                },
-                {
-                    "name": "y"
-                },
-                {
-                    "name": "z"
-                },
-                {
-                    "name": "w"
-                }
-            ]
-        },
-        {
-            "customType": "BABYLON.ColorConverterBlock",
-            "id": 5036,
-            "name": "ColorConverter",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 4,
-            "inputs": [
-                {
-                    "name": "rgb ",
-                    "inputName": "rgb ",
-                    "targetBlockId": 5037,
-                    "targetConnectionName": "rgb",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "hsl "
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "rgb"
-                },
-                {
-                    "name": "hsl"
-                }
-            ]
-        },
-        {
-            "customType": "BABYLON.TextureBlock",
-            "id": 5037,
-            "name": "diffuseTexture",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 3,
-            "inputs": [
-                {
-                    "name": "uv",
-                    "inputName": "uv",
-                    "targetBlockId": 5038,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "source"
-                },
-                {
-                    "name": "layer"
-                },
-                {
-                    "name": "lod"
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "rgba"
-                },
-                {
-                    "name": "rgb"
-                },
-                {
-                    "name": "r"
-                },
-                {
-                    "name": "g"
-                },
-                {
-                    "name": "b"
-                },
-                {
-                    "name": "a"
-                },
-                {
-                    "name": "level"
-                }
-            ],
-            "convertToGammaSpace": false,
-            "convertToLinearSpace": false,
-            "fragmentOnly": false,
-            "disableLevelMultiplication": false
-        },
-        {
-            "customType": "BABYLON.InputBlock",
-            "id": 5038,
-            "name": "uv",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 1,
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "output"
-                }
-            ],
-            "type": 4,
-            "mode": 1,
-            "animationType": 0,
-            "min": 0,
-            "max": 0,
-            "isBoolean": false,
-            "matrixMode": 0,
-            "isConstant": false,
-            "groupInInspector": "",
-            "convertToGammaSpace": false,
-            "convertToLinearSpace": false
-        },
-        {
-            "customType": "BABYLON.DivideBlock",
-            "id": 5039,
-            "name": "Divide",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 4,
-            "inputs": [
-                {
-                    "name": "left",
-                    "inputName": "left",
-                    "targetBlockId": 5040,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "right",
-                    "inputName": "right",
-                    "targetBlockId": 5041,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "output"
-                }
-            ]
-        },
-        {
-            "customType": "BABYLON.InputBlock",
-            "id": 5040,
-            "name": "hueShift",
-            "comments": "",
-            "visibleInInspector": true,
-            "visibleOnFrame": false,
-            "target": 1,
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "output"
-                }
-            ],
-            "type": 1,
-            "mode": 0,
-            "animationType": 0,
-            "min": 0,
-            "max": 0,
-            "isBoolean": false,
-            "matrixMode": 0,
-            "isConstant": false,
-            "groupInInspector": "",
-            "convertToGammaSpace": false,
-            "convertToLinearSpace": false,
-            "valueType": "number",
-            "value": 120
-        },
-        {
-            "customType": "BABYLON.InputBlock",
-            "id": 5041,
-            "name": "Float",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 1,
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "output"
-                }
-            ],
-            "type": 1,
-            "mode": 0,
-            "animationType": 0,
-            "min": 0,
-            "max": 0,
-            "isBoolean": false,
-            "matrixMode": 0,
-            "isConstant": true,
-            "groupInInspector": "",
-            "convertToGammaSpace": false,
-            "convertToLinearSpace": false,
-            "valueType": "number",
-            "value": 360
-        },
-        {
-            "customType": "BABYLON.ColorConverterBlock",
-            "id": 5042,
-            "name": "ColorConverter",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 4,
-            "inputs": [
-                {
-                    "name": "rgb ",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "hsl ",
-                    "inputName": "hsl ",
-                    "targetBlockId": 5043,
-                    "targetConnectionName": "xyz",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "rgb"
-                },
-                {
-                    "name": "hsl"
-                }
-            ]
-        },
-        {
-            "customType": "BABYLON.VectorMergerBlock",
-            "id": 5043,
-            "name": "VectorMerger",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 4,
-            "inputs": [
-                {
-                    "name": "xyzw "
-                },
-                {
-                    "name": "xyz "
-                },
-                {
-                    "name": "xy "
-                },
-                {
-                    "name": "zw "
-                },
-                {
-                    "name": "x",
-                    "inputName": "x",
-                    "targetBlockId": 5044,
-                    "targetConnectionName": "x",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "y",
-                    "inputName": "y",
-                    "targetBlockId": 5052,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "z",
-                    "inputName": "z",
-                    "targetBlockId": 5146,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "w"
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "xyzw"
-                },
-                {
-                    "name": "xyz"
-                },
-                {
-                    "name": "xy"
-                },
-                {
-                    "name": "zw"
-                }
-            ],
-            "xSwizzle": "x",
-            "ySwizzle": "y",
-            "zSwizzle": "z",
-            "wSwizzle": "w"
-        },
-        {
-            "customType": "BABYLON.VectorSplitterBlock",
-            "id": 5044,
-            "name": "VectorSplitter",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 4,
-            "inputs": [
-                {
-                    "name": "xyzw"
-                },
-                {
-                    "name": "xyz ",
-                    "inputName": "xyz ",
-                    "targetBlockId": 5045,
-                    "targetConnectionName": "hsl",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "xy "
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "xyz"
-                },
-                {
-                    "name": "xy"
-                },
-                {
-                    "name": "zw"
-                },
-                {
-                    "name": "x"
-                },
-                {
-                    "name": "y"
-                },
-                {
-                    "name": "z"
-                },
-                {
-                    "name": "w"
-                }
-            ]
-        },
-        {
-            "customType": "BABYLON.ColorConverterBlock",
-            "id": 5045,
-            "name": "ColorConverter",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 4,
-            "inputs": [
-                {
-                    "name": "rgb ",
-                    "inputName": "rgb ",
-                    "targetBlockId": 5046,
-                    "targetConnectionName": "rgb",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "hsl "
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "rgb"
-                },
-                {
-                    "name": "hsl"
-                }
-            ]
-        },
-        {
-            "customType": "BABYLON.ColorSplitterBlock",
-            "id": 5046,
-            "name": "ColorSplitter",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 4,
-            "inputs": [
-                {
-                    "name": "rgba",
-                    "inputName": "rgba",
-                    "targetBlockId": 5047,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "rgb "
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "rgb"
-                },
-                {
-                    "name": "r"
-                },
-                {
-                    "name": "g"
-                },
-                {
-                    "name": "b"
-                },
-                {
-                    "name": "a"
-                }
-            ]
-        },
-        {
-            "customType": "BABYLON.InputBlock",
-            "id": 5047,
-            "name": "targetColor",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 1,
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "output"
-                }
-            ],
-            "type": 64,
-            "mode": 0,
-            "animationType": 0,
-            "min": 0,
-            "max": 0,
-            "isBoolean": false,
-            "matrixMode": 0,
-            "isConstant": false,
-            "groupInInspector": "",
-            "convertToGammaSpace": false,
-            "convertToLinearSpace": false,
-            "valueType": "BABYLON.Color4",
-            "value": [
-                0,
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "customType": "BABYLON.MultiplyBlock",
-            "id": 5052,
-            "name": "Multiply",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 4,
-            "inputs": [
-                {
-                    "name": "left",
-                    "inputName": "left",
-                    "targetBlockId": 5044,
-                    "targetConnectionName": "y",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "right",
-                    "inputName": "right",
-                    "targetBlockId": 5035,
-                    "targetConnectionName": "y",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "output"
-                }
-            ]
-        },
-        {
-            "customType": "BABYLON.MultiplyBlock",
-            "id": 5146,
-            "name": "Multiply",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 4,
-            "inputs": [
-                {
-                    "name": "left",
-                    "inputName": "left",
-                    "targetBlockId": 5044,
-                    "targetConnectionName": "z",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "right",
-                    "inputName": "right",
-                    "targetBlockId": 5035,
-                    "targetConnectionName": "z",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "output"
-                }
-            ]
-        },
-        {
-            "customType": "BABYLON.DivideBlock",
-            "id": 5048,
-            "name": "Divide",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 4,
-            "inputs": [
-                {
-                    "name": "left",
-                    "inputName": "left",
-                    "targetBlockId": 5046,
-                    "targetConnectionName": "a",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "right",
-                    "inputName": "right",
-                    "targetBlockId": 5049,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "output"
-                }
-            ]
-        },
-        {
-            "customType": "BABYLON.InputBlock",
-            "id": 5049,
-            "name": "Float2",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 1,
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "output"
-                }
-            ],
-            "type": 1,
-            "mode": 0,
-            "animationType": 0,
-            "min": 0,
-            "max": 0,
-            "isBoolean": false,
-            "matrixMode": 0,
-            "isConstant": true,
-            "groupInInspector": "",
-            "convertToGammaSpace": false,
-            "convertToLinearSpace": false,
-            "valueType": "number",
-            "value": 255
-        },
-        {
-            "customType": "BABYLON.MultiplyBlock",
-            "id": 5050,
-            "name": "Multiply",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 4,
-            "inputs": [
-                {
-                    "name": "left",
-                    "inputName": "left",
-                    "targetBlockId": 5037,
-                    "targetConnectionName": "a",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                },
-                {
-                    "name": "right",
-                    "inputName": "right",
-                    "targetBlockId": 5051,
-                    "targetConnectionName": "output",
-                    "isExposedOnFrame": true,
-                    "exposedPortPosition": -1
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "output"
-                }
-            ]
-        },
-        {
-            "customType": "BABYLON.InputBlock",
-            "id": 5051,
-            "name": "Material alpha",
-            "comments": "",
-            "visibleInInspector": false,
-            "visibleOnFrame": false,
-            "target": 1,
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "output"
-                }
-            ],
-            "type": 1,
-            "mode": 0,
-            "systemValue": 11,
-            "animationType": 0,
-            "min": 0,
-            "max": 0,
-            "isBoolean": false,
-            "matrixMode": 0,
-            "isConstant": false,
-            "groupInInspector": "",
-            "convertToGammaSpace": false,
-            "convertToLinearSpace": false
+          "name": "vector",
+          "inputName": "vector",
+          "targetBlockId": 858,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
         }
-    ],
-    "uniqueId": 4
+      ],
+      "outputs": []
+    },
+    {
+      "customType": "BABYLON.TransformBlock",
+      "id": 858,
+      "name": "WorldPos * ViewProjectionTransform",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 1,
+      "inputs": [
+        {
+          "name": "vector",
+          "inputName": "vector",
+          "targetBlockId": 859,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "transform",
+          "inputName": "transform",
+          "targetBlockId": 862,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output"
+        },
+        {
+          "name": "xyz"
+        }
+      ],
+      "complementZ": 0,
+      "complementW": 1
+    },
+    {
+      "customType": "BABYLON.TransformBlock",
+      "id": 859,
+      "name": "WorldPos",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 1,
+      "inputs": [
+        {
+          "name": "vector",
+          "inputName": "vector",
+          "targetBlockId": 860,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "transform",
+          "inputName": "transform",
+          "targetBlockId": 861,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output"
+        },
+        {
+          "name": "xyz"
+        }
+      ],
+      "complementZ": 0,
+      "complementW": 1
+    },
+    {
+      "customType": "BABYLON.InputBlock",
+      "id": 860,
+      "name": "position",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 1,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ],
+      "type": 8,
+      "mode": 1,
+      "animationType": 0,
+      "min": 0,
+      "max": 0,
+      "isBoolean": false,
+      "matrixMode": 0,
+      "isConstant": false,
+      "groupInInspector": "",
+      "convertToGammaSpace": false,
+      "convertToLinearSpace": false
+    },
+    {
+      "customType": "BABYLON.InputBlock",
+      "id": 861,
+      "name": "World",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 1,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ],
+      "type": 128,
+      "mode": 0,
+      "systemValue": 1,
+      "animationType": 0,
+      "min": 0,
+      "max": 0,
+      "isBoolean": false,
+      "matrixMode": 0,
+      "isConstant": false,
+      "groupInInspector": "",
+      "convertToGammaSpace": false,
+      "convertToLinearSpace": false
+    },
+    {
+      "customType": "BABYLON.InputBlock",
+      "id": 862,
+      "name": "ViewProjection",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 1,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ],
+      "type": 128,
+      "mode": 0,
+      "systemValue": 4,
+      "animationType": 0,
+      "min": 0,
+      "max": 0,
+      "isBoolean": false,
+      "matrixMode": 0,
+      "isConstant": false,
+      "groupInInspector": "",
+      "convertToGammaSpace": false,
+      "convertToLinearSpace": false
+    },
+    {
+      "customType": "BABYLON.FragmentOutputBlock",
+      "id": 863,
+      "name": "FragmentOutput",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 2,
+      "inputs": [
+        {
+          "name": "rgba"
+        },
+        {
+          "name": "rgb",
+          "inputName": "rgb",
+          "targetBlockId": 864,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "a",
+          "inputName": "a",
+          "targetBlockId": 892,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "glow",
+          "inputName": "glow",
+          "targetBlockId": 894,
+          "targetConnectionName": "specularOutput",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [],
+      "convertToGammaSpace": false,
+      "convertToLinearSpace": false,
+      "useLogarithmicDepth": false
+    },
+    {
+      "customType": "BABYLON.MultiplyBlock",
+      "id": 864,
+      "name": "Multiply",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "left",
+          "inputName": "left",
+          "targetBlockId": 865,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "right",
+          "inputName": "right",
+          "targetBlockId": 897,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ]
+    },
+    {
+      "customType": "BABYLON.LerpBlock",
+      "id": 865,
+      "name": "Lerp",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "left",
+          "inputName": "left",
+          "targetBlockId": 866,
+          "targetConnectionName": "rgb",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "right",
+          "inputName": "right",
+          "targetBlockId": 877,
+          "targetConnectionName": "rgb",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "gradient",
+          "inputName": "gradient",
+          "targetBlockId": 885,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ]
+    },
+    {
+      "customType": "BABYLON.ColorConverterBlock",
+      "id": 866,
+      "name": "ColorConverter",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "rgb ",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "hsl ",
+          "inputName": "hsl ",
+          "targetBlockId": 867,
+          "targetConnectionName": "xyz",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "rgb"
+        },
+        {
+          "name": "hsl"
+        }
+      ]
+    },
+    {
+      "customType": "BABYLON.VectorMergerBlock",
+      "id": 867,
+      "name": "VectorMerger",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "xyzw "
+        },
+        {
+          "name": "xyz "
+        },
+        {
+          "name": "xy "
+        },
+        {
+          "name": "zw "
+        },
+        {
+          "name": "x",
+          "inputName": "x",
+          "targetBlockId": 868,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "y",
+          "inputName": "y",
+          "targetBlockId": 870,
+          "targetConnectionName": "y",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "z",
+          "inputName": "z",
+          "targetBlockId": 870,
+          "targetConnectionName": "z",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "w"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "xyzw"
+        },
+        {
+          "name": "xyz"
+        },
+        {
+          "name": "xy"
+        },
+        {
+          "name": "zw"
+        }
+      ],
+      "xSwizzle": "x",
+      "ySwizzle": "y",
+      "zSwizzle": "z",
+      "wSwizzle": "w"
+    },
+    {
+      "customType": "BABYLON.TrigonometryBlock",
+      "id": 868,
+      "name": "Fract",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "input",
+          "inputName": "input",
+          "targetBlockId": 869,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ],
+      "operation": 14
+    },
+    {
+      "customType": "BABYLON.AddBlock",
+      "id": 869,
+      "name": "Add",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "left",
+          "inputName": "left",
+          "targetBlockId": 870,
+          "targetConnectionName": "x",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "right",
+          "inputName": "right",
+          "targetBlockId": 874,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ]
+    },
+    {
+      "customType": "BABYLON.VectorSplitterBlock",
+      "id": 870,
+      "name": "VectorSplitter",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "xyzw"
+        },
+        {
+          "name": "xyz ",
+          "inputName": "xyz ",
+          "targetBlockId": 871,
+          "targetConnectionName": "hsl",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "xy "
+        }
+      ],
+      "outputs": [
+        {
+          "name": "xyz"
+        },
+        {
+          "name": "xy"
+        },
+        {
+          "name": "zw"
+        },
+        {
+          "name": "x"
+        },
+        {
+          "name": "y"
+        },
+        {
+          "name": "z"
+        },
+        {
+          "name": "w"
+        }
+      ]
+    },
+    {
+      "customType": "BABYLON.ColorConverterBlock",
+      "id": 871,
+      "name": "ColorConverter",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "rgb ",
+          "inputName": "rgb ",
+          "targetBlockId": 872,
+          "targetConnectionName": "rgb",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "hsl "
+        }
+      ],
+      "outputs": [
+        {
+          "name": "rgb"
+        },
+        {
+          "name": "hsl"
+        }
+      ]
+    },
+    {
+      "customType": "BABYLON.TextureBlock",
+      "id": 872,
+      "name": "diffuseTexture",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 3,
+      "inputs": [
+        {
+          "name": "uv",
+          "inputName": "uv",
+          "targetBlockId": 873,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "source"
+        },
+        {
+          "name": "layer"
+        },
+        {
+          "name": "lod"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "rgba"
+        },
+        {
+          "name": "rgb"
+        },
+        {
+          "name": "r"
+        },
+        {
+          "name": "g"
+        },
+        {
+          "name": "b"
+        },
+        {
+          "name": "a"
+        },
+        {
+          "name": "level"
+        }
+      ],
+      "convertToGammaSpace": false,
+      "convertToLinearSpace": false,
+      "fragmentOnly": false,
+      "disableLevelMultiplication": false
+    },
+    {
+      "customType": "BABYLON.InputBlock",
+      "id": 873,
+      "name": "uv",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 1,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ],
+      "type": 4,
+      "mode": 1,
+      "animationType": 0,
+      "min": 0,
+      "max": 0,
+      "isBoolean": false,
+      "matrixMode": 0,
+      "isConstant": false,
+      "groupInInspector": "",
+      "convertToGammaSpace": false,
+      "convertToLinearSpace": false
+    },
+    {
+      "customType": "BABYLON.DivideBlock",
+      "id": 874,
+      "name": "Divide",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "left",
+          "inputName": "left",
+          "targetBlockId": 875,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "right",
+          "inputName": "right",
+          "targetBlockId": 876,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ]
+    },
+    {
+      "customType": "BABYLON.InputBlock",
+      "id": 875,
+      "name": "hueShift",
+      "comments": "",
+      "visibleInInspector": true,
+      "visibleOnFrame": false,
+      "target": 1,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ],
+      "type": 1,
+      "mode": 0,
+      "animationType": 0,
+      "min": 0,
+      "max": 0,
+      "isBoolean": false,
+      "matrixMode": 0,
+      "isConstant": false,
+      "groupInInspector": "",
+      "convertToGammaSpace": false,
+      "convertToLinearSpace": false,
+      "valueType": "number",
+      "value": 120
+    },
+    {
+      "customType": "BABYLON.InputBlock",
+      "id": 876,
+      "name": "Float",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 1,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ],
+      "type": 1,
+      "mode": 0,
+      "animationType": 0,
+      "min": 0,
+      "max": 0,
+      "isBoolean": false,
+      "matrixMode": 0,
+      "isConstant": true,
+      "groupInInspector": "",
+      "convertToGammaSpace": false,
+      "convertToLinearSpace": false,
+      "valueType": "number",
+      "value": 360
+    },
+    {
+      "customType": "BABYLON.ColorConverterBlock",
+      "id": 877,
+      "name": "ColorConverter",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "rgb ",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "hsl ",
+          "inputName": "hsl ",
+          "targetBlockId": 878,
+          "targetConnectionName": "xyz",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "rgb"
+        },
+        {
+          "name": "hsl"
+        }
+      ]
+    },
+    {
+      "customType": "BABYLON.VectorMergerBlock",
+      "id": 878,
+      "name": "VectorMerger",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "xyzw "
+        },
+        {
+          "name": "xyz "
+        },
+        {
+          "name": "xy "
+        },
+        {
+          "name": "zw "
+        },
+        {
+          "name": "x",
+          "inputName": "x",
+          "targetBlockId": 879,
+          "targetConnectionName": "x",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "y",
+          "inputName": "y",
+          "targetBlockId": 883,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "z",
+          "inputName": "z",
+          "targetBlockId": 884,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "w"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "xyzw"
+        },
+        {
+          "name": "xyz"
+        },
+        {
+          "name": "xy"
+        },
+        {
+          "name": "zw"
+        }
+      ],
+      "xSwizzle": "x",
+      "ySwizzle": "y",
+      "zSwizzle": "z",
+      "wSwizzle": "w"
+    },
+    {
+      "customType": "BABYLON.VectorSplitterBlock",
+      "id": 879,
+      "name": "VectorSplitter",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "xyzw"
+        },
+        {
+          "name": "xyz ",
+          "inputName": "xyz ",
+          "targetBlockId": 880,
+          "targetConnectionName": "hsl",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "xy "
+        }
+      ],
+      "outputs": [
+        {
+          "name": "xyz"
+        },
+        {
+          "name": "xy"
+        },
+        {
+          "name": "zw"
+        },
+        {
+          "name": "x"
+        },
+        {
+          "name": "y"
+        },
+        {
+          "name": "z"
+        },
+        {
+          "name": "w"
+        }
+      ]
+    },
+    {
+      "customType": "BABYLON.ColorConverterBlock",
+      "id": 880,
+      "name": "ColorConverter",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "rgb ",
+          "inputName": "rgb ",
+          "targetBlockId": 881,
+          "targetConnectionName": "rgb",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "hsl "
+        }
+      ],
+      "outputs": [
+        {
+          "name": "rgb"
+        },
+        {
+          "name": "hsl"
+        }
+      ]
+    },
+    {
+      "customType": "BABYLON.ColorSplitterBlock",
+      "id": 881,
+      "name": "ColorSplitter",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "rgba",
+          "inputName": "rgba",
+          "targetBlockId": 882,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "rgb "
+        }
+      ],
+      "outputs": [
+        {
+          "name": "rgb"
+        },
+        {
+          "name": "r"
+        },
+        {
+          "name": "g"
+        },
+        {
+          "name": "b"
+        },
+        {
+          "name": "a"
+        }
+      ]
+    },
+    {
+      "customType": "BABYLON.InputBlock",
+      "id": 882,
+      "name": "targetColor",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 1,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ],
+      "type": 64,
+      "mode": 0,
+      "animationType": 0,
+      "min": 0,
+      "max": 0,
+      "isBoolean": false,
+      "matrixMode": 0,
+      "isConstant": false,
+      "groupInInspector": "",
+      "convertToGammaSpace": false,
+      "convertToLinearSpace": false,
+      "valueType": "BABYLON.Color4",
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "customType": "BABYLON.MultiplyBlock",
+      "id": 883,
+      "name": "Multiply",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "left",
+          "inputName": "left",
+          "targetBlockId": 879,
+          "targetConnectionName": "y",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "right",
+          "inputName": "right",
+          "targetBlockId": 870,
+          "targetConnectionName": "y",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ]
+    },
+    {
+      "customType": "BABYLON.MultiplyBlock",
+      "id": 884,
+      "name": "Multiply",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "left",
+          "inputName": "left",
+          "targetBlockId": 879,
+          "targetConnectionName": "z",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "right",
+          "inputName": "right",
+          "targetBlockId": 870,
+          "targetConnectionName": "z",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ]
+    },
+    {
+      "customType": "BABYLON.DivideBlock",
+      "id": 885,
+      "name": "Divide",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "left",
+          "inputName": "left",
+          "targetBlockId": 881,
+          "targetConnectionName": "a",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "right",
+          "inputName": "right",
+          "targetBlockId": 886,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ]
+    },
+    {
+      "customType": "BABYLON.InputBlock",
+      "id": 886,
+      "name": "Float2",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 1,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ],
+      "type": 1,
+      "mode": 0,
+      "animationType": 0,
+      "min": 0,
+      "max": 0,
+      "isBoolean": false,
+      "matrixMode": 0,
+      "isConstant": true,
+      "groupInInspector": "",
+      "convertToGammaSpace": false,
+      "convertToLinearSpace": false,
+      "valueType": "number",
+      "value": 255
+    },
+    {
+      "customType": "BABYLON.ClampBlock",
+      "id": 897,
+      "name": "Clamp",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "value",
+          "inputName": "value",
+          "targetBlockId": 894,
+          "targetConnectionName": "diffuseOutput",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ],
+      "minimum": 0.5,
+      "maximum": 1
+    },
+    {
+      "customType": "BABYLON.LightBlock",
+      "id": 894,
+      "name": "Lights",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 3,
+      "inputs": [
+        {
+          "name": "worldPosition",
+          "inputName": "worldPosition",
+          "targetBlockId": 888,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "worldNormal",
+          "inputName": "worldNormal",
+          "targetBlockId": 890,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "cameraPosition",
+          "inputName": "cameraPosition",
+          "targetBlockId": 895,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "glossiness"
+        },
+        {
+          "name": "glossPower"
+        },
+        {
+          "name": "diffuseColor"
+        },
+        {
+          "name": "specularColor"
+        },
+        {
+          "name": "view"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "diffuseOutput"
+        },
+        {
+          "name": "specularOutput"
+        },
+        {
+          "name": "shadow"
+        }
+      ],
+      "generateOnlyFragmentCode": false
+    },
+    {
+      "customType": "BABYLON.TransformBlock",
+      "id": 888,
+      "name": "World position",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 1,
+      "inputs": [
+        {
+          "name": "vector",
+          "inputName": "vector",
+          "targetBlockId": 860,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "transform",
+          "inputName": "transform",
+          "targetBlockId": 861,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output"
+        },
+        {
+          "name": "xyz"
+        }
+      ],
+      "complementZ": 0,
+      "complementW": 1
+    },
+    {
+      "customType": "BABYLON.TransformBlock",
+      "id": 890,
+      "name": "World normal",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 1,
+      "inputs": [
+        {
+          "name": "vector",
+          "inputName": "vector",
+          "targetBlockId": 891,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "transform",
+          "inputName": "transform",
+          "targetBlockId": 861,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output"
+        },
+        {
+          "name": "xyz"
+        }
+      ],
+      "complementZ": 0,
+      "complementW": 0
+    },
+    {
+      "customType": "BABYLON.InputBlock",
+      "id": 891,
+      "name": "normal",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 1,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ],
+      "type": 8,
+      "mode": 1,
+      "animationType": 0,
+      "min": 0,
+      "max": 0,
+      "isBoolean": false,
+      "matrixMode": 0,
+      "isConstant": false,
+      "groupInInspector": "",
+      "convertToGammaSpace": false,
+      "convertToLinearSpace": false
+    },
+    {
+      "customType": "BABYLON.InputBlock",
+      "id": 895,
+      "name": "cameraPosition",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 1,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ],
+      "type": 8,
+      "mode": 0,
+      "systemValue": 7,
+      "animationType": 0,
+      "min": 0,
+      "max": 0,
+      "isBoolean": false,
+      "matrixMode": 0,
+      "isConstant": false,
+      "groupInInspector": "",
+      "convertToGammaSpace": false,
+      "convertToLinearSpace": false
+    },
+    {
+      "customType": "BABYLON.MultiplyBlock",
+      "id": 892,
+      "name": "Multiply",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "left",
+          "inputName": "left",
+          "targetBlockId": 872,
+          "targetConnectionName": "a",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "right",
+          "inputName": "right",
+          "targetBlockId": 893,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ]
+    },
+    {
+      "customType": "BABYLON.InputBlock",
+      "id": 893,
+      "name": "Material alpha",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 1,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ],
+      "type": 1,
+      "mode": 0,
+      "systemValue": 11,
+      "animationType": 0,
+      "min": 0,
+      "max": 0,
+      "isBoolean": false,
+      "matrixMode": 0,
+      "isConstant": false,
+      "groupInInspector": "",
+      "convertToGammaSpace": false,
+      "convertToLinearSpace": false
+    },
+    {
+      "customType": "BABYLON.ShadowMapBlock",
+      "id": 887,
+      "name": "ShadowMap",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 2,
+      "inputs": [
+        {
+          "name": "worldPosition",
+          "inputName": "worldPosition",
+          "targetBlockId": 888,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "viewProjection",
+          "inputName": "viewProjection",
+          "targetBlockId": 889,
+          "targetConnectionName": "output",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "worldNormal",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "depth"
+        }
+      ]
+    },
+    {
+      "customType": "BABYLON.InputBlock",
+      "id": 889,
+      "name": "View x Projection",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 1,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ],
+      "type": 128,
+      "mode": 0,
+      "systemValue": 4,
+      "animationType": 0,
+      "min": 0,
+      "max": 0,
+      "isBoolean": false,
+      "matrixMode": 0,
+      "isConstant": false,
+      "groupInInspector": "",
+      "convertToGammaSpace": false,
+      "convertToLinearSpace": false
+    },
+    {
+      "customType": "BABYLON.MultiplyBlock",
+      "id": 896,
+      "name": "Multiply",
+      "comments": "",
+      "visibleInInspector": false,
+      "visibleOnFrame": false,
+      "target": 4,
+      "inputs": [
+        {
+          "name": "left",
+          "inputName": "left",
+          "targetBlockId": 887,
+          "targetConnectionName": "depth",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        },
+        {
+          "name": "right",
+          "inputName": "right",
+          "targetBlockId": 894,
+          "targetConnectionName": "diffuseOutput",
+          "isExposedOnFrame": true,
+          "exposedPortPosition": -1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output"
+        }
+      ]
+    }
+  ],
+  "uniqueId": 4
 }

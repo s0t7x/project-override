@@ -48,9 +48,15 @@ export class WorldMeshBuilder {
     private chunkCollisionUpdateQueue: Set<string>;
     private isUpdatingChunkCollisions: boolean;
 
+    private shadowOnlyMaterial: BABYLON.StandardMaterial;
+
     constructor(scene: BABYLON.Scene, blockDefs: BlockDefinition[], shadowGenerator?: BABYLON.ShadowGenerator) {
         this.scene = scene;
         this.shadowGenerator = shadowGenerator || null;
+
+        this.shadowOnlyMaterial = new BABYLON.StandardMaterial("shadowOnlyMat", this.scene);
+        this.shadowOnlyMaterial.disableColorWrite = true; // Don't draw color
+        this.shadowOnlyMaterial.disableLighting = true;  // No need for lighting calculations
         
         this.blockDefinitions = new Map();
         blockDefs.forEach(def => this.blockDefinitions.set(def.id, def));
@@ -65,39 +71,87 @@ export class WorldMeshBuilder {
         this.chunkCollisionMeshes = new Map();
         this.chunkCollisionUpdateQueue = new Set();
         this.isUpdatingChunkCollisions = false;
-
-        this.preloadTextures();
     }
 
-    private preloadTextures() {
-        const texturePaths = new Set<string>();
-        this.blockDefinitions.forEach(def => {
-            if (def.textures.side)
-                if(typeof def.textures.side === 'string') texturePaths.add(def.textures.side);
-                else texturePaths.add(def.textures.side.texturePath);
-            if(def.textures.top)
-                if(typeof def.textures.top === 'string') texturePaths.add(def.textures.top);
-                else texturePaths.add(def.textures.top.texturePath);
-            if (def.textures.bottom)
-                if(typeof def.textures.bottom === 'string') texturePaths.add(def.textures.bottom);
-                else texturePaths.add(def.textures.bottom.texturePath);
-            if (def.autoTileTop?.atlasTexturePath) texturePaths.add(def.autoTileTop.atlasTexturePath);
-        });
+// In WorldMeshBuilder.ts
 
-        texturePaths.forEach(path => {
-            if (path && !this.textureCache.has(path)) {
+private async preloadTextures(): Promise<void> {
+    console.log("[WorldMeshBuilder] Collecting textures for preloading...");
+
+    // 1. Gather all unique texture paths (this part is synchronous and fine)
+    const texturePaths = new Set<string>();
+    this.blockDefinitions.forEach(def => {
+        if (def.textures.side) {
+            texturePaths.add(typeof def.textures.side === 'string' ? def.textures.side : def.textures.side.texturePath);
+        }
+        if (def.textures.top) {
+            texturePaths.add(typeof def.textures.top === 'string' ? def.textures.top : def.textures.top.texturePath);
+        }
+        if (def.textures.bottom) {
+            texturePaths.add(typeof def.textures.bottom === 'string' ? def.textures.bottom : def.textures.bottom.texturePath);
+        }
+        if (def.autoTileTop?.atlasTexturePath) {
+            texturePaths.add(def.autoTileTop.atlasTexturePath);
+        }
+    });
+
+    // 2. Create an array to hold all the loading promises
+    const loadingPromises: Promise<void>[] = [];
+
+    // 3. Iterate through the paths and create a loading promise for each new texture
+    texturePaths.forEach(path => {
+        if (path && !this.textureCache.has(path)) {
+            // Create a new Promise that will resolve when the texture's onLoadObservable fires
+            const promise = new Promise<void>((resolve, reject) => {
                 let filePath = '' + path;
-                if((process as any).resourcesPath && !path.startsWith('http')) filePath = (process as any).resourcesPath + '/app' + path;
-                console.warn('Asset URL ' + path);
-                const texture = new BABYLON.Texture(filePath, this.scene,
-                    false, true, BABYLON.Texture.NEAREST_SAMPLINGMODE
+                if ((process as any).resourcesPath && !path.startsWith('http')) {
+                    filePath = (process as any).resourcesPath + '/app' + path;
+                }
+
+                console.log(`[WorldMeshBuilder] Starting to load texture: ${filePath}`);
+
+                // The onError callback in the constructor is the best place to reject the promise
+                const onError = (message?: string, exception?: any) => {
+                    console.error(`Failed to load texture: ${filePath}`, message, exception);
+                    reject(new Error(`Failed to load texture: ${filePath}. Reason: ${message}`));
+                };
+                
+                const texture = new BABYLON.Texture(
+                    filePath, 
+                    this.scene, 
+                    false, // noMipmap
+                    true,  // invertY
+                    BABYLON.Texture.NEAREST_SAMPLINGMODE,
+                    null,  // We use the observable, so onLoad callback is null
+                    onError
                 );
+
                 texture.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
                 texture.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
-                this.textureCache.set(path, texture);
-            }
-        });
+                
+                // When the texture is successfully loaded, resolve the promise
+                texture.onLoadObservable.addOnce(() => {
+                    console.log(`[WorldMeshBuilder] Successfully loaded: ${path}`);
+                    // IMPORTANT: Add the texture to the cache *after* it has loaded
+                    // to prevent other parts of the code from using an incomplete texture.
+                    this.textureCache.set(path, texture);
+                    resolve();
+                });
+            });
+
+            loadingPromises.push(promise);
+        }
+    });
+
+    if (loadingPromises.length > 0) {
+        console.log(`[WorldMeshBuilder] Waiting for ${loadingPromises.length} textures to load...`);
+        // 4. Wait for all the promises in the array to resolve
+        await Promise.all(loadingPromises);
+        console.log("[WorldMeshBuilder] All textures have been successfully preloaded.");
+    } else {
+        console.log("[WorldMeshBuilder] No new textures to preload.");
     }
+}
 
     private getMaterial(blockDef: BlockDefinition, faceType: 'top' | 'bottom' | 'side'): BABYLON.StandardMaterial {
         let texturePath: string | undefined;
@@ -133,12 +187,11 @@ export class WorldMeshBuilder {
                     materialKeySuffix = `bottom_fallback_side`;
             }
         } else { // side
+            console.log(typeof blockDef.textures.side === 'string', typeof blockDef.textures.side, blockDef.textures.side)
             if(typeof blockDef.textures.side === 'string') texturePath = blockDef.textures.side;
             else {texturePath = blockDef.textures.side.texturePath; isTilemapTexture = true;}
             materialKeySuffix = `side_${texturePath}`;
         }
-
-        console.log(isTilemapTexture)
 
         if (!texturePath) {
             console.warn(`[WorldMeshBuilder] WARN: No texture path for block '${blockIdForLog}' face '${faceType}'. Using fallback magenta.`);
@@ -192,6 +245,7 @@ export class WorldMeshBuilder {
 
     public async loadInitialWorld(worldBlocks: IWorldBlock[]): Promise<void> {
         console.log(`[WorldMeshBuilder] Raw worldBlocks loaded:`, JSON.parse(JSON.stringify(worldBlocks)));
+        await this.preloadTextures()
         this.voxelData.clear();
         const allDirtyChunkKeys = new Set<string>();
 
@@ -238,8 +292,6 @@ export class WorldMeshBuilder {
                             const ny = startY + j;
                             const nz = startZ + k;
 
-                            console.log(`[WorldMeshBuilder] Explode: Creating voxel at (${nx}, ${ny}, ${nz}) type: ${block.type}`);
-
                             const currentBlockKey = getVoxelKey(nx, ny, nz);
                             const ib: IWorldBlock = {
                                 position: { x: nx, y: ny, z: nz },
@@ -248,7 +300,6 @@ export class WorldMeshBuilder {
                             };
                             this.voxelData.set(currentBlockKey, ib);
                             const { cx, cy, cz } = this.getChunkCoordinates(nx, ny, nz);
-                            console.log(`[WorldMeshBuilder] Explode: Voxel (${nx},${ny},${nz}) in chunk (${cx},${cy},${cz}). Key: ${getChunkKeyFromCoords(cx, cy, cz)}`);
                             allDirtyChunkKeys.add(getChunkKeyFromCoords(cx, cy, cz));
                         }
                     }
@@ -256,22 +307,15 @@ export class WorldMeshBuilder {
                 // return; // This return was problematic if there were other non-exploding blocks after an exploding one.
                 // Let's remove it to process all blocks in worldBlocks.
             } else { // Handle non-exploding blocks
-                console.log(`[WorldMeshBuilder] Processing non-exploding block.`);
                 const { x, y, z } = block.position;
                 const currentBlockKey = getVoxelKey(x, y, z);
                 this.voxelData.set(currentBlockKey, block); // Store the original block info
                 const { cx, cy, cz } = this.getChunkCoordinates(x, y, z);
-                console.log(`[WorldMeshBuilder] Non-Explode: Voxel (${x},${y},${z}) in chunk (${cx},${cy},${cz}). Key: ${getChunkKeyFromCoords(cx, cy, cz)}`);
                 allDirtyChunkKeys.add(getChunkKeyFromCoords(cx, cy, cz));
             }
         });
 
         console.log(`[WorldMeshBuilder] VoxelData populated. Size: ${this.voxelData.size}`);
-        let count = 0;
-        for (const [key, value] of this.voxelData.entries()) {
-            if (count < 10) console.log(`VoxelData sample: ${key}`, value); // Log more samples
-            count++;
-        }
 
         allDirtyChunkKeys.forEach(chunkKey => {
             this.dirtyChunks.add(chunkKey);
@@ -475,7 +519,7 @@ export class WorldMeshBuilder {
                             }
                         }
                         
-                        if(blockDef.textures.side  && typeof blockDef.textures.side !== 'string') {
+                        if(blockDef.textures.side && typeof blockDef.textures.side !== 'string') {
                             const tmt = blockDef.textures.side as TileMapTexture;
                             const texture = this.textureCache.get(tmt.texturePath);
                             if (texture) {
@@ -552,8 +596,9 @@ export class WorldMeshBuilder {
                         instance.receiveShadows = true;
                         instance.parent = chunkRoot;
 
+                        if(this.shadowGenerator && worldY > 0) this.shadowGenerator.addShadowCaster(instance);
+
                         instance.cullingStrategy = BABYLON.AbstractMesh.CULLINGSTRATEGY_OPTIMISTIC_INCLUSION;
-                        console.log('created instance of block at', instance.position.x, instance.position.y, instance.position.z)
                     }
                 }
             }
@@ -671,7 +716,8 @@ export class WorldMeshBuilder {
         }
 
         mergedChunkCollisionMesh.name = `collision_chunk_${chunkKey}`;
-        mergedChunkCollisionMesh.isVisible = false;
+        mergedChunkCollisionMesh.material = this.shadowOnlyMaterial;
+        mergedChunkCollisionMesh.visibility = 0;
 
         mergedChunkCollisionMesh.physicsBody = new BABYLON.PhysicsBody(
             mergedChunkCollisionMesh,              // Node
@@ -686,17 +732,7 @@ export class WorldMeshBuilder {
 
         mergedChunkCollisionMesh.physicsBody.shape = shape;
 
-        if(this.shadowGenerator)
-                            this.shadowGenerator.addShadowCaster(mergedChunkCollisionMesh);
-
-        // mergedChunkCollisionMesh.physicsImpostor = new BABYLON.PhysicsImpostor(
-        //     mergedChunkCollisionMesh,
-        //     BABYLON.PhysicsImpostor.MeshImpostor,
-        //     { mass: 0, restitution: 0.1, friction: 0.5 }, // Adjust physics properties as needed
-        //     this.scene
-        // );
         this.chunkCollisionMeshes.set(chunkKey, mergedChunkCollisionMesh);
-        // console.log(`[WorldMeshBuilder] Rebuilt collision mesh for chunk ${chunkKey} from ${tempBoxesForMerging.length} solid blocks.`);
     }
 
     public dispose(): void {
