@@ -4,6 +4,7 @@ import { SpriteSheetCharacter, CharacterDirection } from './SpriteSheetCharacter
 
 export interface PlayerControllerOptions {
     moveSpeed?: number;
+    runSpeed?: number;
     initialPosition: BABYLON.Vector3;
     characterSummary: ICharacterSummary;
 }
@@ -21,6 +22,7 @@ export class PlayerController {
     // --- Private Properties ---
     private _inputMap: { [key: string]: boolean } = {};
     private _moveSpeed: number;
+    private _runSpeed: number;
     
     // Observers for proper disposal
     private _updateObserver: BABYLON.Nullable<BABYLON.Observer<BABYLON.Scene>> = null;
@@ -29,6 +31,7 @@ export class PlayerController {
     constructor(scene: BABYLON.Scene, options: PlayerControllerOptions) {
         this.scene = scene;
         this._moveSpeed = options.moveSpeed ?? 2.0;
+        this._runSpeed = options.runSpeed ?? 3.5;
 
         // Create the core, synchronous objects
         this.character = new SpriteSheetCharacter('player', this.scene, options.initialPosition);
@@ -68,6 +71,7 @@ export class PlayerController {
             if (kbInfo.type === BABYLON.KeyboardEventTypes.KEYDOWN) {
                 this._inputMap[key] = true;
             } else if (kbInfo.type === BABYLON.KeyboardEventTypes.KEYUP) {
+                if(key == 'shift') console.log('shift not pressed now')
                 this._inputMap[key] = false;
             }
         });
@@ -88,19 +92,28 @@ export class PlayerController {
         cameraRight.y = 0; cameraRight.normalize();
 
         let isMoving = false;
+        let isRunning = false;
         if (this._inputMap['w']) { moveDirection.addInPlace(cameraForward); isMoving = true; }
         if (this._inputMap['s']) { moveDirection.subtractInPlace(cameraForward); isMoving = true; }
         if (this._inputMap['a']) { moveDirection.subtractInPlace(cameraRight); isMoving = true; }
         if (this._inputMap['d']) { moveDirection.addInPlace(cameraRight); isMoving = true; }
+        if (this._inputMap['shift']) { isRunning = true; }
 
         const currentYVelocity = body.getLinearVelocity()?.y || 0;
 
         if (isMoving && moveDirection.lengthSquared() > 0.01) {
             moveDirection.normalize();
-            const targetVelocity = moveDirection.scale(this._moveSpeed);
+            const targetVelocity = moveDirection.scale(isRunning ? this._runSpeed : this._moveSpeed);
             body.setLinearVelocity(new BABYLON.Vector3(targetVelocity.x, currentYVelocity, targetVelocity.z));
 
             this.character.animationState = 'walk';
+            if(isRunning && this.character.animationSpeed != 2) {
+                this.character.animationSpeed = 2;
+                this.character.updateAnimationName(true);
+            } else if (this.character.animationSpeed != 1) {
+                this.character.animationSpeed = 1;
+                this.character.updateAnimationName(true);
+            }
             
             if (Math.abs(moveDirection.z) > Math.abs(moveDirection.x)) {
                 this.character.lookDirection = moveDirection.z > 0 ? CharacterDirection.Up : CharacterDirection.Down;
@@ -112,6 +125,11 @@ export class PlayerController {
             body.setLinearVelocity(new BABYLON.Vector3(currentVelocity.x * 0.5, currentYVelocity, currentVelocity.z * 0.5));
             if (Math.abs(currentVelocity.x) < 0.1 && Math.abs(currentVelocity.z) < 0.1) {
                  body.setLinearVelocity(new BABYLON.Vector3(0, currentYVelocity, 0));
+            }
+            
+            if (this.character.animationSpeed != 1) {
+                this.character.animationSpeed = 1;
+                this.character.updateAnimationName(true);
             }
 
             this.character.animationState = 'idle';

@@ -67,6 +67,7 @@ export class SpriteSheetCharacter extends SpriteSheetPlane {
     protected animationTimer: number = 0;
     protected currentFrameDuration: number = BASE_FRAME_DURATION;
     protected isAnimationPlaying: boolean = true;
+    public animationSpeed: number = 1;
 
     protected readonly uvScaleX: number = 1 / SHEET_COLUMNS;
     protected readonly uvScaleY: number = 1 / SHEET_ROWS;
@@ -145,7 +146,7 @@ export class SpriteSheetCharacter extends SpriteSheetPlane {
         );
         this.dummyMesh.physicsBody.setMassProperties({
             mass: 1,
-            inertia: new B.Vector3(1e7, 1, 1e7)
+            inertia: new B.Vector3(1e7, 1e7, 1e7)
         });
         this.dummyMesh.physicsBody.setAngularDamping(1000);
         const playerShape = new B.PhysicsShape({
@@ -531,7 +532,7 @@ export class SpriteSheetCharacter extends SpriteSheetPlane {
         }
     }
 
-    protected updateAnimationName(forceUpdateUV: boolean = false): void {
+    public updateAnimationName(forceUpdateUV: boolean = false): void {
         // Determine the correct animation name based on the current state (e.g., 'walk') and sprite direction (e.g., 'left')
         const prefix = this.animationState || 'idle';
         const newAnimationName = `${prefix}_${this.currentDirection}` as AnimationName;
@@ -567,7 +568,7 @@ export class SpriteSheetCharacter extends SpriteSheetPlane {
 
         // console.log(`[DEBUG Anim] SetAnimInternal: UPDATING Animation from ${this.currentFullAnimation} to ${name}`);
         this.currentFullAnimation = name;
-        this.currentFrameDuration = (animDef.durationMultiplier || 1.0) * BASE_FRAME_DURATION;
+        this.currentFrameDuration = (animDef.durationMultiplier || 1.0) * BASE_FRAME_DURATION * (1/this.animationSpeed);
 
         // Reset frame index and timer only if the base animation type changes (e.g., 'walk' to 'idle')
         const currentPrefix = this.currentFullAnimation.split('_')[0];
