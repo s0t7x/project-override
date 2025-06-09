@@ -3,6 +3,8 @@ import { BlockDefinition } from './BlockDefinition';
 import { IWorldBlock } from '@project-override/shared/core/WorldBlock';
 import { TileMapTexture } from './TileMapTexture';
 
+export const WORLD_BLOCK_LAYER = 0x2;
+
 export interface AutoTileConfig {
     atlasTexturePath: string;
     atlasDimensions: { tilesWide: number, tilesHigh: number };
@@ -207,6 +209,7 @@ private async preloadTextures(): Promise<void> {
         if (this.materialCache.has(materialKey)) return this.materialCache.get(materialKey)!;
 
         const material = new BABYLON.StandardMaterial(materialKey, this.scene);
+        material.maxSimultaneousLights = 3;
         const texture = this.textureCache.get(texturePath);
         if (texture) {
             material.diffuseTexture = texture;
@@ -553,6 +556,7 @@ private async preloadTextures(): Promise<void> {
                         }, this.scene);
 
                         baseMesh.receiveShadows = true;
+                        baseMesh.layerMask = WORLD_BLOCK_LAYER;
 
                         if (needsMultiMaterial) {
                             const multiMaterial = new BABYLON.MultiMaterial(baseMeshName + "_multiMat", this.scene);
@@ -594,6 +598,7 @@ private async preloadTextures(): Promise<void> {
                             instance.rotation.y = BABYLON.Tools.ToRadians(block.rotation);
                         }
                         instance.receiveShadows = true;
+                        instance.layerMask = WORLD_BLOCK_LAYER;
                         instance.parent = chunkRoot;
 
                         if(this.shadowGenerator && worldY > 0) this.shadowGenerator.addShadowCaster(instance);

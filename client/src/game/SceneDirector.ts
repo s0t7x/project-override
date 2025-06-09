@@ -3,6 +3,7 @@ import { EntryScene } from '@/babylon/scenes/EntryScene';
 import { FirstTimeSetupScene } from '@/babylon/scenes/FirstTimeSetupScene';
 import { TestEditorScene } from '@/babylon/scenes/TestEditorScene';
 import { TestScene } from '@/babylon/scenes/TestScene';
+import { TitleScreenScene } from '@/babylon/scenes/TitleScreenScene';
 import * as BABYLON from '@babylonjs/core';
 
 export class SceneDirector {
@@ -75,6 +76,9 @@ export class SceneDirector {
 					break;
 				case 'firstTimeSetup':
 					newScene = new FirstTimeSetupScene(this.engine);
+					break;
+				case 'titleScreen':
+					newScene = new TitleScreenScene(this.engine);
 					break;
 				default:
 					console.log('[GameEngine] Invalid Scene Name: ' + next + '.');

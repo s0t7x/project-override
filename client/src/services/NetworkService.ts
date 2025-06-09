@@ -173,7 +173,6 @@ export class NetworkService {
             this.onStateChange(room, this.handlePrimaryStateUpdate)
             return
         }
-        if(!room) return;
         this.clearAllMessageListeners(room)
         room.onMessage('*', (type, message) => {
             const roomMsgListeners = this.messageListeners.get(room.name);

@@ -3,7 +3,7 @@ import '@babylonjs/inspector';
 import { BaseScene } from './BaseScene';
 import { useGeneralStore } from '@/stores/GeneralStore';
 import { useServiceStore } from '@/stores/ServiceStore';
-import { WorldMeshBuilder } from '../utils/WorldMeshBuilder';
+import { WORLD_BLOCK_LAYER, WorldMeshBuilder } from '../utils/WorldMeshBuilder';
 import { IWorldBlock } from '@project-override/shared/core/WorldBlock';
 import { BlockDefinition } from '../utils/BlockDefinition';
 
@@ -14,6 +14,7 @@ import { SpriteSheetCharacter, CharacterDirection } from '../prefabs/SpriteSheet
 import { Plant } from '../prefabs/Plant';
 import { StaticProp } from '../prefabs/StaticProp';
 import { PlayerController } from '../prefabs/PlayerController';
+import { SPRITE_PLANE_LAYER } from '../prefabs/SpriteSheetPlane';
 
 export class TestScene extends BaseScene {
     private worldBuilder: WorldMeshBuilder | undefined;
@@ -21,6 +22,9 @@ export class TestScene extends BaseScene {
 
     private physicsViewer: BABYLON.PhysicsViewer | undefined;
     private isPhysicsViewerVisible: boolean = false;
+
+    private shadowGenerator: BABYLON.ShadowGenerator | undefined;
+    private spriteShadowGenerator: BABYLON.ShadowGenerator | undefined;
 
 
     constructor(engine: BABYLON.Engine) {
@@ -78,8 +82,8 @@ export class TestScene extends BaseScene {
             chest.enablePhysics();
 
             // --- Apply Shadows to Scene Objects ---
-            this.player.enableShadows(shadowGenerator);
-            chest.enableShadows(shadowGenerator);
+            this.player.enableShadows(this.shadowGenerator!);
+            chest.enableShadows(this.shadowGenerator!);
 
             // --- Final Setup & Observables ---
             this.onKeyboardObservable.add((kbInfo) => {
@@ -117,22 +121,31 @@ export class TestScene extends BaseScene {
         // This is our main "sun" light, creating the strong shadows.
         const directionalLight = new BABYLON.DirectionalLight("dirLight", new BABYLON.Vector3(-0.5, -1, -0.7), this);
         directionalLight.position = new BABYLON.Vector3(20, 40, 20);
-        directionalLight.intensity = 1.2;
-
+        directionalLight.intensity = 1.3;
         directionalLight.autoUpdateExtends = true;
+        directionalLight.includeOnlyWithLayerMask = WORLD_BLOCK_LAYER | SPRITE_PLANE_LAYER;
+
+        const spriteLight = new BABYLON.DirectionalLight("dirSpriteLight", directionalLight.direction, this);
+        spriteLight.position = directionalLight.position;
+        spriteLight.intensity = 0;
+        spriteLight.includeOnlyWithLayerMask = WORLD_BLOCK_LAYER;
 
         // directionalLight.autoCalcShadowZBounds = false; // Turn OFF automatic calculation.
         // directionalLight.shadowMinZ = 1;   // Start casting shadows 1 unit away from the light's position.
         // directionalLight.shadowMaxZ = 1000; // Stop casting shadows 100 units away.
 
+        this.spriteShadowGenerator = new BABYLON.ShadowGenerator(512, spriteLight); // Can be smaller
+        this.spriteShadowGenerator.transparencyShadow = true;
+        this.spriteShadowGenerator.usePoissonSampling = true;
+        this.spriteShadowGenerator.darkness = 0.6; // Controls how dark shadows are
 
         // Create the shadow generator
-        const shadowGenerator = new BABYLON.ShadowGenerator(2048, directionalLight);
-        shadowGenerator.useExponentialShadowMap = true; // Smoother shadow edges
-        shadowGenerator.darkness = 0.7; // Controls how dark shadows are
-        shadowGenerator.transparencyShadow = true; // Allow transparency
+        this.shadowGenerator = new BABYLON.ShadowGenerator(2048, directionalLight);
+        this.shadowGenerator.usePoissonSampling = true;
+        this.shadowGenerator.transparencyShadow = true; // Allow transparency
+        this.shadowGenerator.darkness = 0.6; // Controls how dark shadows are
 
-        return shadowGenerator;
+        return this.shadowGenerator;
     }
 
     // --- NEW: Post-Processing Pipeline ---

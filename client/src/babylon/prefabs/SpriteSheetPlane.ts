@@ -8,6 +8,8 @@ import { IColor3 } from '@project-override/shared/math/Color3';
 const HUE_SHIFT_TEXTURE_SAMPLER_NAME = "diffuseTexture";
 const HUE_SHIFT_UNIFORM_NAME = "hueShift";
 
+export const SPRITE_PLANE_LAYER = 0x1;
+
 // ---
 
 export class SpriteSheetPlane {
@@ -53,6 +55,7 @@ export class SpriteSheetPlane {
         this.mesh.rotationQuaternion = Quaternion.Identity(); // Use Quaternion
         this.mesh.visibility = 0;
         this.mesh.receiveShadows = true;
+        this.mesh.layerMask = SPRITE_PLANE_LAYER;
 
         this.collisionMesh = B.MeshBuilder.CreateBox(`${name}_collision`, { size: this.planeSize * 0.9}, this.scene);
         this.collisionMesh.parent = this.mesh;
@@ -232,11 +235,20 @@ export class SpriteSheetPlane {
     }
 
 
-    public enableShadows(shadowGenerator: B.ShadowGenerator): void {
-        console.log(`[${this.name}] Enabling shadows...`);
+    /**
+     * Enables shadows for this character.
+     * 
+     * IMPORTANT: The provided 'shadowGenerator' should be a special generator whose light
+     * is configured with `light.excludeWithLayerMask = SPRITE_PLANE_LAYER`.
+     * This ensures the character's collision mesh casts shadows on the environment
+     * but NOT on its own sprite plane.
+     *
+     * @param characterShadowGenerator The shadow generator dedicated to characters.
+     */
+    public enableShadows(characterShadowGenerator: B.ShadowGenerator): void {        
+        // Add the invisible collision mesh to the character-specific shadow caster list.
+        characterShadowGenerator.addShadowCaster(this.collisionMesh);
         
-        // Add the character's main plane to the shadow caster list
-        shadowGenerator.addShadowCaster(this.collisionMesh);
         this.mesh.receiveShadows = true;
         
         console.log(`[${this.name}] Shadow setup complete.`);

@@ -25,8 +25,7 @@ export class FirstTimeSetupScene extends BaseScene {
 			if (localStorage) {
 				const eulaAccepted = localStorage.getItem<boolean>('eulaAccepted');
 				if (eulaAccepted) {
-					// should change scene here but right now fairPlayPolicy is a scene selector lol
-					this.showPlayFairPolicy(uiDirector);
+					useGeneralStore.getState().gameEngine?.changeScene('titleScreen');
 					return;
 				}
 			}
@@ -45,28 +44,8 @@ export class FirstTimeSetupScene extends BaseScene {
 							if (localStorage) {
 								localStorage.setItem('eulaAccepted', true);
 							}
-							this.showPlayFairPolicy(uiDirector);
 							uiDirector.closeAlert('EULA');
-						}
-					]]
-			))
-	}
-
-	showPlayFairPolicy(uiDirector: any) {
-		uiDirector.showAlert(
-				'Dev Build',
-				``,
-				new Map([[
-						'Test Scene',
-						() => {
-							uiDirector.closeAlert('Dev Build');
-							useGeneralStore.getState().gameEngine?.changeScene('test');
-						}
-					],[
-						'Editor',
-						() => {
-							uiDirector.closeAlert('Dev Build');
-							useGeneralStore.getState().gameEngine?.changeScene('testEditor');
+							useGeneralStore.getState().gameEngine?.changeScene('titleScreen');
 						}
 					]]
 			))
