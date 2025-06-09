@@ -115,7 +115,7 @@ export class TestScene extends BaseScene {
 
         // Add a soft, ambient light to fill in shadows so they aren't pure black.
         const ambientLight = new BABYLON.HemisphericLight("ambientLight", new BABYLON.Vector3(0, 1, 0), this);
-        ambientLight.intensity = 0.2;
+        ambientLight.intensity = 0.3;
         ambientLight.specular = BABYLON.Color3.Black(); // No shiny reflections
 
         // This is our main "sun" light, creating the strong shadows.
@@ -140,10 +140,13 @@ export class TestScene extends BaseScene {
         this.spriteShadowGenerator.darkness = 0.6; // Controls how dark shadows are
 
         // Create the shadow generator
-        this.shadowGenerator = new BABYLON.ShadowGenerator(2048, directionalLight);
+        this.shadowGenerator = new BABYLON.ShadowGenerator(1024, directionalLight);
         this.shadowGenerator.usePoissonSampling = true;
         this.shadowGenerator.transparencyShadow = true; // Allow transparency
-        this.shadowGenerator.darkness = 0.6; // Controls how dark shadows are
+        this.shadowGenerator.darkness = 0.5; // Controls how dark shadows are
+
+        this.shadowGenerator.bias = 0.00008;
+        // this.shadowGenerator.normalBias = 0.5;
 
         return this.shadowGenerator;
     }

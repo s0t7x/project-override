@@ -3,6 +3,7 @@ import * as GUI from '@babylonjs/gui';
 import { BaseScene } from './BaseScene';
 import { AnimationUtils } from '../utils/AnimationUtils'; // Adjust path as needed
 import { useGeneralStore } from '@/stores/GeneralStore';
+import { useServiceStore } from '@/stores/ServiceStore';
 
 export class TitleScreenScene extends BaseScene {
     private _advancedTexture!: GUI.AdvancedDynamicTexture;
@@ -16,7 +17,7 @@ export class TitleScreenScene extends BaseScene {
 
     // --- Replace with your actual asset URLs ---
     private readonly BACKGROUND_IMAGE_URL = "https://static.pressakey.de/gfxgames/RPG-Maker-MV-5712-1599115840.jpg"; // Placeholder background
-    private readonly LOGO_IMAGE_URL = "https://www.babylonjs.com/assets/logo-babylonjs-social-twitter.png"; // Placeholder logo
+    private readonly LOGO_IMAGE_URL = "https://i.imgur.com/gXw24hw.png"; // Placeholder logo
 
     constructor(engine: BABYLON.Engine) {
         super(engine);
@@ -28,6 +29,11 @@ export class TitleScreenScene extends BaseScene {
 
         this.onReadyObservable.addOnce(() => {
             console.log('TitleScreenScene: Scene loaded. Starting title sequence.');
+            const uiDirector = useGeneralStore.getState().gameEngine?.uiDirector;
+            const bgmService = useServiceStore.getState().bgmService;
+            if (!uiDirector || !bgmService) return;
+
+            bgmService.play({ name: "menu_theme", filePath: "/assets/audio/bgm/MainframeOfTheForgottenRealm.mp3", loop: true, volume: 0.1 }, 0);
             this._runTitleSequence();
         });
     }
@@ -52,7 +58,7 @@ export class TitleScreenScene extends BaseScene {
 
         // 2. Centered Logo
         this._logoImage = new GUI.Image("logo", this.LOGO_IMAGE_URL);
-        this._logoImage.width = "35%";
+        this._logoImage.width = "70%";
         this._logoImage.stretch = GUI.Image.STRETCH_UNIFORM;
         this._logoImage.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
         this._logoImage.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
