@@ -28,12 +28,6 @@ function requireBoot() {
     console.log(app.getGPUFeatureStatus(), gpuInfo);
   };
   function createWindow() {
-    try {
-      require("steamworks.js").electronEnableSteamOverlay();
-    } catch (err) {
-      if (process.env.NODE_ENV !== "development") return;
-      console.log("Cannot connect to steam");
-    }
     const mainWindow = new BrowserWindow({
       width: 1200,
       height: 800,

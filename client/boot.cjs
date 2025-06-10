@@ -24,7 +24,7 @@ const openDevTools = async (mainWindow) => {
 
 function createWindow() {
   try{
-    require('steamworks.js').electronEnableSteamOverlay()
+    // require('steamworks.js').electronEnableSteamOverlay()
   } catch (err) {
     if(process.env.NODE_ENV !== 'development') return;
     console.log("Cannot connect to steam")
