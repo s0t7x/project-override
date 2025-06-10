@@ -10,7 +10,7 @@ interface BgmTrack {
 export class BgmService {
 	private currentAudio: HTMLAudioElement | null = null;
 	private currentTrackName: string | null = null;
-	private targetVolume: number = AudioSettings.bgm.volume;
+	private targetVolume: number = AudioSettings.bgm.volume * AudioSettings.master.volume;
 	private isInitialized: boolean = false;
 	private audioContextUnlocked: boolean = false;
 	private unlockHandlerRef: (() => void) | null = null;

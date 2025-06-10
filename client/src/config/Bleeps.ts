@@ -1,8 +1,9 @@
 import { BleepsProviderSettings } from '@arwes/react';
+import AudioSettings from './Audio';
 
 export type BleepsNames = 'hover' | 'click' | 'assemble' | 'type' | 'intro' | 'error';
 export const BleepsSettings: BleepsProviderSettings<BleepsNames> = {
-	master: { volume: 1.0 },
+	master: { volume: AudioSettings.master.volume * AudioSettings.ui.volume },
 	categories: {
 		background: { volume: 0.5 },
 		transition: { volume: 0.5 },

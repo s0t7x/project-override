@@ -5,6 +5,8 @@ import { BaseScene } from './BaseScene';
 import { useGeneralStore } from '@/stores/GeneralStore';
 import { useServiceStore } from '@/stores/ServiceStore';
 import { AnimationUtils } from '../utils/AnimationUtils';
+import { useGameEngine } from '@/context/GameEngine';
+import { LoginScreen } from '@/react/screens/LoginScreen';
 
 export class TitleScreenScene extends BaseScene {
     private _advancedTexture!: GUI.AdvancedDynamicTexture;
@@ -38,6 +40,8 @@ export class TitleScreenScene extends BaseScene {
         this._createParticleEffects();
         this._createGlowEffect();
         this._createLightRays();
+
+        this._createPostProcessingEffects();
         
         // Setup UI and controls
         this._setupUI();
@@ -52,6 +56,35 @@ export class TitleScreenScene extends BaseScene {
             bgmService.play({ name: "menu_theme", filePath: "/assets/audio/bgm/ProjectOverride.mp3", loop: true, volume: 1.0 }, 0);
             this._runTitleSequence();
         });
+    }
+
+    private _createPostProcessingEffects(): void {
+        const pipeline = new BABYLON.DefaultRenderingPipeline(
+            "defaultPipeline",
+            true, // is HDR
+            this
+        );
+
+        // Bloom - Makes bright things glow beautifully.
+        pipeline.bloomEnabled = false;
+        pipeline.bloomThreshold = 0.4;
+        pipeline.bloomWeight = 0.7;
+        pipeline.bloomKernel = 64;
+        pipeline.bloomScale = 0.2;
+
+        // Depth of Field - Blurs the background, focusing on the UI/Logo.
+        // pipeline.depthOfFieldEnabled = true;
+        // pipeline.depthOfField.focusDistance = 5; // Focus distance - matches camera's target
+        // pipeline.depthOfField.fStop = 1.4;
+        // pipeline.depthOfField.focalLength = 30;
+
+        // Chromatic Aberration - A subtle lens distortion effect for a cinematic touch.
+        pipeline.chromaticAberrationEnabled = false;
+        pipeline.chromaticAberration.aberrationAmount = 10;
+        pipeline.chromaticAberration.radialIntensity = 0.5;
+
+        // FXAA - Anti-aliasing for smooth edges.
+        pipeline.fxaaEnabled = false;
     }
 
     /**
@@ -94,13 +127,13 @@ export class TitleScreenScene extends BaseScene {
         particleSystem.particleTexture = new BABYLON.Texture(this.PARTICLE_TEXTURE_URL, this);
 
         // Emitter settings - a box at the bottom of the screen
-        particleSystem.emitter = new BABYLON.Vector3(0, -8, 0); // Start below the camera view
+        particleSystem.emitter = new BABYLON.Vector3(0, -10, 0); // Start below the camera view
         particleSystem.minEmitBox = new BABYLON.Vector3(-15, 0, 0); 
         particleSystem.maxEmitBox = new BABYLON.Vector3(15, 0, 0);
 
         // Particle appearance and behavior
-        particleSystem.color1 = new BABYLON.Color4(0.5, 0.7, 2, 0.4);
-        particleSystem.color2 = new BABYLON.Color4(0.1, 0.0, 1, 0.3);
+        particleSystem.color1 = new BABYLON.Color4(0.5, 0.7, 2, 0.2);
+        particleSystem.color2 = new BABYLON.Color4(0.1, 0.0, 1, 0.1);
         particleSystem.colorDead = new BABYLON.Color4(0, 0, 0, 0.0); // Fades to dark and transparent
 
         particleSystem.minSize = 0.01;
@@ -135,7 +168,7 @@ export class TitleScreenScene extends BaseScene {
         const RAY_COUNT = 128; // Increased for a fuller, more dynamic scene
         const MIN_VISIBILITY = 0.1; 
         const MAX_VISIBILITY = 0.3; 
-        const SPREAD = 40;
+        const SPREAD = 50;
         const ANIMATION_SPEED = 80.0; // Higher number = slower shimmer
 
 
@@ -153,7 +186,7 @@ export class TitleScreenScene extends BaseScene {
         rayMaterial.alphaMode = BABYLON.Constants.ALPHA_COMBINE;
         rayMaterial.emissiveColor = new BABYLON.Color3(0.05, 0.02, 0.2);
 
-        const baseRayPlane = BABYLON.MeshBuilder.CreatePlane("baseRayPlane", { width: 8, height: 80 }, this);
+        const baseRayPlane = BABYLON.MeshBuilder.CreatePlane("baseRayPlane", { width: 8, height: 100 }, this);
         baseRayPlane.material = rayMaterial;
         baseRayPlane.isVisible = false;
 
@@ -228,7 +261,7 @@ export class TitleScreenScene extends BaseScene {
         // If it's the very first spawn, randomize Y position too for a staggered start.
         // Otherwise, Y position is handled by the reset logic.
         if (isInitial) {
-            rayInstance.position.y = 0;
+            rayInstance.position.y = 20;
         }
 
         rayInstance.rotation.y = BABYLON.Tools.ToRadians(45) + (Math.random() - 0.5) * BABYLON.Tools.ToRadians(10);
@@ -313,7 +346,9 @@ export class TitleScreenScene extends BaseScene {
 
         console.log("TitleScreenScene: Input received. Showing debug alert.");
         // You can add a fade-out animation here if you wish before showing the alert
-        this._showDebugAlert();
+
+        useGeneralStore.getState().gameEngine?.uiDirector?.push(LoginScreen);
+        // this._showDebugAlert();
     };
 
     private _onKeyDown = (evt: BABYLON.KeyboardInfo): void => {

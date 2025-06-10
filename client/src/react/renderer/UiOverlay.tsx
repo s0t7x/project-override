@@ -91,7 +91,7 @@ const UiOverlay: React.FC = () => {
 
 			{/* Debugging output: */}
 			<div style={{ position: 'fixed', bottom: '10px', left: '10px', background: 'rgba(200,200,200,0.8)', color: 'black', padding: '5px', pointerEvents: 'auto', zIndex: 200, fontSize: '12px' }}>
-				Active Screen: { currentScreenNode ?? (currentScreenNode as any)?.constructor?.name ?? 'None' }
+				Active Screen: { currentScreenNode ? (currentScreenNode as any)?.constructor?.name : 'None' }
 				<br/>Update Count: {uiUpdateCount} | Alive Screen: {uiDirector?.currentScreens?.length} | Alerts: {currentAlerts.length} | Toasts: {currentToasts.length}
 			</div>
 		</div>
