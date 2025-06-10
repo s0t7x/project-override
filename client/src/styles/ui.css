@@ -26,9 +26,10 @@
 }
 
 :root {
-  --main-color: cyan;
-  --secondary-color: #ddd;
+  --main-color: rgb(202, 215, 221);
+  --secondary-color: #5c94c2;
   --danger-color: rgb(241, 118, 102);
+  --background-color: rgba(0,0,0,0.7);
 }
 
 /* Basic Reset & Body Setup (already in index.html style tag, but good practice here too) */

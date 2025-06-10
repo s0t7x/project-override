@@ -9,11 +9,13 @@ import { AnimationUtils } from '../utils/AnimationUtils';
 export class TitleScreenScene extends BaseScene {
     private _advancedTexture!: GUI.AdvancedDynamicTexture;
     private _mainContainer!: GUI.Container;
+    private _ctaText!: GUI.TextBlock;
     private _ctaSkipped: boolean = false;
     private _pointerDownObserver: BABYLON.Observer<BABYLON.PointerInfo> | null = null;
 
-    private readonly FADE_IN_TIME = 0.2;
+    private readonly FADE_IN_TIME = 0.1;
     private readonly FADE_OUT_TIME = 0.2;
+    private readonly CTA_BLINK_TIME = 120;
     
     // --- Asset URLs ---
     // Using placeholders for a dynamic background and particles
@@ -47,7 +49,7 @@ export class TitleScreenScene extends BaseScene {
             const bgmService = useServiceStore.getState().bgmService;
             if (!uiDirector || !bgmService) return;
 
-            bgmService.play({ name: "menu_theme", filePath: "/assets/audio/bgm/MainframeOfTheForgottenRealm.mp3", loop: true, volume: 0.1 }, 0);
+            bgmService.play({ name: "menu_theme", filePath: "/assets/audio/bgm/ProjectOverride.mp3", loop: true, volume: 1.0 }, 0);
             this._runTitleSequence();
         });
     }
@@ -130,11 +132,12 @@ export class TitleScreenScene extends BaseScene {
      */
     private _createLightRays(): void {
         // --- Core Parameters to Tweak ---
-        const RAY_COUNT = 64; // Increased for a fuller, more dynamic scene
+        const RAY_COUNT = 128; // Increased for a fuller, more dynamic scene
         const MIN_VISIBILITY = 0.1; 
         const MAX_VISIBILITY = 0.3; 
         const SPREAD = 40;
         const ANIMATION_SPEED = 80.0; // Higher number = slower shimmer
+
 
         // --- New Movement Parameters ---
         const MIN_SPEED = 0.2;  // The slowest a ray can drift upwards
@@ -160,6 +163,7 @@ export class TitleScreenScene extends BaseScene {
 
         // Define our desired ray color once
         const rayColor = new BABYLON.Color3(0.4, 0.0, 0.1);
+        const rayColor2 = new BABYLON.Color3(0.4, 0.2, 0.8);
 
 
         for (let i = 0; i < RAY_COUNT; i++) {
@@ -168,7 +172,11 @@ export class TitleScreenScene extends BaseScene {
             // Randomize all properties for the initial position
             this._randomizeRayProperties(rayInstance, true, SPREAD);
 
-            rayInstance.instancedBuffers.color = new BABYLON.Color4(rayColor.r, rayColor.g, rayColor.b, 0);
+            if(Math.random() > 0.5) {
+                rayInstance.instancedBuffers.color = new BABYLON.Color4(rayColor.r, rayColor.g, rayColor.b, 0);
+            } else {
+                rayInstance.instancedBuffers.color = new BABYLON.Color4(rayColor2.r, rayColor2.g, rayColor2.b, 0);
+            }
 
             // Store custom data (its unique speed) directly on the instance object.
             // This is a common and easy way to manage state for instanced meshes.
@@ -257,16 +265,34 @@ export class TitleScreenScene extends BaseScene {
 
         // 2. Game Title Logo (Text)
         const titleLogo = new GUI.Image("logo", this.LOGO_TEXT_URL);
-        titleLogo.width = "50%";
+        titleLogo.width = "66%";
         titleLogo.stretch = GUI.Image.STRETCH_UNIFORM;
         // Position it slightly above the center to make space for the menu
         titleLogo.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
         titleLogo.paddingBottom = "40%";
         this._mainContainer.addControl(titleLogo);
 
+        this._ctaText = new GUI.TextBlock("cta", "Press any Key");
+        this._ctaText.color = "black";
+        this._ctaText.fontSize = "28px";
+        this._ctaText.outlineColor = "#ffffffce";
+        this._ctaText.outlineWidth = 3;
+        this._ctaText.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+        this._ctaText.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+        this._ctaText.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+        this._ctaText.paddingBottom = "25%";
+        this._mainContainer.addControl(this._ctaText);
+
+        this.onBeforeRenderObservable.add(() => {
+            if(this._ctaSkipped) this._ctaText.isVisible = false;
+            else if(this.getFrameId() % this.CTA_BLINK_TIME == 0) {
+                this._ctaText.isVisible = !this._ctaText.isVisible
+            }
+        });
+
         const copyrightText = new GUI.TextBlock("copyright", "© 2025 Miguel Oppermann. All rights reserved. Logo Illustration © 2025 Miguel Oppermann");
         copyrightText.color = "white";
-        copyrightText.fontSize = "12px";
+        copyrightText.fontSize = "10px";
         copyrightText.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
         copyrightText.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
         copyrightText.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
@@ -303,11 +329,11 @@ export class TitleScreenScene extends BaseScene {
     private _setupSkipControls(): void {
         this.onKeyboardObservable.add(this._onKeyDown);
         
-        this._pointerDownObserver = this.onPointerObservable.add((pointerInfo) => {
-            if (pointerInfo.type === BABYLON.PointerEventTypes.POINTERDOWN) {
-                this._onPointerDown(pointerInfo);
-            }
-        });
+        // this._pointerDownObserver = this.onPointerObservable.add((pointerInfo) => {
+        //     if (pointerInfo.type === BABYLON.PointerEventTypes.POINTERDOWN) {
+        //         this._onPointerDown(pointerInfo);
+        //     }
+        // });
 
         this.onDisposeObservable.addOnce(() => {
             console.log("TitleScreenScene: Disposing skip controls.");

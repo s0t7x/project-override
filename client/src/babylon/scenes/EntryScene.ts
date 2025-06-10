@@ -84,13 +84,13 @@ export class EntryScene extends BaseScene {
 			}
 		}
 
-		const bottomText = new GUI.TextBlock("bottomText", "Havok™ is a trademark of Microsoft Corporation. | Colyseus is copyright © Lucid Sight, Inc.\nReact is a trademark of Meta Platforms, Inc. | Electron is a trademark of the OpenJS Foundation. | Powered by Babylon.js.");
+		const bottomText = new GUI.TextBlock("bottomText", "Havok™ is a trademark of Microsoft Corporation. Colyseus is copyright © Lucid Sight, Inc.\nReact is a trademark of Meta Platforms, Inc. Electron is a trademark of the OpenJS Foundation. Powered by Babylon.js.");
 		bottomText.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
 		bottomText.color = "white";
-		bottomText.fontSize = "14px";
+		bottomText.fontSize = "10px";
 		// bottomText.fontWeight = "bold";
 		bottomText.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
-		bottomText.paddingBottom = "2%";
+		bottomText.paddingBottom = "10px";
 		this._mainContainer.addControl(bottomText);
 	}
 

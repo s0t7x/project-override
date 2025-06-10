@@ -24,7 +24,7 @@ export const Window: React.FC<WindowProps> = ({ children, title = 'Unknown', x =
                 <FrameNefrex
                     style={{
                         // @ts-expect-error css variables
-                        '--arwes-frames-bg-color': 'hsla(180, 75%, 10%, 0.7)',
+                        '--arwes-frames-bg-color': 'var(--background-color)',
                         '--arwes-frames-line-color': 'var(--main-color)',
                         '--arwes-frames-deco-color': 'var(--main-color)',
                         zIndex: -1,
