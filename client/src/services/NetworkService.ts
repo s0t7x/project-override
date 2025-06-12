@@ -2,6 +2,8 @@ import { NetworkSettings } from "@/config/Network";
 import { useAuthStore } from "@/stores/AuthStore";
 import { useNetworkStore } from "@/stores/NetworkStore";
 import { Client, Room } from "colyseus.js";
+import { IAuthTokens } from "@project-override/shared/messages/Auth"
+import { ServerErrorMessageTypeEnum } from "@project-override/shared/messages/ServerError";
 
 export class NetworkService {
     private _isInitialized: boolean = false;
@@ -62,6 +64,29 @@ export class NetworkService {
         listeners.add(handler);
     }
 
+    public addErrorListener<T = any>(room: Room | null, handler: (data: T) => void): void {
+        const r = room ? room : this.primaryRoom;
+        if (!r) {
+            console.warn(`[NetworkService] Cannot add listener. Not room specified and not in a primary room.`);
+            return;
+        }
+
+        if (!this.messageListeners.has(r.name)) {
+            this.messageListeners.set(r.name, new Map());
+        }
+        Object.keys(ServerErrorMessageTypeEnum).forEach((name) => {
+            const type = "Error." + name;
+            console.log('register for', type)
+            const roomMsgListeners = this.messageListeners.get(r.name)!;
+            if (!roomMsgListeners.has(type)) {
+                roomMsgListeners.set(type, new Set());
+            }
+            const listeners = roomMsgListeners.get(type)!;
+            listeners.add(handler);
+        })
+       
+    }
+
     public removeMessageListener(room: Room | null, type: string | number, handler?: Function): void {
         const r = room ? room : this.primaryRoom;
         if (!r) {
@@ -90,9 +115,9 @@ export class NetworkService {
         }
     }
 
-    public onMessageOnce<T = any>(room: Room, type: string | number, callback: (payload: T) => void): void {
+    public onMessageOnce<T = any>(room: Room | null, type: string | number, callback: (payload: T) => void): void {
         const onceWrapper = (payload: T) => {
-            this.removeMessageListener(room, type, onceWrapper);
+            this.removeMessageListener(room || this.primaryRoom, type, onceWrapper);
             callback(payload);
         };
         this.addMessageListener(room, type, onceWrapper);

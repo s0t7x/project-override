@@ -3,6 +3,7 @@ import { IMessage } from 'messages/Messages';
 export const AuthMessageTypeEnum = {
 	AuthLoginRequest: 'Auth.LoginRequest',
 	AuthLoginResponse: 'Auth.LoginResponse',
+	AuthSteamLoginRequest: 'Auth.SteamLoginRequest',
 	AuthRegisterRequest: 'Auth.RegisterRequest',
 	AuthRegisterResponse: 'Auth.RegisterResponse',
 	AuthRefreshRequest: 'Auth.RefreshRequest',
@@ -23,13 +24,22 @@ export class AuthLoginRequest implements IMessage {
 }
 
 export class AuthLoginResponse implements IMessage, IAuthTokens {
-	public readonly type: AuthMessageType = 'Auth.LoginResponse';
+	public readonly type: AuthMessageType = AuthMessageTypeEnum.AuthLoginResponse;
 	public readonly accessToken: string;
 	public readonly refreshToken: string;
 
 	constructor(tokens: IAuthTokens) {
 		this.accessToken = tokens.accessToken;
 		this.refreshToken = tokens.refreshToken;
+	}
+}
+
+export class AuthSteamLoginRequest implements IMessage {
+	public readonly type: AuthMessageType = AuthMessageTypeEnum.AuthSteamLoginRequest;
+	public readonly authTicket: string;
+
+	constructor(authTicket: string) {
+		this.authTicket = authTicket;
 	}
 }
 

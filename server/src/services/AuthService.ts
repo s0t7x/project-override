@@ -17,6 +17,31 @@ interface RefreshTokenStoreEntry {
 }
 const inMemoryRefreshTokenStore: Map<string, RefreshTokenStoreEntry> = new Map(); // NOT FOR PRODUCTION
 
+async function validateSteamAuthTicket(authTicket: string) {
+  const apiKey = process.env.STEAM_API_KEY;
+  const appId = 480;  // e.g., 480 for SpaceWar (Steam’s test app)
+
+  // Construct the URL
+  const url = `https://api.steampowered.com/ISteamUserAuth/AuthenticateUserTicket/v1/?key=${apiKey}&appid=${appId}&ticket=${authTicket}`;
+
+  try {
+    const response = await fetch(url, { method: 'GET' });
+    const data = await response.json() as any;
+    
+    // The response typically contains a "response" object with details.
+    if (data && data.response && data.response.params) {
+      if(data.response.params.result == "OK")
+	  	return BigInt(data.response.params.steamid);
+    } 
+	console.error('Validation failed or unexpected response format:', data);
+  } catch (error) {
+    console.error('Error validating ticket:', error);
+  }
+
+  return null;
+}
+
+
 class AuthServiceInternal {
 	/**
 	 * Authenticates a user by username and password.
@@ -40,6 +65,27 @@ class AuthServiceInternal {
 		const isPasswordValid = await bcrypt.compare(plainPasswordPlainText, user.passwordHash);
 		if (!isPasswordValid) {
 			throw new BusinessRuleError('Invalid username or password.', 401); // 401 Unauthorized
+		}
+
+		// Record login attempt (can be done asynchronously, fire-and-forget)
+		userService.recordUserLogin(user.id, ipAddress).catch((err) => console.warn('Failed to record login:', err));
+
+		return this.generateAndStoreTokens(user);
+	}
+
+	async loginWithSteam(steamAuthTicket: string, ipAddress?: string): Promise<IAuthTokens> {
+		const steamId = await validateSteamAuthTicket(steamAuthTicket);
+		if (!steamId) {
+			throw new NotFoundError(`SteamId "${steamId}" not valid.`);
+		}
+		
+		const user = await userRepository.findBySteamId64(steamId);
+		if (!user) {
+			throw new NotFoundError(`User for SteamId "${steamId}" not found.`);
+		}
+
+		if (user.bannedUntil && user.bannedUntil > new Date()) {
+			throw new ForbiddenError(`User with SteamId "${steamId}" is banned until ${user.bannedUntil.toISOString()}. Reason: ${user.banReason || 'N/A'}`);
 		}
 
 		// Record login attempt (can be done asynchronously, fire-and-forget)

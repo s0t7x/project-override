@@ -8,7 +8,7 @@ import { prisma } from '../db/client';
 import { JsonObject } from '@prisma/client/runtime/library';
 import { ServerError, NotFoundError, ForbiddenError, BusinessRuleError } from '@project-override/shared/dist/messages/ServerError';
 import { IEquipmentSlot } from '@project-override/shared/dist/core/EquipmentSlot';
-import { ICharacterAppearance } from '@project-override/shared/dist/game/CharacterAppearance';
+import { ICharacterAppearance } from '@project-override/shared/dist/core/CharacterAppearance';
 
 // Define a more complete Character representation for some service methods
 export type FullCharacterSheet = Character & {

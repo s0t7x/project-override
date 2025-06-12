@@ -17,6 +17,7 @@ model User {
   id            String    @id @default(uuid())
   username      String    @unique
   passwordHash  String
+  steamId64     BigInt?    @unique
   role          UserRole  @default(PLAYER) // Maps to the UserRole enum
   maxCharacters Int       @default(4) @db.SmallInt
   createdAt     DateTime  @default(now())

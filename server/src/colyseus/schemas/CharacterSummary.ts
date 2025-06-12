@@ -1,5 +1,5 @@
 import { ArraySchema, Schema, type } from '@colyseus/schema';
-import { ICharacterSummary } from '@project-override/shared/dist/game/CharacterSummary';
+import { ICharacterSummary } from '@project-override/shared/dist/core/CharacterSummary';
 import { IEquipmentComponent } from '@project-override/shared/dist/components/EquipmentComponent';
 import { EntityComponentsTypeEnum, IEntityComponents } from '@project-override/shared/dist/components/EntityComponents';
 import { CharacterAppearance } from './CharacterAppearance';

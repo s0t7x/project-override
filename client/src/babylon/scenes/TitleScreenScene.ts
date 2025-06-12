@@ -402,11 +402,11 @@ export class TitleScreenScene extends BaseScene {
     private _setupSkipControls(): void {
         this.onKeyboardObservable.add(this._onKeyDown);
         
-        // this._pointerDownObserver = this.onPointerObservable.add((pointerInfo) => {
-        //     if (pointerInfo.type === BABYLON.PointerEventTypes.POINTERDOWN) {
-        //         this._onPointerDown(pointerInfo);
-        //     }
-        // });
+        this._pointerDownObserver = this.onPointerObservable.add((pointerInfo) => {
+            if (pointerInfo.type === BABYLON.PointerEventTypes.POINTERDOWN) {
+                this._onPointerDown(pointerInfo);
+            }
+        });
 
         this.onDisposeObservable.addOnce(() => {
             console.log("TitleScreenScene: Disposing skip controls.");

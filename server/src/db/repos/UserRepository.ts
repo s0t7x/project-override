@@ -50,6 +50,14 @@ class UserRepositoryInternal {
 		});
 	}
 
+	async findBySteamId64(steamId64: bigint, includeCharacters: boolean = false): Promise<UserWithCharacterPreviews | User | null> {
+		return prisma.user.findUnique({
+			// Use imported `prisma`
+			where: { steamId64 },
+			include: includeCharacters ? userIncludeRelations : undefined,
+		});
+	}
+
 	async update(id: string, data: UserUpdateData): Promise<User> {
 		return prisma.user.update({
 			// Use imported `prisma`

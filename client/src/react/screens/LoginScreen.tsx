@@ -6,6 +6,20 @@ import { useServices } from "@/context/Services";
 import { Spinner } from "../common/Spinner";
 import { useGameEngine } from "@/context/GameEngine";
 import { Text } from "@arwes/react";
+import { useAuthStore } from "@/stores/AuthStore";
+import { AuthLoginResponse, AuthMessageTypeEnum } from "@project-override/shared/messages/Auth";
+import { ServerError } from "@project-override/shared/messages/ServerError";
+
+function parseJwt(token: string): any {
+  try {
+    const payloadBase64 = token.split('.')[1];
+    const payloadJson = atob(payloadBase64);
+    return JSON.parse(payloadJson);
+  } catch (e) {
+    console.error("Invalid JWT", e);
+    return null;
+  }
+}
 
 const styles: { [key: string]: React.CSSProperties } = {
     form: {
@@ -41,24 +55,59 @@ const styles: { [key: string]: React.CSSProperties } = {
 };
 
 export const LoginScreen: BaseScreen = () => {
-
+    const { uiDirector, sceneDirector } = useGameEngine()
+    const { steamworks, networkService } = useServices();
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const { uiDirector } = useGameEngine()
-    const { steamworks } = useServices();
 
-    const [authTicket, setAuthTicket] = useState<any>(null)
+    const {authTokens} = useAuthStore();
+    
+
+    const [connected, setConnected] = useState<boolean>(false);
+    const [hasError, setHasError] = useState<boolean>(false);
 
     useEffect(() => {
-        (async () => {
-            const steamId = steamworks.client.localplayer.getSteamId().steamId64;
-            const authTicket = await steamworks.client.auth.getSessionTicketWithSteamId(steamId);
-            if (authTicket) {
-                setAuthTicket(authTicket);
-                uiDirector.showAlert('Connected', `Got AuthTicket (${Buffer.from(authTicket.getBytes(), 'binary').toString('hex').substring(0, 16) + '...'}) for SteamId64: ${steamId}`, undefined, undefined, { y: '75%'})
+        networkService.initialize();
+        networkService.joinRoom('auth', undefined, true).then((room) => {
+            if(room) {
+                setConnected(true);
             }
-        })();
+        })
     }, []);
+
+    useEffect(() => {
+        if(connected)
+            (async () => {
+                const steamId = steamworks.client.localplayer.getSteamId().steamId64;
+                const authTicket = await steamworks.client.auth.getSessionTicketWithSteamId(steamId);
+                if (authTicket) {
+                    networkService.addErrorListener(null, (data) => {
+                        setHasError(true);
+                        uiDirector.showAlert("Error", data.message, () => {
+                            uiDirector.pop();
+                            sceneDirector.changeScene('titleScreen');
+                        }, null, { y: '75%'});
+                    });
+                    networkService.onMessageOnce(null, AuthMessageTypeEnum.AuthLoginResponse, (response: AuthLoginResponse) => {
+                        useAuthStore.setState({
+                            authTokens: {
+                                accessToken: response.accessToken,
+                                refreshToken: response.refreshToken
+                            },
+                            payload: parseJwt(response.accessToken),
+                            isAuthenticated: true
+                        });
+                    });
+                    networkService.sendMessage(null, AuthMessageTypeEnum.AuthSteamLoginRequest, { authTicket: Buffer.from(authTicket.getBytes(), 'binary').toString('hex') })
+                }
+            })();
+    }, [connected]);
+
+    useEffect(() => {
+        if(authTokens) {
+            uiDirector.showAlert('', 'Popo');
+        }
+    }, [authTokens])
 
     // --- Event Handling ---
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -71,14 +120,14 @@ export const LoginScreen: BaseScreen = () => {
     };
 
     return <>
-        {(steamworks && !authTicket) ?
+        {(steamworks && !authTokens && !hasError) ?
             <Window title='' y='75%'>
                 <form style={styles.form}>
-                    <Spinner text='Authenticating with Steam...' />
+                    <Spinner text={connected ? 'Authenticating with Steam...' : 'Connecting...'} />
                 </form>
             </Window>
             :
-            (authTicket ? <></> :
+            (authTokens || hasError ? <></> :
                 <Window title='' y='75%'>
                     <form onSubmit={handleSubmit} style={styles.form}>
                         <div style={styles.inputGroup}>

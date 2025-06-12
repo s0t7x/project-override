@@ -10,6 +10,7 @@ import {
 	AuthRefreshResponse,
 	AuthRegisterRequest,
 	AuthRegisterResponse,
+	AuthSteamLoginRequest,
 } from '@project-override/shared/dist/messages/Auth';
 import { authService } from '../../services/AuthService';
 import { userService } from '../../services/UserService';
@@ -23,6 +24,22 @@ export class AuthRoom extends Room<UnusedState> {
 			if (message.username && message.password) {
 				try {
 					const authTokens = await authService.login(message.username, message.password);
+					console.log(`[AuthRoom ${this.roomId}] Authentication successful for ${client.sessionId}.`);
+					networkService.sendMessage(client, new AuthLoginResponse(authTokens));
+				} catch (error: Error | any) {
+					console.error(`[AuthRoom ${this.roomId}] Authentication failed for ${client.sessionId}:`, error);
+					networkService.sendError(client, error instanceof ServerError ? error : new ServerError(error.message));
+				}
+			} else {
+				networkService.sendError(client, new ValidationError('Username and password are required.') as ServerError);
+			}
+		});
+
+		this.onMessage(AuthMessageTypeEnum.AuthSteamLoginRequest, async (client, message: AuthSteamLoginRequest) => {
+			console.log(`[AuthRoom ${this.roomId}] Received AuthSteamLoginRequest from ${client.sessionId}:`, message);
+			if (message.authTicket) {
+				try {
+					const authTokens = await authService.loginWithSteam(message.authTicket);
 					console.log(`[AuthRoom ${this.roomId}] Authentication successful for ${client.sessionId}.`);
 					networkService.sendMessage(client, new AuthLoginResponse(authTokens));
 				} catch (error: Error | any) {
