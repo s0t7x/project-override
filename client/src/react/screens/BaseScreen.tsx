@@ -1,3 +1,3 @@
 import React from 'react';
 
-export type BaseScreen = React.ReactNode;
+export type BaseScreen = React.FC;

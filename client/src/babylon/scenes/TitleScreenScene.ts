@@ -1,4 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
+import '@babylonjs/inspector';
 import * as GUI from '@babylonjs/gui';
 import { BaseScene } from './BaseScene';
 // import { AnimationUtils } from '../utils/AnimationUtils'; // Replaced with built-in animations
@@ -7,6 +8,8 @@ import { useServiceStore } from '@/stores/ServiceStore';
 import { AnimationUtils } from '../utils/AnimationUtils';
 import { useGameEngine } from '@/context/GameEngine';
 import { LoginScreen } from '@/react/screens/LoginScreen';
+
+export const UI_LAYER = 0x10000000;
 
 export class TitleScreenScene extends BaseScene {
     private _advancedTexture!: GUI.AdvancedDynamicTexture;
@@ -18,6 +21,9 @@ export class TitleScreenScene extends BaseScene {
     private readonly FADE_IN_TIME = 0.1;
     private readonly FADE_OUT_TIME = 0.2;
     private readonly CTA_BLINK_TIME = 120;
+
+    private camera: BABYLON.Camera;
+    private uiCamera: BABYLON.Camera;
     
     // --- Asset URLs ---
     // Using placeholders for a dynamic background and particles
@@ -28,24 +34,45 @@ export class TitleScreenScene extends BaseScene {
 
     constructor(engine: BABYLON.Engine) {
         super(engine);
-        // We only need a camera. The background will be a 3D skybox.
-        this.createDefaultCameraOrLight(true, false, false);
-        // The camera needs to be positioned to see the 3D scene
-        if (this.activeCamera) {
-            this.activeCamera.position = new BABYLON.Vector3(0, 0, -20);
-        }
+        // this.debugLayer.show({ embedMode: true });
+        this.camera = new BABYLON.ArcRotateCamera("camera", Math.PI / 2 + Math.PI / 7, Math.PI / 2, 100,
+            new BABYLON.Vector3(0, 0, 0),
+        this);
+        this.camera.position = new BABYLON.Vector3(0, 0, 20);
 
+        this.setActiveCameraByName("camera");
+        this.createDefaultCameraOrLight(true, false, false);
+    
+        this.uiCamera = new BABYLON.ArcRotateCamera("uiCamera", Math.PI / 2 + Math.PI / 7, Math.PI / 2, 100,
+            new BABYLON.Vector3(0, 20, 0),
+        this);
+        this.uiCamera.layerMask = UI_LAYER;
+        this.uiCamera.position = this.camera.position;
+
+        
         // Create the new dynamic visual elements
         this._createDynamicBackground();
         this._createParticleEffects();
         this._createGlowEffect();
         this._createLightRays();
-
+        
         this._createPostProcessingEffects();
         
         // Setup UI and controls
         this._setupUI();
         this._setupSkipControls();
+        
+        this.autoClear = false; // Prevents the canvas from being cleared between camera renders
+        this.autoClearDepthAndStencil = false; // Also disable for depth/stencil
+        
+        this.onBeforeCameraRenderObservable.add((camera) => {
+            // Only clear the screen before the FIRST camera renders
+            if (camera === this.camera) {
+                engine.clear(this.clearColor, true, true, true);
+            }
+        });
+        
+        this.activeCameras = [this.camera, this.uiCamera]
 
         this.onReadyObservable.addOnce(() => {
             console.log('TitleScreenScene: Scene loaded. Starting title sequence.');
@@ -61,30 +88,35 @@ export class TitleScreenScene extends BaseScene {
     private _createPostProcessingEffects(): void {
         const pipeline = new BABYLON.DefaultRenderingPipeline(
             "defaultPipeline",
-            true, // is HDR
-            this
+            false, // is HDR
+            this, [this.camera]
         );
 
-        // Bloom - Makes bright things glow beautifully.
-        pipeline.bloomEnabled = false;
-        pipeline.bloomThreshold = 0.4;
-        pipeline.bloomWeight = 0.7;
-        pipeline.bloomKernel = 64;
-        pipeline.bloomScale = 0.2;
+        pipeline.bloomEnabled = true;
+        pipeline.bloomThreshold = 0.2;
+        pipeline.bloomScale = 0.7;
+
+        pipeline.chromaticAberrationEnabled = true;
+        pipeline.chromaticAberration.aberrationAmount = 20;
+
+        pipeline.depthOfFieldEnabled = true;
+        pipeline.depthOfField.lensSize = 80;
+        pipeline.depthOfField.focusDistance = 0;
+
+        pipeline.grainEnabled = true;
+        pipeline.grain.animated = true;
+
+        pipeline.imageProcessingEnabled = true;
+        pipeline.imageProcessing.exposure = 1.2;
 
         // Depth of Field - Blurs the background, focusing on the UI/Logo.
-        // pipeline.depthOfFieldEnabled = true;
-        // pipeline.depthOfField.focusDistance = 5; // Focus distance - matches camera's target
-        // pipeline.depthOfField.fStop = 1.4;
-        // pipeline.depthOfField.focalLength = 30;
-
-        // Chromatic Aberration - A subtle lens distortion effect for a cinematic touch.
-        pipeline.chromaticAberrationEnabled = false;
-        pipeline.chromaticAberration.aberrationAmount = 10;
-        pipeline.chromaticAberration.radialIntensity = 0.5;
+        pipeline.depthOfFieldEnabled = true;
+        pipeline.depthOfField.focusDistance = 5; // Focus distance - matches camera's target
+        pipeline.depthOfField.fStop = 1.4;
+        pipeline.depthOfField.focalLength = 80;
 
         // FXAA - Anti-aliasing for smooth edges.
-        pipeline.fxaaEnabled = false;
+        pipeline.fxaaEnabled = true;
     }
 
     /**
@@ -167,7 +199,7 @@ export class TitleScreenScene extends BaseScene {
         // --- Core Parameters to Tweak ---
         const RAY_COUNT = 128; // Increased for a fuller, more dynamic scene
         const MIN_VISIBILITY = 0.1; 
-        const MAX_VISIBILITY = 0.3; 
+        const MAX_VISIBILITY = 0.8; 
         const SPREAD = 50;
         const ANIMATION_SPEED = 80.0; // Higher number = slower shimmer
 
@@ -186,7 +218,9 @@ export class TitleScreenScene extends BaseScene {
         rayMaterial.alphaMode = BABYLON.Constants.ALPHA_COMBINE;
         rayMaterial.emissiveColor = new BABYLON.Color3(0.05, 0.02, 0.2);
 
-        const baseRayPlane = BABYLON.MeshBuilder.CreatePlane("baseRayPlane", { width: 8, height: 100 }, this);
+        const baseRayPlane = BABYLON.MeshBuilder.CreatePlane("baseRayPlane", { width: 8, height: 50
+
+         }, this);
         baseRayPlane.material = rayMaterial;
         baseRayPlane.isVisible = false;
 
@@ -287,6 +321,8 @@ export class TitleScreenScene extends BaseScene {
      */
     private _setupUI(): void {
         this._advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("TitleUI", true, this);
+        if(this._advancedTexture.layer)
+            this._advancedTexture.layer.layerMask = UI_LAYER;
         
         this._mainContainer = new GUI.Container("mainContainer");
         this._mainContainer.width = "100%";
@@ -302,6 +338,7 @@ export class TitleScreenScene extends BaseScene {
         titleLogo.stretch = GUI.Image.STRETCH_UNIFORM;
         // Position it slightly above the center to make space for the menu
         titleLogo.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+        titleLogo.top = "-5%"
         titleLogo.paddingBottom = "40%";
         this._mainContainer.addControl(titleLogo);
 
@@ -323,8 +360,9 @@ export class TitleScreenScene extends BaseScene {
             }
         });
 
-        const copyrightText = new GUI.TextBlock("copyright", "© 2025 Miguel Oppermann. All rights reserved. Logo Illustration © 2025 Miguel Oppermann");
+        const copyrightText = new GUI.TextBlock("copyright", "© 2025 Miguel Oppermann. All rights reserved.");
         copyrightText.color = "white";
+        copyrightText.alpha = 0.6;
         copyrightText.fontSize = "10px";
         copyrightText.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
         copyrightText.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
@@ -347,7 +385,7 @@ export class TitleScreenScene extends BaseScene {
         console.log("TitleScreenScene: Input received. Showing debug alert.");
         // You can add a fade-out animation here if you wish before showing the alert
 
-        useGeneralStore.getState().gameEngine?.uiDirector?.push(LoginScreen);
+        useGeneralStore.getState().gameEngine?.uiDirector?.push('login');
         // this._showDebugAlert();
     };
 

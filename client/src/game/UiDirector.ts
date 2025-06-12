@@ -3,7 +3,7 @@ import { ToastProps, ToastCorner } from '@/react/common/Toast'; // Import ToastP
 import { BaseScreen } from '@/react/screens/BaseScreen';
 
 export class UiDirector {
-	public currentScreens: BaseScreen[] = [];
+	public currentScreens: string[] = [];
 	public currentAlerts: Map<string, AlertProps> = new Map(); // Maps title to AlertProps
 	public currentToasts: Map<string, ToastProps> = new Map(); // Maps ID to ToastProps
 	private onStateChangeCallback: (() => void) | null = null;
@@ -17,7 +17,7 @@ export class UiDirector {
 		this.onStateChangeCallback?.();
 	}
 
-	public push(screen: BaseScreen): void {
+	public push(screen: string): void {
 		this.currentScreens.push(screen);
 		this.notifyStateChange();
 	}
@@ -32,7 +32,7 @@ export class UiDirector {
 		}
 	}
 
-	public getActiveScreen(): BaseScreen | null {
+	public getActiveScreen(): string | null {
 		return this.currentScreens.length > 0 ? this.currentScreens[this.currentScreens.length - 1] || null : null;
 	}
 
@@ -40,8 +40,8 @@ export class UiDirector {
 		console.log('[UI] Initializing...');
 	}
 
-	public showAlert(title: string, message: string, callback: (() => void) | Map<string, () => void>, children?: any) {
-		this.currentAlerts.set(title, {title, message, callback, children});
+	public showAlert(title: string, message: string, callback?: (() => void) | Map<string, () => void>, children?: any, props?: any) {
+		this.currentAlerts.set(title, {title, message, callback, children, ...props});
 		this.notifyStateChange();
 	}
 

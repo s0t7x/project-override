@@ -26,10 +26,11 @@
 }
 
 :root {
-  --main-color: rgb(202, 215, 221);
+  --main-color: rgba(217, 246, 255);
+  --primary-color: rgb(10, 2, 5);
   --secondary-color: #5c94c2;
   --danger-color: rgb(241, 118, 102);
-  --background-color: rgba(0,0,0,0.7);
+  --background-color: rgba(217, 246, 255, 0.25)
 }
 
 /* Basic Reset & Body Setup (already in index.html style tag, but good practice here too) */
@@ -40,8 +41,7 @@ html, body, #root {
     height: 100%;
     overflow: hidden; /* Prevent scrollbars on the body */
     background-color: #000; /* Default background */
-    color: #ddd; /* Default light text color */
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--main-color); /* Default light text color */
     box-sizing: border-box;
     /* cursor: url('/assets/system/cursor.png'), default;
     cursor: url('/assets/system/cursor.png'), text;
@@ -114,7 +114,7 @@ html, body, #root {
     min-height: 1.5rem;
     text-transform: uppercase;
     letter-spacing: 2px;
-    border-radius: 10px;
+    border-radius: 0px;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 0 5px var(--main-color);
@@ -189,7 +189,7 @@ html, body, #root {
     color: var(--main-color);
     font-family: 'Orbitron', sans-serif;
     font-size: 16px;
-    border-radius: 6px;
+    border-radius: 0px;
     outline: none;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
     backdrop-filter: blur(2px);
@@ -217,16 +217,38 @@ html, body, #root {
   }
 
   .sci-fi-spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid rgba(0, 255, 255, 0.3);
+    width: 32px;
+    height: 32px;
+    border: 0px none;
     border-top: 4px solid var(--main-color);
     border-radius: 50%;
-    animation: spin 1s linear infinite;
-    box-shadow: 0 0 10px var(--main-color), 0 0 20px rgba(0,255,255,0.4);
+    animation: spin 2000ms ease-in-out infinite;
+    box-shadow: 0 0 10px var(--main-color), 0 0 20px var(--background-color);
 }
 
+  .sci-fi-spinner-internal {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border: 0px solid var(--main-color);
+    border-radius: 0%;
+    animation: spin 2000ms ease-in-out alternate infinite;
+    box-shadow: 0 0 10px var(--main-color), 0 0 20px var(--background-color);
+  }
+
+  .sci-fi-spinner-text {
+    animation: glow 2000ms ease-in-out alternate infinite;
+    text-shadow: 0 0 10px var(--main-color), 0 0 20px var(--background-color);
+  }
+
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% { transform: rotate(0deg);}
+    50% { transform: rotate(180deg);}
+    100% { transform: rotate(360deg);}
+}
+
+@keyframes glow {
+    0% { opacity: 0.3; }
+    50% { opacity: 1; }
+    100% { opacity: 0.3; }
 }
