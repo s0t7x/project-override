@@ -55,7 +55,7 @@ class AuthServiceInternal {
 	async login(username: string, plainPasswordPlainText: string, ipAddress?: string): Promise<IAuthTokens> {
 		const user = await userRepository.findByUsername(username);
 		if (!user) {
-			throw new NotFoundError(`User "${username}" not found.`);
+			throw new BusinessRuleError('Invalid username or password.', 401); // 401 Unauthorized
 		}
 
 		if (user.bannedUntil && user.bannedUntil > new Date()) {

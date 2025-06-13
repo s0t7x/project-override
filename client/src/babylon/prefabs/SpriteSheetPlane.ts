@@ -32,17 +32,17 @@ export class SpriteSheetPlane {
         name: string,
         scene: B.Scene,
         initialPosition: B.Vector3 = Vector3.Zero(),
-        planeSize: number = 1
+        planeSize: B.Vector2 = new B.Vector2(1, 1)
     ) {
         this.name = name;
         this.scene = scene;
-        this.planeSize = planeSize;
+        this.planeSize = 1.0;
         this.assetService = useServiceStore.getState().assetService || undefined;
 
         if (!SpriteSheetPlane.baseHueShiftMaterial) {
             const parsedMaterial = B.NodeMaterial.Parse(HueShiftSpriteMaterialSnippet, this.scene)
             parsedMaterial.backFaceCulling = false;
-            parsedMaterial.alphaMode = B.Engine.ALPHA_COMBINE;
+            // parsedMaterial.alphaMode = B.Engine.TEST_AL;
             // Store the parsed material
             SpriteSheetPlane.baseHueShiftMaterial = parsedMaterial;
             console.log("[SpriteSheetPlane] Base hue shift NodeMaterial loaded.");
@@ -56,8 +56,10 @@ export class SpriteSheetPlane {
         this.mesh.visibility = 0;
         this.mesh.receiveShadows = true;
         this.mesh.layerMask = SPRITE_PLANE_LAYER;
+        // this.mesh.renderingGroupId = 1;
+        this.mesh.scaling = new Vector3(planeSize.x, planeSize.y, 1.0);
 
-        this.collisionMesh = B.MeshBuilder.CreateBox(`${name}_collision`, { size: this.planeSize * 0.9}, this.scene);
+        this.collisionMesh = B.MeshBuilder.CreateBox(`${name}_collision`, { size: this.planeSize }, this.scene);
         this.collisionMesh.parent = this.mesh;
         this.collisionMesh.isPickable = false;
         this.collisionMesh.visibility = 0;

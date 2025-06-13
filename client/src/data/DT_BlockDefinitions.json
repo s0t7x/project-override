@@ -47,6 +47,18 @@
         "textures": {
             "side": "/assets/textures/dev_64x64-blue.png",
             "top": "https://placehold.co/64.png"
-        }
+        },
+        "scale": { "x": 1.0, "y": 0.5, "z": 1.0 },
+        "offset": { "x": 0, "y": -0.25, "z": 0 }
+    },
+    {
+        "id": "dev_bush",
+        "isSolid": false,
+        "textures": {
+            "side": "/assets/textures/dev_64x64-green.png",
+            "top": "/assets/textures/dev_64x64-green.png"
+        },
+        "scale": { "x": 1.0, "y": 0.3, "z": 1.0 },
+        "offset": { "x": 0, "y": -0.35, "z": 0 }
     }
 ]

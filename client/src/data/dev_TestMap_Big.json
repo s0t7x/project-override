@@ -1,56 +1,57 @@
 [
-  { "position": { "x": 25, "y": 0, "z": 25 }, "type": "dev_ground_grass", "explode": { "x": 50, "y": 0, "z": 50 }, "rotation": 0 },
-  { "position": { "x": 10, "y": 0, "z": 5 }, "type": "dev_water", "rotation": 0 },
-  { "position": { "x": 10, "y": 0, "z": 6 }, "type": "dev_water", "rotation": 0 },
-  { "position": { "x": 10, "y": 0, "z": 7 }, "type": "dev_water", "rotation": 0 },
-  { "position": { "x": 11, "y": 0, "z": 5 }, "type": "dev_water", "rotation": 0 },
-  { "position": { "x": 11, "y": 0, "z": 6 }, "type": "dev_water", "rotation": 0 },
-  { "position": { "x": 11, "y": 0, "z": 7 }, "type": "dev_water", "rotation": 0 },
-  { "position": { "x": 12, "y": 0, "z": 5 }, "type": "dev_water", "rotation": 0 },
-  { "position": { "x": 12, "y": 0, "z": 6 }, "type": "dev_water", "rotation": 0 },
-  { "position": { "x": 12, "y": 0, "z": 7 }, "type": "dev_water", "rotation": 0 },
-  { "position": { "x": 35, "y": 0, "z": 40 }, "type": "dev_water", "rotation": 0 },
-  { "position": { "x": 35, "y": 0, "z": 41 }, "type": "dev_water", "rotation": 0 },
-  { "position": { "x": 36, "y": 0, "z": 40 }, "type": "dev_water", "rotation": 0 },
-  { "position": { "x": 36, "y": 0, "z": 41 }, "type": "dev_water", "rotation": 0 },
-  { "position": { "x": 5, "y": 0, "z": 20 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 5, "y": 1, "z": 20 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 5, "y": 2, "z": 20 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 6, "y": 0, "z": 20 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 6, "y": 1, "z": 20 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 6, "y": 2, "z": 20 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 7, "y": 0, "z": 20 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 7, "y": 1, "z": 20 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 7, "y": 2, "z": 20 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 5, "y": 0, "z": 21 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 5, "y": 1, "z": 21 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 5, "y": 2, "z": 21 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 7, "y": 0, "z": 21 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 7, "y": 1, "z": 21 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 7, "y": 2, "z": 21 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 5, "y": 0, "z": 22 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 5, "y": 1, "z": 22 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 5, "y": 2, "z": 22 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 6, "y": 0, "z": 22 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 6, "y": 1, "z": 22 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 6, "y": 2, "z": 22 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 7, "y": 0, "z": 22 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 7, "y": 1, "z": 22 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 7, "y": 2, "z": 22 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 40, "y": 0, "z": 10 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 40, "y": 1, "z": 10 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 41, "y": 0, "z": 10 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 41, "y": 1, "z": 10 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 42, "y": 0, "z": 10 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 42, "y": 1, "z": 10 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 40, "y": 0, "z": 11 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 40, "y": 1, "z": 11 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 42, "y": 0, "z": 11 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 42, "y": 1, "z": 11 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 40, "y": 0, "z": 12 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 40, "y": 1, "z": 12 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 41, "y": 0, "z": 12 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 41, "y": 1, "z": 12 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 42, "y": 0, "z": 12 }, "type": "dev_stone_wall", "rotation": 0 },
-  { "position": { "x": 42, "y": 1, "z": 12 }, "type": "dev_stone_wall", "rotation": 0 }
+  { "position": { "x": 0, "y": 0, "z": 0 }, "type": "dev_ground_grass", "explode": { "x": 25, "y": 0, "z": 25 }, "rotation": 0 },
+  {
+    "position": {
+      "x": -3,
+      "y": 1,
+      "z": 2
+    },
+    "type": "dev_stone_wall_bottom",
+    "rotation": 0
+  },
+  {
+    "position": {
+      "x": -2,
+      "y": 1,
+      "z": 2
+    },
+    "type": "dev_stone_wall",
+    "rotation": 0
+  },
+  {
+    "position": {
+      "x": -1,
+      "y": 1,
+      "z": 2
+    },
+    "type": "dev_water",
+    "rotation": 0
+  },
+  {
+    "position": {
+      "x": 0,
+      "y": 1,
+      "z": 2
+    },
+    "type": "dev_bush",
+    "rotation": 0
+  },
+  {
+    "position": {
+      "x": 1,
+      "y": 1,
+      "z": 2
+    },
+    "type": "dev_bush",
+    "rotation": 0
+  },
+  {
+    "position": {
+      "x": 2,
+      "y": 1,
+      "z": 2
+    },
+    "type": "dev_bush",
+    "rotation": 0
+  }
 ]

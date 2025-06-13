@@ -473,7 +473,7 @@ private async preloadTextures(): Promise<void> {
                         continue;
                     }
                     // Skip rendering if block is not solid and not explicitly renderable when non-solid
-                    if (!blockDef.isSolid) continue;
+                    // if (!blockDef.isSolid) continue;
 
 
                     if (blockDef.isSolid && // Only cull fully solid blocks
@@ -590,12 +590,15 @@ private async preloadTextures(): Promise<void> {
                         const instance = baseMesh.createInstance(instanceName);
                         // Center the instance at (worldX * BS, worldY * BS, worldZ * BS)
                         instance.position.set(
-                            worldX * this.BLOCK_SIZE,
-                            worldY * this.BLOCK_SIZE,
-                            worldZ * this.BLOCK_SIZE
+                            worldX * this.BLOCK_SIZE + this.BLOCK_SIZE * (blockDef.offset ? blockDef.offset?.x : 0),
+                            worldY * this.BLOCK_SIZE + this.BLOCK_SIZE * (blockDef.offset ? blockDef.offset?.y : 0),
+                            worldZ * this.BLOCK_SIZE + this.BLOCK_SIZE * (blockDef.offset ? blockDef.offset?.z : 0)
                         );
                         if (block.rotation) {
                             instance.rotation.y = BABYLON.Tools.ToRadians(block.rotation);
+                        }
+                        if(blockDef.scale) {
+                            instance.scaling = new BABYLON.Vector3(blockDef.scale?.x, blockDef.scale?.y, blockDef.scale?.z);
                         }
                         instance.receiveShadows = true;
                         instance.layerMask = WORLD_BLOCK_LAYER;

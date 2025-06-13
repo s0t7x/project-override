@@ -365,8 +365,8 @@ export class SpriteSheetCharacter extends SpriteSheetPlane {
 
     public stopAnimation(): void { this.isAnimationPlaying = false; }
     public resumeAnimation(): void { this.isAnimationPlaying = true; }
-    public setPosition(position: B.Vector3): void { this.mesh.position.copyFrom(position); }
-    public getPosition(): B.Vector3 { return this.mesh.position; }
+    public setPosition(position: B.Vector3): void { this.dummyMesh!.position.copyFrom(position); }
+    public getPosition(): B.Vector3 { return this.dummyMesh!.position; }
     public hasTexture(): boolean { return this.texture_base !== null; } // Check base texture
 
     protected update = (): void => {

@@ -9,6 +9,7 @@ import { Text } from "@arwes/react";
 import { useAuthStore } from "@/stores/AuthStore";
 import { AuthLoginResponse, AuthMessageTypeEnum } from "@project-override/shared/messages/Auth";
 import { ServerError } from "@project-override/shared/messages/ServerError";
+import { useServiceStore } from "@/stores/ServiceStore";
 
 function parseJwt(token: string): any {
   try {
@@ -59,11 +60,13 @@ export const LoginScreen: BaseScreen = () => {
     const { steamworks, networkService } = useServices();
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-
+    
     const {authTokens} = useAuthStore();
     
-
+    const [triedSteam, setTriedSteam] = useState<boolean>(false);
+    const [tryLogin, setTryLogin] = useState<boolean>(false);
     const [connected, setConnected] = useState<boolean>(false);
+    const [hasSteamAuthTicket, setHasSteamAuthTicket] = useState<boolean>(false);
     const [hasError, setHasError] = useState<boolean>(false);
 
     useEffect(() => {
@@ -71,63 +74,76 @@ export const LoginScreen: BaseScreen = () => {
         networkService.joinRoom('auth', undefined, true).then((room) => {
             if(room) {
                 setConnected(true);
+                networkService.addErrorListener(null, (data) => {
+                    setTryLogin(false);
+                    setHasError(true);
+                    const ts = triedSteam
+                    uiDirector.showAlert("Error", data.message, () => {
+                        console.log(ts)
+                        if(ts) {
+                            uiDirector.pop();
+                            sceneDirector.changeScene('titleScreen');
+                        } else {
+                            setHasError(false);
+                            setTriedSteam(true);
+                        }
+                    }, null, { y: '75%'});
+                });
+                networkService.onMessageOnce(null, AuthMessageTypeEnum.AuthLoginResponse, (response: AuthLoginResponse) => {
+                    setTryLogin(false);
+                    useAuthStore.setState({
+                        authTokens: {
+                            accessToken: response.accessToken,
+                            refreshToken: response.refreshToken
+                        },
+                        payload: parseJwt(response.accessToken),
+                        isAuthenticated: true
+                    });
+                    sceneDirector.changeScene('test');
+                });
             }
+        }, () => {
+            uiDirector.showAlert("Error", 'No connection to server', () => {
+                uiDirector.pop();
+                sceneDirector.changeScene('titleScreen');
+            }, null, { y: '75%'});
+            setHasError(true);
         })
     }, []);
 
     useEffect(() => {
         if(connected)
             (async () => {
-                const steamId = steamworks.client.localplayer.getSteamId().steamId64;
-                const authTicket = await steamworks.client.auth.getSessionTicketWithSteamId(steamId);
+                let authTicket = null;
+                if(steamworks?.client) {
+                    const steamId = steamworks.client.localplayer.getSteamId().steamId64;
+                    authTicket = await steamworks.client.auth.getSessionTicketWithSteamId(steamId);
+                }
                 if (authTicket) {
-                    networkService.addErrorListener(null, (data) => {
-                        setHasError(true);
-                        uiDirector.showAlert("Error", data.message, () => {
-                            uiDirector.pop();
-                            sceneDirector.changeScene('titleScreen');
-                        }, null, { y: '75%'});
-                    });
-                    networkService.onMessageOnce(null, AuthMessageTypeEnum.AuthLoginResponse, (response: AuthLoginResponse) => {
-                        useAuthStore.setState({
-                            authTokens: {
-                                accessToken: response.accessToken,
-                                refreshToken: response.refreshToken
-                            },
-                            payload: parseJwt(response.accessToken),
-                            isAuthenticated: true
-                        });
-                    });
+                    setHasSteamAuthTicket(true);
                     networkService.sendMessage(null, AuthMessageTypeEnum.AuthSteamLoginRequest, { authTicket: Buffer.from(authTicket.getBytes(), 'binary').toString('hex') })
                 }
             })();
     }, [connected]);
-
-    useEffect(() => {
-        if(authTokens) {
-            uiDirector.showAlert('', 'Popo');
-        }
-    }, [authTokens])
 
     // --- Event Handling ---
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         // Prevent the default browser behavior of reloading the page on submit.
         event.preventDefault();
 
-        // Here is where you would handle the form data, e.g., send it to an API.
-        console.log('Submitting with:', { username, password });
-        alert(`Login attempt for: ${username}`);
+        setTryLogin(true);
+        networkService.sendMessage(null, AuthMessageTypeEnum.AuthLoginRequest, { username, password })
     };
 
     return <>
-        {(steamworks && !authTokens && !hasError) ?
+        {((steamworks.client && !hasSteamAuthTicket) && !authTokens && !hasError) || tryLogin ?
             <Window title='' y='75%'>
                 <form style={styles.form}>
-                    <Spinner text={connected ? 'Authenticating with Steam...' : 'Connecting...'} />
+                    <Spinner text={connected ? (tryLogin ? 'Authenticating with Account...' : 'Authenticating with Steam...') : 'Connecting...'} />
                 </form>
             </Window>
             :
-            (authTokens || hasError ? <></> :
+            (authTokens || hasError || !triedSteam ? <></> :
                 <Window title='' y='75%'>
                     <form onSubmit={handleSubmit} style={styles.form}>
                         <div style={styles.inputGroup}>

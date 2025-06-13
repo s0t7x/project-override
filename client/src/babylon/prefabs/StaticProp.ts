@@ -4,8 +4,9 @@ import { SpriteSheetPlane } from "./SpriteSheetPlane";
 
 export class StaticProp extends SpriteSheetPlane {
     private static _propIdx = 0;
-    constructor(name: string, scene: Scene, position: B.Vector3) {
-        super('static_prop_' + name + StaticProp._propIdx++, scene, position);
+    constructor(name: string, scene: Scene, position: B.Vector3, size?: B.Vector2, pivot?: B.Vector3) {
+        super('static_prop_' + name + StaticProp._propIdx++, scene, position, size);
+        if(pivot) this.mesh.setPivotPoint(pivot);
         this.billboard = true;
     }
 

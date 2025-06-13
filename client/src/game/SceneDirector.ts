@@ -80,6 +80,9 @@ export class SceneDirector {
 				case 'titleScreen':
 					newScene = new TitleScreenScene(this.engine);
 					break;
+				case 'characterSelection':
+					// newScene = new TestScene(this.engine);
+					break;
 				default:
 					console.log('[GameEngine] Invalid Scene Name: ' + next + '.');
 					newScene = null;
