@@ -160,8 +160,6 @@ private async preloadTextures(): Promise<void> {
         let materialKeySuffix: string;
         const blockIdForLog = blockDef.id || 'UNKNOWN_BLOCK_ID';
 
-        let isTilemapTexture = false;
-
         if (faceType === 'top') {
             if (blockDef.autoTileTop) {
                 texturePath = blockDef.autoTileTop.atlasTexturePath;
@@ -169,29 +167,29 @@ private async preloadTextures(): Promise<void> {
             } else {
                 if(blockDef.textures.top) {
                     if(typeof blockDef.textures.top === 'string') texturePath = blockDef.textures.top;
-                    else {texturePath = blockDef.textures.top.texturePath; isTilemapTexture = true;}
+                    else {texturePath = blockDef.textures.top.texturePath; }
                     materialKeySuffix = `top_${texturePath}`;
 
                 } else {
                     if(typeof blockDef.textures.side === 'string') texturePath = blockDef.textures.side;
-                    else { texturePath = blockDef.textures.side.texturePath; isTilemapTexture = true;}
+                    else { texturePath = blockDef.textures.side.texturePath; }
                     materialKeySuffix = `top_fallback_side`;
                 }
             }
         } else if (faceType === 'bottom') {
             if( blockDef.textures.bottom) {
                 if(typeof blockDef.textures.bottom === 'string') texturePath = blockDef.textures.bottom;
-                else { texturePath = blockDef.textures.bottom.texturePath; isTilemapTexture = true;}
+                else { texturePath = blockDef.textures.bottom.texturePath; }
                 materialKeySuffix = `bottom_${texturePath}`;
             } else {
                 if(typeof blockDef.textures.side === 'string') texturePath = blockDef.textures.side;
-                    else { texturePath = blockDef.textures.side.texturePath; isTilemapTexture = true;}
+                    else { texturePath = blockDef.textures.side.texturePath; }
                     materialKeySuffix = `bottom_fallback_side`;
             }
         } else { // side
             console.log(typeof blockDef.textures.side === 'string', typeof blockDef.textures.side, blockDef.textures.side)
             if(typeof blockDef.textures.side === 'string') texturePath = blockDef.textures.side;
-            else {texturePath = blockDef.textures.side.texturePath; isTilemapTexture = true;}
+            else {texturePath = blockDef.textures.side.texturePath; }
             materialKeySuffix = `side_${texturePath}`;
         }
 

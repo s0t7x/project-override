@@ -67,7 +67,7 @@ export class CharactersRoom extends Room<CharactersRoomState> {
 	}
 
 	onAuth(client: Client<any, any>, options: any, context: AuthContext) {
-		const { token } = context;
+		const token = context?.token || options?.token || undefined;
 		if (!token) {
 			console.error(`[CharactersRoom ${this.roomId}] Client ${client.sessionId} failed authentication: no access token provided.`);
 			throw new ValidationError('Access token is required.');

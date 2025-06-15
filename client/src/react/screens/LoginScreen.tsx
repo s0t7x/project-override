@@ -5,11 +5,10 @@ import { Button } from "../common/Button";
 import { useServices } from "@/context/Services";
 import { Spinner } from "../common/Spinner";
 import { useGameEngine } from "@/context/GameEngine";
-import { Text } from "@arwes/react";
 import { useAuthStore } from "@/stores/AuthStore";
 import { AuthLoginResponse, AuthMessageTypeEnum } from "@project-override/shared/messages/Auth";
-import { ServerError } from "@project-override/shared/messages/ServerError";
-import { useServiceStore } from "@/stores/ServiceStore";
+import { TitleScreenScene } from "@/babylon/scenes/TitleScreenScene";
+import { AnimationUtils } from "@/babylon/utils/AnimationUtils";
 
 function parseJwt(token: string): any {
   try {
@@ -99,7 +98,14 @@ export const LoginScreen: BaseScreen = () => {
                         payload: parseJwt(response.accessToken),
                         isAuthenticated: true
                     });
-                    sceneDirector.changeScene('test');
+                    const scene = sceneDirector.getActiveScene() as TitleScreenScene;
+                    if(scene) {
+                        AnimationUtils.fadeAlpha(scene, scene._mainContainer, 0, 1).then(() => {
+                            // sceneDirector.changeScene('test');
+                            uiDirector.pop();
+                            uiDirector.push('characterSelection');
+                        });
+                    }
                 });
             }
         }, () => {

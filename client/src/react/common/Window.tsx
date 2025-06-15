@@ -1,6 +1,6 @@
 // React integration of `createFrameNefrexSettings`.
 import { Animator } from '@arwes/react'
-import { FrameHeader, FrameNefrex, FrameLines } from '@arwes/react'
+import { FrameHeader, FrameLines } from '@arwes/react'
 import { Illuminator } from '@arwes/react'
 import { BleepsOnAnimator, styleFrameClipOctagon } from '@arwes/react';
 
@@ -20,7 +20,7 @@ type BleepsNames = 'hover' | 'click' | 'assemble' | 'type'
 export const Window: React.FC<WindowProps> = ({ children, title = 'Unknown', x = '50%', y = '50%', width = 300, height = 'auto', className = '', style = {}}) => {
     return (
         <Animator>
-            <div style={{ position: 'absolute', left: x, top: y, transform: 'translate(-50%, -50%)', width: width, height: height, padding: 10, pointerEvents: 'all',userSelect:'auto', border: 0, boxShadow: 'rgb(from var(--background-color) r g b / 20%) 1px 3px 50px'}} className={className} >
+            <div style={{ position: 'absolute', left: x, top: y, transform: 'translate(-50%, -50%)', width: width, height: height, padding: 10, pointerEvents: 'all',userSelect:'auto', border: 0, boxShadow: 'rgb(from var(--background-color) r g b / 20%) 1px 3px 50px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}} className={className} >
                 <FrameLines
                     style={{
                         // @ts-expect-error css variables
@@ -57,7 +57,7 @@ export const Window: React.FC<WindowProps> = ({ children, title = 'Unknown', x =
                         </marquee>
                     </div> </> : <></>}
                 </div>
-                <div style={{ zIndex: 20, marginTop: -50, paddingLeft: 8, paddingRight: 8, paddingTop: 0, color: 'var(--main-color)', height: 'calc(100% - (45px/2))', width: '100%', ...style, textShadow: 'var(--background-color) 0px 0px 5px' }}>
+                <div style={{ zIndex: 20, marginTop: -32, paddingLeft: 8, paddingRight: 8, paddingTop: 0, color: 'var(--main-color)', height: 'calc(100% - (45px/2))', width: '100%', ...style, textShadow: 'var(--background-color) 0px 0px 5px' }}>
                     {children}
                 </div>
             </div>

@@ -2,7 +2,6 @@ import { NetworkSettings } from "@/config/Network";
 import { useAuthStore } from "@/stores/AuthStore";
 import { useNetworkStore } from "@/stores/NetworkStore";
 import { Client, Room } from "colyseus.js";
-import { IAuthTokens } from "@project-override/shared/messages/Auth"
 import { ServerErrorMessageTypeEnum } from "@project-override/shared/messages/ServerError";
 
 export class NetworkService {

@@ -2,24 +2,27 @@ import React, { useEffect, useState } from 'react';
 import { useGameEngine } from '@/context/GameEngine';
 import { Alert, AlertProps } from '../common/Alert';
 import ToastComponent, { ToastProps as ExternalToastProps, ToastCorner } from '../common/Toast';
-import { BaseScreen } from '../screens/BaseScreen';
 import { LoginScreen } from '../screens/LoginScreen';
+import { CharacterSelectionScreen } from '../screens/CharacterSelectionScreen';
+import { SettingsScreen } from '../screens/SettingsScreen';
 
 const SCREEN_MAP: { [key: string]: React.FC<any> } = {
-  login: LoginScreen
+  login: LoginScreen,
+  characterSelection: CharacterSelectionScreen,
+  settings: SettingsScreen
 };
 
 // Placeholder component until actual scenes are created
 const PlaceholderUI: React.FC<{ screenName: string }> = ({ screenName }) => (
 	<div style={{ position: 'absolute', top: '50px', left: '10px', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '10px', pointerEvents: 'auto', zIndex: 100 }}>
-		Current Screen Placeholder:
+		Screen Placeholder:
 		<br />
 		{screenName || "No Active Screen"}
 	</div>
 );
 
 const UiOverlay: React.FC = () => {
-	const { uiDirector, uiUpdateCount } = useGameEngine();
+	const { uiDirector, uiUpdateCount, sceneDirector, gameEngine } = useGameEngine();
 	const [activeScreenId, setActiveScreenId] = useState<string | null>('initializing');
 
 	const [currentAlerts, setCurrentAlerts] = useState<AlertProps[]>([]);
@@ -39,6 +42,18 @@ const UiOverlay: React.FC = () => {
 			setCurrentToasts(toasts);
 		}
 	}, [uiDirector, uiUpdateCount]); // Re-run when uiDirector instance or uiUpdateCount changes
+
+	const [fps, setFps] = useState<number>(0);
+
+	useEffect(() => {
+		const fpsUpdater = setInterval(() => {
+			if(gameEngine && gameEngine.engine)
+				setFps(Math.trunc(gameEngine.engine.getFps()));
+		}, 500);
+		return () => {
+			clearInterval(fpsUpdater);
+		}
+	}, [])
 
 	const renderToastsForCorner = (corner: ToastCorner) => {
 		return currentToasts
@@ -76,7 +91,7 @@ const UiOverlay: React.FC = () => {
 			{ActiveScreenComponent ? (
                 <ActiveScreenComponent />
             ) : (
-                <PlaceholderUI screenName={activeScreenId || "None"} />
+				<PlaceholderUI screenName={activeScreenId || "None"} />
             )}
 
 			{currentAlerts.map((alert) => (
@@ -98,10 +113,13 @@ const UiOverlay: React.FC = () => {
 			))}
 
 			{/* Debugging output: */}
-			{/* <div style={{ position: 'fixed', bottom: '10px', left: '10px', background: 'rgba(200,200,200,0.8)', color: 'black', padding: '5px', pointerEvents: 'auto', zIndex: 200, fontSize: '12px' }}>
-				Active Screen: { currentScreenNode ? (currentScreenNode as any)?.constructor?.name : 'None' }
+			<div style={{ position: 'fixed', bottom: '10px', left: '10px', background: 'rgba(200,200,200,0.8)', color: 'black', padding: '5px', pointerEvents: 'auto', zIndex: 200, fontSize: '12px' }}>
+				Active Scene: { sceneDirector.getActiveScene()?.constructor.name || 'None' }
+				<br/>FPS: { fps }
+				<br/>
+				<br/>Active Screen: { activeScreenId ? activeScreenId : 'None' }
 				<br/>Update Count: {uiUpdateCount} | Alive Screen: {uiDirector?.currentScreens?.length} | Alerts: {currentAlerts.length} | Toasts: {currentToasts.length}
-			</div> */}
+			</div>
 		</div>
 	);
 };

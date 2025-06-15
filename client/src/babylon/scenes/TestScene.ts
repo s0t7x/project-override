@@ -11,7 +11,6 @@ import DEV_TESTMAP from '@/data/dev_TestMap_Big.json';
 import blockDefinitionsData from '@/data/DT_BlockDefinitions.json';
 import { ICharacterSummary } from '@project-override/shared/core/CharacterSummary';
 import { PlayerController } from '../prefabs/PlayerController';
-import { SPRITE_PLANE_LAYER } from '../prefabs/SpriteSheetPlane';
 import { Plant } from '../prefabs/Plant';
 import { StaticProp } from '../prefabs/StaticProp';
 

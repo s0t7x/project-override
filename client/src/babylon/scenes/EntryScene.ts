@@ -2,7 +2,6 @@ import * as BABYLON from '@babylonjs/core';
 import * as GUI from '@babylonjs/gui';
 import { BaseScene } from './BaseScene';
 import { useGeneralStore } from '@/stores/GeneralStore';
-import { useNetworkStore } from '@/stores/NetworkStore';
 import { useServiceStore } from '@/stores/ServiceStore';
 import { AnimationUtils } from '../utils/AnimationUtils'; // Adjust path as needed
 

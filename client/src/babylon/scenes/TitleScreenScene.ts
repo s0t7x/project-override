@@ -6,14 +6,12 @@ import { BaseScene } from './BaseScene';
 import { useGeneralStore } from '@/stores/GeneralStore';
 import { useServiceStore } from '@/stores/ServiceStore';
 import { AnimationUtils } from '../utils/AnimationUtils';
-import { useGameEngine } from '@/context/GameEngine';
-import { LoginScreen } from '@/react/screens/LoginScreen';
 
 export const UI_LAYER = 0x10000000;
 
 export class TitleScreenScene extends BaseScene {
     private _advancedTexture!: GUI.AdvancedDynamicTexture;
-    private _mainContainer!: GUI.Container;
+    public _mainContainer!: GUI.Container;
     private _ctaText!: GUI.TextBlock;
     private _ctaSkipped: boolean = false;
     private _pointerDownObserver: BABYLON.Observer<BABYLON.PointerInfo> | null = null;
@@ -107,7 +105,8 @@ export class TitleScreenScene extends BaseScene {
         pipeline.grain.animated = true;
 
         pipeline.imageProcessingEnabled = true;
-        pipeline.imageProcessing.exposure = 1.2;
+        pipeline.imageProcessing.exposure = 1.4;
+        pipeline.imageProcessing.contrast = 0.9;
 
         // Depth of Field - Blurs the background, focusing on the UI/Logo.
         pipeline.depthOfFieldEnabled = true;
@@ -342,7 +341,7 @@ export class TitleScreenScene extends BaseScene {
         titleLogo.paddingBottom = "40%";
         this._mainContainer.addControl(titleLogo);
 
-        this._ctaText = new GUI.TextBlock("cta", "Press any Key");
+        this._ctaText = new GUI.TextBlock("cta", "Start Game");
         this._ctaText.color = "black";
         this._ctaText.fontSize = "28px";
         this._ctaText.outlineColor = "#ffffffce";
@@ -383,9 +382,9 @@ export class TitleScreenScene extends BaseScene {
         this._ctaSkipped = true;
 
         console.log("TitleScreenScene: Input received. Showing debug alert.");
-        // You can add a fade-out animation here if you wish before showing the alert
-
+        
         useGeneralStore.getState().gameEngine?.uiDirector?.push('login');
+
         // this._showDebugAlert();
     };
 
@@ -417,25 +416,25 @@ export class TitleScreenScene extends BaseScene {
         });
     }
 
-    private _showDebugAlert() {
-        const uiDirector = useGeneralStore.getState().gameEngine?.uiDirector;
-        if (!uiDirector) return;
-		uiDirector.showAlert(
-				'Dev Build',
-				``,
-				new Map([[
-						'Test Scene',
-						() => {
-							uiDirector.closeAlert('Dev Build');
-							useGeneralStore.getState().gameEngine?.changeScene('test');
-						}
-					],[
-						'Editor',
-						() => {
-							uiDirector.closeAlert('Dev Build');
-							useGeneralStore.getState().gameEngine?.changeScene('testEditor');
-						}
-					]]
-			))
-	}
+    // private _showDebugAlert() {
+    //     const uiDirector = useGeneralStore.getState().gameEngine?.uiDirector;
+    //     if (!uiDirector) return;
+	// 	uiDirector.showAlert(
+	// 			'Dev Build',
+	// 			``,
+	// 			new Map([[
+	// 					'Test Scene',
+	// 					() => {
+	// 						uiDirector.closeAlert('Dev Build');
+	// 						useGeneralStore.getState().gameEngine?.changeScene('test');
+	// 					}
+	// 				],[
+	// 					'Editor',
+	// 					() => {
+	// 						uiDirector.closeAlert('Dev Build');
+	// 						useGeneralStore.getState().gameEngine?.changeScene('testEditor');
+	// 					}
+	// 				]]
+	// 		))
+	// }
 }

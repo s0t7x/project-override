@@ -10,7 +10,6 @@ import { BlockDefinition } from '../utils/BlockDefinition';
 import DEV_TESTMAP from '@/data/dev_TestMap_Big.json';
 import blockDefinitionsData from '@/data/DT_BlockDefinitions.json';
 import { ICharacterSummary } from '@project-override/shared/core/CharacterSummary';
-import { SpriteSheetCharacter, CharacterDirection } from '../prefabs/SpriteSheetCharacter';
 import { Plant } from '../prefabs/Plant';
 import { StaticProp } from '../prefabs/StaticProp';
 import { PlayerController } from '../prefabs/PlayerController';

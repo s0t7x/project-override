@@ -28,7 +28,6 @@ export const Button: React.FC<ButtonProps> = (props: any) => {
         onClick?.(event)
       }}
         {...rest}
-        style={{}}
     >
       <div className="button-content">{children}</div>
     </Animated>

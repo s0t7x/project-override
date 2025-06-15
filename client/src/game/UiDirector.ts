@@ -1,6 +1,5 @@
 import { AlertProps } from '@/react/common/Alert';
 import { ToastProps, ToastCorner } from '@/react/common/Toast'; // Import ToastProps and ToastCorner
-import { BaseScreen } from '@/react/screens/BaseScreen';
 
 export class UiDirector {
 	public currentScreens: string[] = [];

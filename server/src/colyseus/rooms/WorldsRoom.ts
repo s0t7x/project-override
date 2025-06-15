@@ -46,8 +46,8 @@ export class WorldsRoom extends Room<WorldsRoomState> {
 		});
 	}
 
-	async onAuth(client: Client, options: { characterId?: string }, context: AuthContext): Promise<IWorldsRoomAuthData> {
-		const { token } = context; // Access token from client's `joinOrCreate` options or context
+	async onAuth(client: Client, options: { characterId?: string, token?: string }, context: AuthContext): Promise<IWorldsRoomAuthData> {
+		const token = context?.token || options?.token || undefined;
 		const characterId = options?.characterId;
 
 		if (!token) {
