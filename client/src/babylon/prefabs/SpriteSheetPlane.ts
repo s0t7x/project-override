@@ -32,7 +32,8 @@ export class SpriteSheetPlane {
         name: string,
         scene: B.Scene,
         initialPosition: B.Vector3 = Vector3.Zero(),
-        planeSize: B.Vector2 = new B.Vector2(1, 1)
+        planeSize: B.Vector2 = new B.Vector2(1, 1),
+        customCollisionMesh?: B.Mesh
     ) {
         this.name = name;
         this.scene = scene;
@@ -57,9 +58,13 @@ export class SpriteSheetPlane {
         this.mesh.receiveShadows = true;
         this.mesh.layerMask = SPRITE_PLANE_LAYER;
         // this.mesh.renderingGroupId = 1;
-        this.mesh.scaling = new Vector3(planeSize.x, planeSize.y, 1.0);
-
-        this.collisionMesh = B.MeshBuilder.CreateBox(`${name}_collision`, { size: this.planeSize }, this.scene);
+        this.mesh.scaling = new Vector3(planeSize.x, planeSize.y, planeSize.x);
+        
+        if(customCollisionMesh) {
+            this.collisionMesh = customCollisionMesh;
+        } else {
+            this.collisionMesh = B.MeshBuilder.CreateBox(`${name}_collision`, { size: this.planeSize }, this.scene);
+        }
         this.collisionMesh.parent = this.mesh;
         this.collisionMesh.isPickable = false;
         this.collisionMesh.visibility = 0;
